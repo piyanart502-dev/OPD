@@ -565,6 +565,25 @@
     .ec-right .cpf-inner .field label{white-space:nowrap;font-size:11px;}
     #recordForm > .actions{margin:14px -18px -16px;}
   }
+
+  /* ===== Problems page ===== */
+  .prob-layout{display:grid;grid-template-columns:minmax(0,1.6fr) minmax(0,1fr);gap:12px;align-items:start;}
+  .prob-layout .p1-card{margin-bottom:12px;}
+  .prob-side .p1-card:last-child{margin-bottom:0;}
+  .prob-group{padding:10px 12px 12px;border-radius:12px;background:#F8FAFC;border:1px solid var(--line);margin-bottom:10px;}
+  .prob-group:last-child{margin-bottom:0;}
+  .prob-head{display:flex;align-items:center;gap:8px;font-family:'Prompt',sans-serif;font-weight:600;font-size:14px;margin-bottom:8px;}
+  .pg-dot{width:10px;height:10px;border-radius:50%;background:var(--main);}
+  .g-phys .pg-dot{background:#EF4444;} .g-beh .pg-dot{background:#F59E0B;} .g-soc .pg-dot{background:#3B82F6;}
+  .pc-count{margin-left:auto;min-width:24px;text-align:center;font-size:12px;font-weight:700;padding:1px 8px;border-radius:999px;background:#E2E8F0;color:#64748B;}
+  .pc-count.has{background:var(--main);color:#fff;}
+  .prob-group .checkrow{gap:6px;}
+  .prob-group .checkrow label{background:#fff;font-size:13px;padding:5px 11px;}
+  .advice-row label{flex:1 1 calc(50% - 8px);border-radius:12px;padding:10px 12px;font-weight:600;justify-content:flex-start;}
+  .prob-side input[type=text]{width:100%;border:1.5px solid var(--line);border-radius:10px;padding:8px 11px;background:#F8FAFC;font-size:14px;}
+  .prob-side input[type=text]:focus{background:#fff;border-color:var(--main);box-shadow:0 0 0 3px rgba(15,118,110,.15);outline:none;}
+  .prob-side textarea{width:100%;min-height:110px;resize:vertical;}
+  @media (max-width:900px){ .prob-layout{grid-template-columns:1fr;} }
 </style>
 </head>
 <body>
@@ -1060,15 +1079,12 @@
       <div class="ibw-note" style="margin-top:8px;">เกณฑ์: ≤5 เสี่ยงต่ำ · 6–9 เสี่ยงปานกลาง · 10–13 เสี่ยงสูง · 14–15 เสี่ยงสูงมาก (พิจารณาแยกคะแนนแต่ละหมวด — บางข้อเป็นพฤติกรรมที่ดี ทำบ่อยจะได้คะแนนต่ำ)</div>
       </div><!-- /step 4 -->
       <div class="form-step" data-step="4">
-      <div class="panel" style="background:var(--paper);padding:16px;margin:0;">
-        <div class="gauge-label-row"><span>ปัญหา/อุปสรรคในการปฏิบัติตามแผนโภชนบำบัด</span></div>
-        <div class="ibw-note" style="margin-top:4px;">แยกตามหมวด — ติ๊กได้หลายข้อในแต่ละหมวด</div>
-      </div>
-
-      <div class="panel" style="background:var(--paper);padding:16px;margin-top:14px;">
-        <div class="gauge-label-row"><span>หมวดร่างกาย/อาการ</span></div>
-        <div class="checkrow" style="margin-top:10px;">
-          <label><input type="checkbox" name="probPhysical" value="เคี้ยวลำบาก/ปัญหาช่องปาก-ฟัน"> เคี้ยวลำบาก/ปัญหาช่องปาก-ฟัน</label>
+      <div class="prob-layout">
+        <div class="prob-main p1-card">
+          <div class="p1-title"><span class="p1-ic">⚠️</span>ปัญหา/อุปสรรคในการปฏิบัติตามแผน <small>ติ๊กได้หลายข้อในแต่ละหมวด</small></div>
+          <div class="prob-group g-phys">
+            <div class="prob-head"><span class="pg-dot"></span>ร่างกาย/อาการ<span class="pc-count" data-for="probPhysical">0</span></div>
+            <div class="checkrow"><label><input type="checkbox" name="probPhysical" value="เคี้ยวลำบาก/ปัญหาช่องปาก-ฟัน"> เคี้ยวลำบาก/ปัญหาช่องปาก-ฟัน</label>
           <label><input type="checkbox" name="probPhysical" value="เบื่ออาหาร/รับประทานได้น้อย"> เบื่ออาหาร/รับประทานได้น้อย</label>
           <label><input type="checkbox" name="probPhysical" value="คลื่นไส้/อาเจียน"> คลื่นไส้/อาเจียน</label>
           <label><input type="checkbox" name="probPhysical" value="กลืนลำบาก"> กลืนลำบาก</label>
@@ -1078,49 +1094,38 @@
           <label><input type="checkbox" name="probPhysical" value="การเจ็บปวดตามร่างกาย"> การเจ็บปวดตามร่างกาย</label>
           <label><input type="checkbox" name="probPhysical" value="นอนไม่หลับ/พักผ่อนไม่เพียงพอ"> นอนไม่หลับ/พักผ่อนไม่เพียงพอ</label>
           <label><input type="checkbox" name="probPhysical" value="ความเครียด"> ความเครียด</label>
-          <label><input type="checkbox" name="probPhysical" value="กรดไหลย้อน"> กรดไหลย้อน</label>
-        </div>
-      </div>
-
-      <div class="panel" style="background:var(--paper);padding:16px;margin-top:14px;">
-        <div class="gauge-label-row"><span>หมวดความรู้/พฤติกรรม</span></div>
-        <div class="checkrow" style="margin-top:10px;">
-          <label><input type="checkbox" name="probBehavior" value="ขาดความรู้ความเข้าใจเรื่องโภชนาการ"> ขาดความรู้ความเข้าใจเรื่องโภชนาการ</label>
+          <label><input type="checkbox" name="probPhysical" value="กรดไหลย้อน"> กรดไหลย้อน</label></div>
+          </div>
+          <div class="prob-group g-beh">
+            <div class="prob-head"><span class="pg-dot"></span>ความรู้/พฤติกรรม<span class="pc-count" data-for="probBehavior">0</span></div>
+            <div class="checkrow"><label><input type="checkbox" name="probBehavior" value="ขาดความรู้ความเข้าใจเรื่องโภชนาการ"> ขาดความรู้ความเข้าใจเรื่องโภชนาการ</label>
           <label><input type="checkbox" name="probBehavior" value="ยา: รับประทานยาไม่ถูกต้อง"> ยา: รับประทานยาไม่ถูกต้อง</label>
           <label><input type="checkbox" name="probBehavior" value="ไม่ให้ความร่วมมือ/ไม่ปฏิบัติตามคำแนะนำ"> ไม่ให้ความร่วมมือ/ไม่ปฏิบัติตามคำแนะนำ</label>
-          <label><input type="checkbox" name="probBehavior" value="รับประทานอาหารไม่ตรงเวลา"> รับประทานอาหารไม่ตรงเวลา</label>
-        </div>
-      </div>
-
-      <div class="panel" style="background:var(--paper);padding:16px;margin-top:14px;">
-        <div class="gauge-label-row"><span>หมวดเศรษฐกิจ/สังคม</span></div>
-        <div class="checkrow" style="margin-top:10px;">
-          <label><input type="checkbox" name="probSocial" value="ข้อจำกัดด้านเศรษฐกิจ/ค่าใช้จ่ายอาหาร"> ข้อจำกัดด้านเศรษฐกิจ/ค่าใช้จ่ายอาหาร</label>
+          <label><input type="checkbox" name="probBehavior" value="รับประทานอาหารไม่ตรงเวลา"> รับประทานอาหารไม่ตรงเวลา</label></div>
+          </div>
+          <div class="prob-group g-soc">
+            <div class="prob-head"><span class="pg-dot"></span>เศรษฐกิจ/สังคม<span class="pc-count" data-for="probSocial">0</span></div>
+            <div class="checkrow"><label><input type="checkbox" name="probSocial" value="ข้อจำกัดด้านเศรษฐกิจ/ค่าใช้จ่ายอาหาร"> ข้อจำกัดด้านเศรษฐกิจ/ค่าใช้จ่ายอาหาร</label>
           <label><input type="checkbox" name="probSocial" value="อาศัยอยู่คนเดียว"> อาศัยอยู่คนเดียว</label>
           <label><input type="checkbox" name="probSocial" value="ไม่มีผู้ดูแล/ช่วยเตรียมอาหาร"> ไม่มีผู้ดูแล/ช่วยเตรียมอาหาร</label>
           <label><input type="checkbox" name="probSocial" value="เข้าถึงอาหารที่เหมาะสมได้ยาก"> เข้าถึงอาหารที่เหมาะสมได้ยาก</label>
           <label><input type="checkbox" name="probSocial" value="ข้อจำกัดทางวัฒนธรรม/ศาสนา"> ข้อจำกัดทางวัฒนธรรม/ศาสนา</label>
           <label><input type="checkbox" name="probSocial" value="ดูแลผู้ป่วยติดเตียง"> ดูแลผู้ป่วยติดเตียง</label>
-          <label><input type="checkbox" name="probSocial" value="ดูแล เลี้ยงดูเด็กต่ำกว่า 5 ปี"> ดูแล เลี้ยงดูเด็กต่ำกว่า 5 ปี</label>
+          <label><input type="checkbox" name="probSocial" value="ดูแล เลี้ยงดูเด็กต่ำกว่า 5 ปี"> ดูแล เลี้ยงดูเด็กต่ำกว่า 5 ปี</label></div>
+          </div>
         </div>
-      </div>
-
-      <div class="panel" style="background:var(--paper);padding:16px;margin-top:14px;">
-        <div class="gauge-label-row"><span>การให้คำแนะนำโภชนาการ (Advice)</span></div>
-        <div class="checkrow" style="margin-top:10px;">
-          <label><input type="checkbox" name="advice" value="DM diet"> DM diet</label>
+        <div class="prob-side">
+          <div class="p1-card">
+            <div class="p1-title"><span class="p1-ic">🥗</span>คำแนะนำโภชนาการ <small>เลือกสูตรอาหารที่แนะนำ</small></div>
+            <div class="checkrow advice-row"><label><input type="checkbox" name="advice" value="DM diet"> DM diet</label>
           <label><input type="checkbox" name="advice" value="CKD diet"> CKD diet</label>
           <label><input type="checkbox" name="advice" value="DASH diet"> DASH diet</label>
-          <label><input type="checkbox" id="f_advice_other_chk" onchange="toggleAdviceOther()"> อื่นๆ</label>
-        </div>
-        <input type="text" id="f_advice_other" placeholder="ระบุคำแนะนำโภชนาการอื่นๆ" style="display:none;margin-top:10px;">
-      </div>
-
-      <div class="panel" style="background:var(--paper);padding:16px;margin-top:14px;">
-        <div class="grid">
-          <div class="field span4">
-            <label>รายละเอียดเพิ่มเติม / แนวทางแก้ไข</label>
-            <textarea id="f_problemNote" placeholder="อธิบายปัญหาหรืออุปสรรคเพิ่มเติม และแนวทางที่วางแผนแก้ไข"></textarea>
+          <label><input type="checkbox" id="f_advice_other_chk" onchange="toggleAdviceOther()"> อื่นๆ</label></div>
+            <input type="text" id="f_advice_other" placeholder="ระบุคำแนะนำโภชนาการอื่นๆ" style="display:none;margin-top:10px;">
+          </div>
+          <div class="p1-card">
+            <div class="p1-title"><span class="p1-ic">📝</span>รายละเอียดเพิ่มเติม</div>
+            <textarea id="f_problemNote" rows="5" placeholder="อธิบายปัญหาหรืออุปสรรคเพิ่มเติม และแนวทางที่วางแผนแก้ไข"></textarea>
           </div>
         </div>
       </div>
@@ -1488,11 +1493,21 @@ const STEP_META = {
   6:['ข้อมูลระบุตัวผู้ป่วย','ดูข้อมูลผู้ป่วยโดยย่อ'],
   7:['แดชบอร์ดรายเดือน','สถิติผู้รับบริการและผลการประเมินรายเดือน']
 };
+
+function updateProbCounts(){
+  document.querySelectorAll('.pc-count').forEach(el=>{
+    const n=document.querySelectorAll('input[name="'+el.dataset.for+'"]:checked').length;
+    el.textContent=n; el.classList.toggle('has',n>0);
+  });
+}
+document.addEventListener('change',function(e){ if(e.target && e.target.name && /^prob/.test(e.target.name)) updateProbCounts(); });
+
 function updateStepHeader(n){
   const m = STEP_META[n]; if(!m) return;
   const t=document.getElementById('shTitle'); if(!t) return;
   t.textContent = m[0];
   document.getElementById('shSub').textContent = m[1];
+  updateProbCounts();
   document.getElementById('shCount').textContent = 'ขั้นที่ '+n+' / '+TOTAL_STEPS;
   document.getElementById('stepProgress').style.width = (n/TOTAL_STEPS*100)+'%';
 }
