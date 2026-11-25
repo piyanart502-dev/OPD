@@ -1752,6 +1752,7 @@ function toggleAdviceOther(){
 
 function setGenderSwitch(val){
   document.getElementById('f_gender').value = val;
+  if(typeof renderLabTable==='function' && document.querySelector('[data-name="UricAcid"]')) updateLabPill('UricAcid');
   document.querySelectorAll('.gender-switch-opt').forEach(btn=>{
     btn.classList.toggle('active', btn.dataset.val === val);
   });
@@ -1850,6 +1851,7 @@ const LAB_PRESETS = [
   {name:'K', label:'Potassium (K)', unit:'mEq/L', type:'range', min:3.5, max:5.0, refText:'3.5-5.0'},
   {name:'Cholesterol', label:'Cholesterol', unit:'mg/dL', type:'max', max:200, refText:'<200'},
   {name:'Triglyceride', label:'Triglyceride', unit:'mg/dL', type:'max', max:150, refText:'<150'},
+  {name:'UricAcid', label:'Uric acid', unit:'mg/dL', type:'range', min:3.4, max:7.0, refText:'ชาย 3.4-7.0 · หญิง 2.4-6.0', byGender:{'ชาย':[3.4,7.0],'หญิง':[2.4,6.0]}},
   {name:'BP', label:'Blood Pressure', unit:'mmHg', type:'bp', sysMax:120, diaMax:80, refText:'<120/80'}
 ];
 
@@ -1896,6 +1898,7 @@ function updateLabPill(name){
     const val = parseFloat(row.querySelector('.lab-val').value);
     if(isNaN(val)){ pill.className='lab-pill'; pill.textContent='–'; return; }
     if(preset.type==='range'){
+      if(preset.byGender){ const g=preset.byGender[document.getElementById('f_gender').value]||[preset.min,preset.max]; preset={...preset,min:g[0],max:g[1]}; }
       if(val<preset.min){ status='low'; label='ต่ำกว่าปกติ'; }
       else if(val>preset.max){ status='high'; label='สูงกว่าปกติ'; }
       else { status='normal'; label='ปกติ'; }
