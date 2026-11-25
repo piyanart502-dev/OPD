@@ -526,7 +526,8 @@
   .form-step[data-step="2"] #energyInline{font-size:14px;}
   .p1-sub{font-family:'Prompt',sans-serif;font-size:13.5px;font-weight:600;margin:14px 0 8px;padding-left:10px;border-left:4px solid var(--main);}
   #energyCard .grid.c2{gap:12px;}
-  #energyCard .cpf-inner{margin-top:4px;}
+  #energyCard .cpf-inner,#energyCard .prot-inner{margin-top:4px;}
+  #energyCard .prot-inner .p1-sub{margin-top:14px;}
   .actions{box-shadow:0 -6px 16px rgba(15,23,42,.05);}
   #btnNext,#btnSubmit{min-width:130px;}
   @media (max-width:600px){ .sh-title{font-size:17px;} .sh-sub{font-size:12px;} .patient-chip small{display:none;} header.top h1{font-size:16px;} }
@@ -549,7 +550,7 @@
     <form id="recordForm">
       <div class="step-indicator">
         <div class="step-dot active" data-step="1" onclick="goToStep(1)" style="cursor:pointer;"><span class="num">1</span><span class="label">ข้อมูลผู้ป่วย / พลังงาน / แลป</span></div>
-        <div class="step-dot" data-step="2" onclick="goToStep(2)" style="cursor:pointer;"><span class="num">2</span><span class="label">โปรตีน & แลกเปลี่ยน</span></div>
+        <div class="step-dot" data-step="2" onclick="goToStep(2)" style="cursor:pointer;"><span class="num">2</span><span class="label">อาหารแลกเปลี่ยน</span></div>
         <div class="step-dot" data-step="3" onclick="goToStep(3)" style="cursor:pointer;"><span class="num">3</span><span class="label">24-hr Recall</span></div>
         <div class="step-dot" data-step="4" onclick="goToStep(4)" style="cursor:pointer;"><span class="num">4</span><span class="label">ประเมิน NCDs</span></div>
         <div class="step-dot" data-step="5" onclick="goToStep(5)" style="cursor:pointer;"><span class="num">5</span><span class="label">ปัญหา / อุปสรรค</span></div>
@@ -632,6 +633,41 @@
           </label>
         </div>
       </div>
+        <div class="prot-inner">
+        <div class="p1-sub">ความต้องการโปรตีน (Protein requirement)</div>
+        <div class="grid c2">
+          <div class="field">
+            <label>g โปรตีน ต่อ kg IBW</label>
+            <input type="number" step="0.1" id="f_proteinPerKg" value="1.1" oninput="computeProtein()">
+            <div class="ibw-note" style="margin-top:0;">g/kg</div>
+          </div>
+        </div>
+
+        <div class="field" id="pregProteinField" style="display:none;margin-top:12px;">
+          <label style="display:flex;align-items:center;gap:8px;font-weight:400;font-size:13.5px;">
+            <input type="checkbox" id="f_pregProteinAddon" onchange="computeProtein()"> เพิ่มโปรตีนสำหรับการตั้งครรภ์ (ไตรมาส 2-3)
+          </label>
+          <div class="grid c2" style="margin-top:8px;">
+            <div class="field">
+              <label>ปริมาณที่เพิ่ม (g/วัน)</label>
+              <input type="number" id="f_pregProteinG" value="25" min="10" max="25" step="1" oninput="computeProtein()">
+              <div class="ibw-note" style="margin-top:0;">แนะนำ 10–25 g/วัน</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="grid c3" style="display:none;">
+          <div>
+            <b id="proteinTotalG">–</b>
+          </div>
+          <div>
+            <b id="proteinTotalKcal">–</b>
+          </div>
+          <div>
+            <b id="proteinPctOfEnergy">–</b>
+          </div>
+        </div>
+      </div>
         <div class="cpf-inner">
         <div class="p1-sub">สัดส่วนสารอาหาร C : P : F</div>
         <div class="grid c3" style="margin-top:10px;">
@@ -680,47 +716,13 @@
       <span id="ibwValue" style="display:none;">–</span>
 
 
-      <div class="panel" style="background:var(--paper);padding:16px;margin-top:14px;">
-        <div class="gauge-label-row"><span>ความต้องการโปรตีน (Protein requirement)</span></div>
-        <div class="grid c2" style="margin-top:10px;">
-          <div class="field">
-            <label>g โปรตีน ต่อ kg IBW</label>
-            <input type="number" step="0.1" id="f_proteinPerKg" value="1.1" oninput="computeProtein()">
-            <div class="ibw-note" style="margin-top:0;">g/kg</div>
-          </div>
-        </div>
-
-        <div class="field" id="pregProteinField" style="display:none;margin-top:12px;">
-          <label style="display:flex;align-items:center;gap:8px;font-weight:400;font-size:13.5px;">
-            <input type="checkbox" id="f_pregProteinAddon" onchange="computeProtein()"> เพิ่มโปรตีนสำหรับการตั้งครรภ์ (ไตรมาส 2-3)
-          </label>
-          <div class="grid c2" style="margin-top:8px;">
-            <div class="field">
-              <label>ปริมาณที่เพิ่ม (g/วัน)</label>
-              <input type="number" id="f_pregProteinG" value="25" min="10" max="25" step="1" oninput="computeProtein()">
-              <div class="ibw-note" style="margin-top:0;">แนะนำ 10–25 g/วัน</div>
-            </div>
-          </div>
-        </div>
-
-        <div class="grid c3" style="display:none;">
-          <div>
-            <b id="proteinTotalG">–</b>
-          </div>
-          <div>
-            <b id="proteinTotalKcal">–</b>
-          </div>
-          <div>
-            <b id="proteinPctOfEnergy">–</b>
-          </div>
-        </div>
-      </div>
+      
 
       
 
       <div class="panel" style="background:var(--paper);padding:16px;margin-top:14px;">
         <div class="gauge-label-row"><span>ตารางอาหารแลกเปลี่ยน (Food Exchange List)</span></div>
-        <div class="ibw-note" style="margin-top:4px;">คำนวณอัตโนมัติจากพลังงานและสัดส่วนสารอาหาร (หน้า 1) — ปรับจำนวนหน่วยนม/ผัก/ผลไม้ได้ ส่วนข้าว-แป้ง/เนื้อสัตว์/ไขมัน ระบบคำนวณให้ครบตามที่เหลือ (ค่าอ้างอิงจากรายการอาหารแลกเปลี่ยนไทย มาตรฐานสมาคมนักกำหนดอาหารแห่งประเทศไทย)</div>
+        <div class="ibw-note" style="margin-top:4px;">คำนวณอัตโนมัติจากพลังงานและสัดส่วนสารอาหาร — ปรับจำนวนหน่วยนม/ผัก/ผลไม้ได้ ส่วนข้าว-แป้ง/เนื้อสัตว์/ไขมัน ระบบคำนวณให้ครบตามที่เหลือ (ค่าอ้างอิงจากรายการอาหารแลกเปลี่ยนไทย มาตรฐานสมาคมนักกำหนดอาหารแห่งประเทศไทย)</div>
 
         <div class="lab-table-wrap" style="margin-top:12px;">
           <table class="lab-table">
@@ -1430,8 +1432,8 @@ function renderSummary(){
 
 
 const STEP_META = {
-  1:['ข้อมูลผู้ป่วย','กรอกข้อมูลทั่วไป น้ำหนัก ส่วนสูง พลังงาน และผลตรวจทางห้องปฏิบัติการ'],
-  2:['โปรตีนและอาหารแลกเปลี่ยน','กำหนดโปรตีนและดูจำนวนหน่วยอาหารแลกเปลี่ยนที่แนะนำ'],
+  1:['ข้อมูลผู้ป่วย','กรอกข้อมูลทั่วไป น้ำหนัก ส่วนสูง พลังงาน โปรตีน และผลตรวจทางห้องปฏิบัติการ'],
+  2:['อาหารแลกเปลี่ยน','จำนวนหน่วยอาหารแลกเปลี่ยนที่แนะนำตามพลังงานและสัดส่วนสารอาหาร'],
   3:['24-hr Dietary Recall','บันทึกอาหารที่ผู้ป่วยรับประทานในแต่ละมื้อ เทียบกับเป้าหมาย'],
   4:['ประเมินพฤติกรรม (Eat Test)','คะแนนพฤติกรรมการบริโภคหวาน มัน เค็ม'],
   5:['ปัญหา/อุปสรรค และคำแนะนำ','ติ๊กปัญหาที่พบและคำแนะนำที่ให้แก่ผู้ป่วย'],
@@ -1589,7 +1591,7 @@ function computeCPF(){
   }
 
   const ok = Math.abs(sum - 100) < 0.5;
-  sumNote.innerHTML = `รวม ${sum.toFixed(1)}% ${ok ? '✓' : '⚠'} (โปรตีน ${pp}% มาจากความต้องการโปรตีน (หน้า 2) ปรับคาร์โบไฮเดรต/ไขมันให้รวมครบ 100%)`;
+  sumNote.innerHTML = `รวม ${sum.toFixed(1)}% ${ok ? '✓' : '⚠'} (โปรตีน ${pp}% มาจากความต้องการโปรตีนด้านบน ปรับคาร์โบไฮเดรต/ไขมันให้รวมครบ 100%)`;
   sumNote.style.color = ok ? 'var(--ok)' : 'var(--danger)';
 
   const carbKcal = Math.round(lastEnergyTotal * pc/100);
