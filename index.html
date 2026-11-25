@@ -623,6 +623,31 @@
   .dlg-btns{display:flex;gap:8px;flex-wrap:wrap;justify-content:center;}
   .dlg-btns button{flex:1 1 140px;border:1.5px solid var(--line);background:#fff;border-radius:12px;padding:10px 14px;font:inherit;font-weight:700;cursor:pointer;}
   .dlg-btns button.primary{background:linear-gradient(135deg,#0F766E,#14B8A6);color:#fff;border-color:transparent;}
+
+  /* ===== รายชื่อผู้ป่วย / ประวัติ ===== */
+  .pl-controls{display:flex;gap:12px;align-items:flex-end;flex-wrap:wrap;margin:6px 0 10px;}
+  .pl-all{display:flex;align-items:center;gap:6px;font-weight:600;font-size:13.5px;padding-bottom:9px;cursor:pointer;}
+  .pl-count{font-size:13px;color:#64748B;margin-bottom:6px;}
+  .pl-wrap{overflow-x:auto;border:1px solid var(--line);border-radius:12px;}
+  .pl-table{width:100%;border-collapse:collapse;font-size:13.5px;min-width:640px;}
+  .pl-table th{background:#F1F5F9;color:#475569;font-size:12px;padding:9px 8px;text-align:left;white-space:nowrap;}
+  .pl-table th small{font-weight:500;color:#94A3B8;}
+  .pl-table td{padding:9px 8px;border-top:1px solid var(--line);}
+  .pl-table tr:hover td{background:#F8FAFC;}
+  .pl-name{color:var(--main);font-weight:700;cursor:pointer;text-decoration:underline;text-decoration-style:dotted;background:none;border:none;font:inherit;padding:0;text-align:left;}
+  .pl-empty{text-align:center;color:#94A3B8;padding:26px !important;}
+  .hist-back{align-items:start;overflow:auto;}
+  .hist{background:#fff;border-radius:20px;max-width:720px;width:100%;margin:20px auto;padding:20px;box-shadow:0 20px 60px rgba(0,0,0,.25);}
+  .hist-head{display:flex;justify-content:space-between;gap:10px;align-items:flex-start;margin-bottom:12px;}
+  .hist-head h3{margin:0;font-size:19px;}
+  .hist-sub{font-size:13px;color:#64748B;margin-top:2px;}
+  .hist-card{border:1.5px solid var(--line);border-radius:14px;padding:12px 14px;margin-bottom:10px;background:#F8FAFC;}
+  .hist-card h4{margin:0 0 8px;font-size:14.5px;display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap;color:var(--main);}
+  .hist-card h4 span{font-size:12px;font-weight:600;color:#64748B;}
+  .hist-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:6px 12px;font-size:13px;margin-bottom:6px;}
+  .hist-grid span{color:#64748B;display:block;font-size:11.5px;}
+  .hist-line{font-size:13px;margin-top:5px;}
+  .hist-line b{color:#475569;}
 </style>
 </head>
 <body>
@@ -1107,12 +1132,19 @@
           <button type="button" class="btn-ghost btn-small no-print" onclick="window.print()">🖨️ พิมพ์เอกสาร</button>
         </div>
         <h4>ข้อมูลระบุตัวผู้ป่วย</h4>
-        <div class="summary-grid">
-          <div><span>วันที่บันทึก</span><b id="sum7Date">–</b></div>
-          <div><span>รายชื่อผู้ป่วย</span><b id="sum7Name" class="sum7-editable" onclick="editFromStep7()" title="แตะเพื่อแก้ไขข้อมูล">–</b></div>
-          <div><span>อายุ</span><b id="sum7Age">–</b></div>
-          <div><span>BMI</span><b id="sum7Bmi">–</b></div>
+        <div class="pl-controls no-print">
+          <div class="field" style="margin:0;"><label>เลือกเดือน</label><input type="month" id="plMonth" onchange="renderPatientList()"></div>
+          <label class="pl-all"><input type="checkbox" id="plAll" onchange="renderPatientList()"> ดูทุกเดือน</label>
+          <div class="field" style="margin:0;flex:1 1 200px;"><label>ค้นหา HN / ชื่อ</label><input type="text" id="plSearch" placeholder="พิมพ์เพื่อค้นหา" oninput="renderPatientList()"></div>
         </div>
+        <div class="pl-count" id="plCount"></div>
+        <div class="pl-wrap"><table class="pl-table"><thead><tr><th>#</th><th>วันที่</th><th>HN</th><th>ชื่อ-สกุล <small>(แตะเพื่อดูประวัติ)</small></th><th>แผนก</th><th>อายุ</th><th>BMI</th><th>MNA-SF</th></tr></thead><tbody id="plBody"></tbody></table></div>
+        <div style="display:none">
+          <b id="sum7Date"></b><b id="sum7Name"></b><b id="sum7Age"></b><b id="sum7Bmi"></b>
+        </div>
+      </div>
+      <div class="dlg-back hist-back" id="histBack" style="display:none;" onclick="if(event.target===this)closeHistory()">
+        <div class="hist"><div class="hist-head"><div><h3 id="histTitle"></h3><div class="hist-sub" id="histSub"></div></div><button type="button" class="btn-ghost btn-small" onclick="closeHistory()">✕ ปิด</button></div><div id="histBody"></div></div>
       </div>
       </div><!-- /step 7 -->
 
@@ -1277,6 +1309,56 @@ function renderDashboard(){
   }
 }
 
+
+function escH(t){return String(t==null?'':t).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
+function recBmi(r){
+  const w=parseFloat(r.isPreg&&r.prepregWeight?r.prepregWeight:r.weight), h=parseFloat(r.height);
+  return (w>0&&h>0)?(w/Math.pow(h/100,2)):null;
+}
+function patientKey(r){return (r.hn&&String(r.hn).trim())?'hn:'+String(r.hn).trim().toLowerCase():'nm:'+String(r.name||'').trim().toLowerCase();}
+function renderPatientList(){
+  const mi=document.getElementById('plMonth');
+  if(!mi.value){const n=new Date();mi.value=n.getFullYear()+'-'+String(n.getMonth()+1).padStart(2,'0');}
+  const all=document.getElementById('plAll').checked; mi.disabled=all;
+  const q=document.getElementById('plSearch').value.trim().toLowerCase();
+  const list=records.filter(r=>(all||(r.date&&r.date.startsWith(mi.value)))&&(!q||String(r.hn||'').toLowerCase().includes(q)||String(r.name||'').toLowerCase().includes(q)))
+    .sort((a,b)=>String(b.date).localeCompare(String(a.date)));
+  document.getElementById('plCount').textContent=(all?'ทุกเดือน':'เดือน '+mi.value)+' · '+list.length+' รายการ';
+  const body=document.getElementById('plBody');
+  if(!list.length){body.innerHTML='<tr><td colspan="8" class="pl-empty">ไม่พบข้อมูลที่บันทึกไว้</td></tr>';return;}
+  body.innerHTML=list.map((r,i)=>{
+    const b=recBmi(r), m=r.mna&&typeof r.mna.score==='number'?r.mna.score+'/14':'–';
+    return `<tr><td>${i+1}</td><td>${escH(r.date)}</td><td>${escH(r.hn||'–')}</td><td><button type="button" class="pl-name" data-key="${escH(patientKey(r))}" onclick="openHistory(this.dataset.key)">${escH(r.name||'–')}</button></td><td>${escH(r.dept||'–')}</td><td>${escH(r.age||'–')}</td><td>${b?b.toFixed(1):'–'}</td><td>${m}</td></tr>`;
+  }).join('');
+}
+function openHistory(key){
+  const rs=records.filter(r=>patientKey(r)===key).sort((a,b)=>String(b.date).localeCompare(String(a.date)));
+  if(!rs.length) return;
+  const f=rs[0];
+  document.getElementById('histTitle').textContent=f.name||'–';
+  document.getElementById('histSub').textContent='HN '+(f.hn||'–')+' · '+(f.gender||'')+' · อายุ '+(f.age||'–')+' ปี · บันทึกทั้งหมด '+rs.length+' ครั้ง';
+  const li=(label,arr)=>arr&&arr.length?`<div class="hist-line"><b>${label}:</b> ${arr.map(escH).join(', ')}</div>`:'';
+  document.getElementById('histBody').innerHTML=rs.map(r=>{
+    const b=recBmi(r), m=r.mna&&typeof r.mna.score==='number'?`${r.mna.score}/14 (${escH(r.mna.status)})`:'–';
+    const probs=[].concat(r.probPhysical||[],r.probBehavior||[],r.probSocial||[]);
+    const labs=(r.labs||[]).map(l=>`${l.name} ${l.value} ${l.unit||''}${l.interp&&l.interp!=='–'?' ('+l.interp+')':''}`);
+    return `<div class="hist-card"><h4>${escH(r.date)}<span>${escH(r.dept||'')}</span></h4>
+      <div class="hist-grid">
+        <div><span>น้ำหนัก / ส่วนสูง</span>${escH(r.weight||'–')} kg / ${escH(r.height||'–')} cm</div>
+        <div><span>BMI</span>${b?b.toFixed(1):'–'}</div>
+        <div><span>IBW</span>${escH(r.ibw||'–')} kg</div>
+        <div><span>พลังงานเป้าหมาย</span>${r.energyTotal?Number(r.energyTotal).toLocaleString()+' kcal':'–'}</div>
+        <div><span>โปรตีน</span>${escH(r.proteinPerKg||'–')} g/kg IBW</div>
+        <div><span>C : P : F (%)</span>${escH(r.pctCarb||'–')} : ${escH(r.pctProtein||'–')} : ${escH(r.pctFat||'–')}</div>
+        <div><span>MNA-SF</span>${m}</div>
+      </div>
+      ${li('ผลแลป',labs)}${li('ปัญหา/อุปสรรค',probs)}${li('คำแนะนำ',r.advice)}
+      ${r.problemNote?`<div class="hist-line"><b>หมายเหตุ:</b> ${escH(r.problemNote)}</div>`:''}</div>`;
+  }).join('');
+  document.getElementById('histBack').style.display='grid';
+}
+function closeHistory(){document.getElementById('histBack').style.display='none';}
+
 function renderStep7(){
   document.getElementById('sum7Date').textContent = document.getElementById('f_date').value || '–';
   document.getElementById('sum7Name').textContent = document.getElementById('f_name').value || '–';
@@ -1429,7 +1511,7 @@ function goToStep(n){
   if(n===1) computeGauge();
   if(n===2) computeIBW();
   if(n===5) renderSummary();
-  if(n===6) renderStep7();
+  if(n===6){ renderStep7(); renderPatientList(); }
   if(n===7) renderDashboard();
   window.scrollTo({top:0, behavior:'smooth'});
 }
