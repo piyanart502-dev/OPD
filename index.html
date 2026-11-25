@@ -466,6 +466,40 @@
     .fsec,.ft{break-inside:avoid;}
     .formal .ft th,.fsec,.formal .ft-sub th{-webkit-print-color-adjust:exact;print-color-adjust:exact;}
   }
+
+  /* ===== Page 1 layout ===== */
+  .p1-card{background:#fff;border:1px solid var(--line);border-radius:16px;padding:14px 16px;margin-bottom:12px;box-shadow:0 1px 2px rgba(15,23,42,.04);}
+  .p1-title{display:flex;align-items:center;gap:8px;font-family:'Prompt',sans-serif;font-size:15px;font-weight:600;margin-bottom:12px;color:var(--ink);flex-wrap:wrap;}
+  .p1-title small{font-family:'IBM Plex Sans Thai',sans-serif;font-weight:400;font-size:12px;color:var(--ink-soft);}
+  .p1-ic{display:grid;place-items:center;width:28px;height:28px;border-radius:9px;background:var(--main-soft);font-size:15px;}
+  .p1-grid{display:grid;grid-template-columns:repeat(6,1fr);gap:10px 12px;}
+  .p1-grid .s1{grid-column:span 1;} .p1-grid .s2{grid-column:span 2;} .p1-grid .s3{grid-column:span 3;}
+  .p1-grid .bmi-inline{margin:0;height:38px;display:flex;align-items:center;justify-content:center;border-radius:10px;background:var(--main-soft);color:var(--main);font-size:14px;border:1.5px solid #B7E3DC;}
+  .p1-grid .bmi-inline b{margin-left:6px;font-size:15px;}
+  .p1-grid .gender-switch{height:38px;}
+  .preg-switch{display:flex;align-items:center;gap:10px;margin-top:14px;padding:10px 12px;border-radius:12px;background:#F8FAFC;border:1.5px solid var(--line);cursor:pointer;font-weight:500;}
+  .preg-switch small{color:var(--ink-soft);font-weight:400;}
+  .preg-switch input{position:absolute;opacity:0;pointer-events:none;}
+  .preg-switch .sw{flex:none;width:38px;height:22px;border-radius:999px;background:#CBD5E1;position:relative;transition:.2s;}
+  .preg-switch .sw::after{content:"";position:absolute;top:3px;left:3px;width:16px;height:16px;border-radius:50%;background:#fff;box-shadow:0 1px 3px rgba(0,0,0,.25);transition:.2s;}
+  .preg-switch:has(input:checked){background:#F0FDFA;border-color:#5EEAD4;}
+  .preg-switch input:checked + .sw{background:var(--main);}
+  .preg-switch input:checked + .sw::after{transform:translateX(16px);}
+  .preg-switch input:focus-visible + .sw{box-shadow:0 0 0 3px rgba(15,118,110,.25);}
+  .p1-card .preg-extra{margin-top:12px;padding:12px;border-radius:12px;background:#F0FDFA;border:1px dashed #5EEAD4;}
+  #bmiExtraPanel{padding:10px 14px !important;margin:0 0 12px !important;border-radius:12px;border:1px solid var(--line);}
+  #bmiExtraPanel .gauge-wrap{margin:0;gap:4px;}
+  #bmiExtraPanel:not(:has(#currentBmiRow:not([style*="none"]),#gainNote:not([style*="none"]))){display:none;}
+  .p1-card.lab-section{padding-bottom:10px;}
+  .p1-card .lab-quick-grid{grid-template-columns:repeat(3,1fr);gap:8px;}
+  .p1-card .lab-quick-item{padding:8px 10px;}
+  @media (max-width:860px){ .p1-card .lab-quick-grid{grid-template-columns:repeat(2,1fr);} }
+  @media (max-width:600px){
+    .p1-grid .s1,.p1-grid .s2,.p1-grid .s3{grid-column:span 3;}
+    .p1-grid .field:has(#f_dept),.p1-grid .field:has(#bmiInline){grid-column:span 6;}
+    .p1-grid .s3{grid-column:span 6;}
+    .p1-card .lab-quick-grid{grid-template-columns:1fr;}
+  }
 </style>
 </head>
 <body>
@@ -496,34 +530,26 @@
       <div id="formMsg" class="form-msg"></div>
 
       <div class="form-step active" data-step="1">
-      <div class="grid">
-        <div class="field"><label>วันที่บันทึก</label><input type="date" id="f_date"></div>
-        <div class="field"><label>เลข HN</label><input type="text" id="f_hn" placeholder="เช่น 68-01234"></div>
-        <div class="field span2"><label>ชื่อ-นามสกุลผู้ป่วย</label><input type="text" id="f_name"></div>
-      </div>
-
-      <div class="grid" style="margin-top:14px;">
-        <div class="field"><label>อายุ (ปี)</label><input type="number" id="f_age" min="0" max="120"></div>
-        <div class="field"><label>เพศ</label>
-          <div class="gender-switch">
-            <button type="button" class="gender-switch-opt active" data-val="หญิง" onclick="setGenderSwitch('หญิง')">หญิง</button>
-            <button type="button" class="gender-switch-opt" data-val="ชาย" onclick="setGenderSwitch('ชาย')">ชาย</button>
+      <div class="p1-card">
+        <div class="p1-title"><span class="p1-ic">👤</span>ข้อมูลผู้ป่วย</div>
+        <div class="p1-grid">
+          <div class="field s2"><label>วันที่บันทึก</label><input type="date" id="f_date"></div>
+          <div class="field s2"><label>เลข HN</label><input type="text" id="f_hn" placeholder="เช่น 68-01234" autocomplete="off"></div>
+          <div class="field s2"><label>แผนก</label><select id="f_dept"><option value="">— เลือกแผนก —</option><option value="OPD">OPD</option><option value="คลินิกเบาหวาน">คลินิกเบาหวาน</option><option value="คลินิกความดัน">คลินิกความดัน</option><option value="คลินิกไตเรื้อรัง">คลินิกไตเรื้อรัง</option><option value="คลินิกแม่-เด็ก">คลินิกแม่-เด็ก</option><option value="รพ.สต.">รพ.สต.</option></select></div>
+          <div class="field s3"><label>ชื่อ-นามสกุล</label><input type="text" id="f_name" placeholder="ชื่อ นามสกุล" autocomplete="off"></div>
+          <div class="field s1"><label>อายุ (ปี)</label><input type="number" id="f_age" min="0" max="120" inputmode="numeric" placeholder="ปี"></div>
+          <div class="field s2"><label>เพศ</label>
+            <div class="gender-switch">
+              <button type="button" class="gender-switch-opt active" data-val="หญิง" onclick="setGenderSwitch('หญิง')">หญิง</button>
+              <button type="button" class="gender-switch-opt" data-val="ชาย" onclick="setGenderSwitch('ชาย')">ชาย</button>
+            </div>
+            <select id="f_gender" style="display:none;"><option value="หญิง">หญิง</option><option value="ชาย">ชาย</option></select>
           </div>
-          <select id="f_gender" style="display:none;"><option value="หญิง">หญิง</option><option value="ชาย">ชาย</option></select>
+          <div class="field s2"><label>น้ำหนัก (kg)</label><input type="number" step="0.1" id="f_weight" inputmode="decimal" placeholder="kg"></div>
+          <div class="field s2"><label>ส่วนสูง (cm)</label><input type="number" step="0.1" id="f_height" inputmode="decimal" placeholder="cm"></div>
+          <div class="field s2"><label>ดัชนีมวลกาย</label><div class="bmi-inline" id="bmiInline">BMI: <b>–</b></div></div>
         </div>
-        <div class="field"><label>น้ำหนัก (kg)</label><input type="number" step="0.1" id="f_weight"></div>
-        <div class="field"><label>ส่วนสูง (cm)</label><input type="number" step="0.1" id="f_height"></div>
-      </div>
-      <div class="bmi-inline" id="bmiInline">BMI: <b>–</b></div>
-
-      <div class="grid" style="margin-top:14px;">
-        <div class="field span2"><label>แผนก</label><select id="f_dept"><option value="">— เลือกแผนก —</option><option value="OPD">OPD</option><option value="คลินิกเบาหวาน">คลินิกเบาหวาน</option><option value="คลินิกความดัน">คลินิกความดัน</option><option value="คลินิกไตเรื้อรัง">คลินิกไตเรื้อรัง</option><option value="คลินิกแม่-เด็ก">คลินิกแม่-เด็ก</option><option value="รพ.สต.">รพ.สต.</option></select></div>
-      </div>
-
-      <div class="preg-toggle">
-        <label><input type="checkbox" id="f_isPreg" onchange="togglePreg()"> ผู้ป่วยอยู่ระหว่างตั้งครรภ์ (แสดงฟิลด์เพิ่มเติม)</label>
-      </div>
-
+        <label class="preg-switch"><input type="checkbox" id="f_isPreg" onchange="togglePreg()"><span class="sw"></span><span>ผู้ป่วยอยู่ระหว่างตั้งครรภ์ <small>(แสดงช่องกรอกเพิ่ม)</small></span></label>
       <div class="grid c3 preg-extra" id="pregExtraRow">
         <div class="field"><label>น้ำหนักก่อนตั้งครรภ์ (kg)</label><input type="number" step="0.1" id="f_prepregWeight"></div>
         <div class="field"><label>อายุครรภ์ (สัปดาห์)</label><input type="number" id="f_ga" min="0" max="45"></div>
@@ -540,6 +566,7 @@
         </div>
       </div>
 
+      </div><!-- /p1-card -->
       <div class="panel" style="background:var(--paper);padding:16px;margin:16px 0 0;" id="bmiExtraPanel">
         <div class="gauge-wrap">
           <div class="gauge-readout" id="currentBmiRow" style="display:none;">BMI ปัจจุบัน (จากน้ำหนักตอนนี้): <b id="currentBmiValue">–</b> <span id="currentBmiStatus" class="status-pill pill-normal">–</span></div>
@@ -547,10 +574,8 @@
         </div>
       </div>
 
-      <div class="lab-section" style="margin-top:14px;">
-        <div class="lab-section-head">
-          <label>ผลตรวจทางห้องปฏิบัติการ (Lab)</label>
-        </div>
+      <div class="p1-card lab-section">
+        <div class="p1-title"><span class="p1-ic">🧪</span>ผลตรวจทางห้องปฏิบัติการ <small>กรอกเฉพาะรายการที่มี ระบบจะแปลผลให้อัตโนมัติ</small></div>
         <div class="lab-quick-grid" id="labRows"></div>
       </div>
       </div><!-- /step 1 -->
