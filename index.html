@@ -1007,8 +1007,9 @@
           <label><input type="checkbox" name="probSocial" value="ข้อจำกัดทางวัฒนธรรม/ศาสนา"> ข้อจำกัดทางวัฒนธรรม/ศาสนา</label>
           <label><input type="checkbox" name="probSocial" value="ดูแลผู้ป่วยติดเตียง"> ดูแลผู้ป่วยติดเตียง</label>
           <label><input type="checkbox" name="probSocial" value="ดูแล เลี้ยงดูเด็กต่ำกว่า 5 ปี"> ดูแล เลี้ยงดูเด็กต่ำกว่า 5 ปี</label></div>
-          <label><input type="checkbox" name="probSocial" value="งานมหรสพต่างๆ"> งานมหรสพต่างๆ</label>
+          <label><input type="checkbox" name="probSocial" id="f_festival_chk" value="งานมหรสพต่างๆ" onchange="syncFestival()"> งานมหรสพต่างๆ</label>
           </div>
+          <input type="text" id="f_festival" placeholder="ระบุงาน เช่น งานวัด งานบุญ งานเลี้ยง" style="display:none;margin-top:8px;width:100%;" oninput="syncFestival()">
         </div>
         <div class="prob-side">
           <div class="p1-card">
@@ -1635,6 +1636,13 @@ function computeExchange(){
     + ` <span style="color:${diffOk?'var(--ok)':'var(--warn)'};">(เทียบกับเป้าหมาย ${lastEnergyTotal.toLocaleString()} kcal ${diffOk?'✓ ใกล้เคียง':'⚠ ต่างกัน '+ (diffKcal>0?'+':'') + diffKcal.toLocaleString()+' kcal'})</span>`;
 }
 
+function syncFestival(){
+  const c=document.getElementById('f_festival_chk'), t=document.getElementById('f_festival');
+  t.style.display=c.checked?'block':'none';
+  if(!c.checked) t.value='';
+  c.value='งานมหรสพต่างๆ'+(t.value.trim()?': '+t.value.trim():'');
+  if(c.checked && document.activeElement===c) t.focus();
+}
 function toggleAdviceOther(){
   const on = document.getElementById('f_advice_other_chk').checked;
   const inp = document.getElementById('f_advice_other');
@@ -3053,6 +3061,7 @@ function resetForm(){
   document.getElementById('f_date').value = todayStr();
   document.getElementById('pregExtraRow').classList.remove('show');
   document.getElementById('f_advice_other').style.display = 'none';
+  syncFestival();
   setGenderSwitch('หญิง');
   renderLabTable();
   seedRecallRows();
