@@ -1,0 +1,3059 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ระบบบันทึกโภชนบำบัดผู้ป่วยนอก</title>
+<link rel="icon" type="image/svg+xml" href="icons/icon.svg">
+<link rel="alternate icon" type="image/png" href="icons/favicon-32.png">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="theme-color" content="#0F766E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Prompt:wght@400;500;600;700&family=IBM+Plex+Sans+Thai:wght@400;500;600;700&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
+<style>
+  :root{
+    --paper:#F7F4EE;
+    --panel:#FFFFFF;
+    --ink:#2B2E2C;
+    --ink-soft:#6B6F6C;
+    --line: #E4DFD3;
+    --main:#2D6A6A;
+    --main-soft: #E2EEEC;
+    --gold: #C9A227;
+    --danger:#B8433A;
+    --ok:#3E7A4A;
+    --warn:#C08A2E;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;background:var(--paper);color:var(--ink);
+    font-family:'IBM Plex Sans Thai',sans-serif;font-size:15px;line-height:1.55;
+    -webkit-font-smoothing:antialiased;
+  }
+  h1,h2,.display{font-family:'Prompt',sans-serif;}
+  .app{max-width:920px;margin:0 auto;padding:28px 20px 60px;}
+
+  header.top{
+    display:flex;align-items:flex-end;justify-content:space-between;gap:16px;flex-wrap:wrap;
+    border-bottom:2px solid var(--ink);padding-bottom:14px;margin-bottom:22px;
+  }
+  header.top h1{font-size:22px;font-weight:600;margin:0 0 4px;}
+  header.top p{margin:0;color:var(--ink-soft);font-size:13px;}
+  .count-chip{background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:6px 14px;text-align:center;font-size:12.5px;color:var(--ink-soft);}
+  .count-chip b{font-family:'Prompt',sans-serif;color:var(--ink);font-size:16px;display:block;}
+
+  .panel{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:22px;margin-bottom:20px;}
+  .panel h2{font-size:16px;margin:0 0 16px;display:flex;align-items:center;gap:8px;}
+  .panel h2 .accent{width:4px;height:16px;border-radius:2px;background:var(--main);display:inline-block;}
+
+  .grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;}
+  .grid.c2{grid-template-columns:repeat(2,1fr);}
+  .grid.c3{grid-template-columns:repeat(3,1fr);}
+  @media (max-width:760px){ .grid, .grid.c2, .grid.c3 {grid-template-columns:1fr 1fr;} }
+  @media (max-width:500px){ .grid, .grid.c2, .grid.c3 {grid-template-columns:1fr;} }
+
+  .field{display:flex;flex-direction:column;gap:5px;}
+  .field.span2{grid-column:span 2;}
+  .field.span4{grid-column:1/-1;}
+  @media (max-width:760px){ .field.span2, .field.span4 {grid-column:1/-1;} }
+  .field label{font-size:12.5px;color:var(--ink-soft);font-weight:600;}
+  .field input, .field select, .field textarea{
+    font-family:'IBM Plex Sans Thai',sans-serif;font-size:14.5px;
+    border:1.3px solid var(--line);border-radius:8px;padding:9px 10px;
+    background:#FDFCFA;color:var(--ink);
+  }
+  .field input:focus, .field select:focus, .field textarea:focus{outline:none;border-color:var(--main);}
+  .field textarea{resize:vertical;min-height:64px;}
+
+  .gender-switch{display:flex;border:1.3px solid var(--line);border-radius:8px;overflow:hidden;}
+  .gender-switch-opt{
+    flex:1;padding:9px 8px;border:none;background:#FDFCFA;color:var(--ink-soft);font-size:14px;
+    font-family:'IBM Plex Sans Thai',sans-serif;font-weight:600;cursor:pointer;transition:.15s ease;
+  }
+  .gender-switch-opt.active{background:var(--main);color:#fff;}
+  .gender-switch-opt:not(.active):hover{background:var(--main-soft);}
+
+  .bmi-inline{margin-top:10px;font-size:13.5px;color:var(--ink-soft);}
+  .bmi-inline b{font-family:'Prompt',sans-serif;font-size:15px;color:var(--ink);}
+
+  .preg-toggle{
+    display:flex;align-items:center;gap:10px;margin-top:16px;padding:12px 14px;
+    background:var(--main-soft);border:1px dashed var(--main);border-radius:10px;
+  }
+  .preg-toggle label{font-size:13.5px;font-weight:600;display:flex;align-items:center;gap:8px;cursor:pointer;}
+  .preg-extra{display:none;margin-top:14px;}
+  .preg-extra.show{display:grid;}
+
+  .checkrow{display:flex;flex-wrap:wrap;gap:10px 16px;padding-top:2px;}
+  .checkrow label{display:flex;align-items:center;gap:6px;font-size:13.5px;color:var(--ink);font-weight:400;}
+
+  .lab-section-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;}
+  .lab-section-head label{font-size:12.5px;color:var(--ink-soft);font-weight:600;}
+  .lab-table-wrap{border:1px solid var(--line);border-radius:10px;overflow:hidden;}
+  .lab-table{width:100%;border-collapse:collapse;font-size:13.5px;background:#FDFCFA;}
+  .lab-table th{text-align:left;font-size:12px;color:var(--ink-soft);font-weight:600;padding:9px 12px;background:var(--main-soft);border-bottom:1px solid var(--line);}
+  .lab-table td{padding:9px 12px;border-bottom:1px solid var(--line);vertical-align:middle;}
+  .lab-table tr:last-child td{border-bottom:none;}
+  .lab-item-name{font-weight:600;white-space:nowrap;}
+  .lab-input-cell{display:flex;align-items:center;gap:6px;flex-wrap:wrap;}
+  .lab-input-cell input{width:90px;border:1.3px solid var(--line);border-radius:7px;padding:7px 8px;font-size:13.5px;background:#fff;color:var(--ink);}
+  .lab-input-cell input:focus{outline:none;border-color:var(--main);}
+  .lab-unit-text{font-size:12px;color:var(--ink-soft);white-space:nowrap;}
+  .lab-ref-text{color:var(--ink-soft);font-size:12.5px;white-space:nowrap;}
+  .lab-pill{display:inline-block;min-width:60px;text-align:center;padding:4px 10px;border-radius:20px;font-size:12px;font-weight:600;background:#EDEAE2;color:var(--ink-soft);}
+  .lab-pill.normal{background:#DFEFE1;color:var(--ok);}
+  .lab-pill.high{background:#F5DBD8;color:var(--danger);}
+  .lab-pill.low{background:#F5E7CC;color:var(--warn);}
+  @media (max-width:700px){
+    .lab-table{font-size:12.5px;}
+    .lab-table th, .lab-table td{padding:7px 8px;}
+    .lab-input-cell input{width:64px;}
+  }
+
+  .lab-quick-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+  @media (max-width:600px){ .lab-quick-grid{grid-template-columns:1fr;} }
+  .lab-quick-item{border:1.3px solid var(--line);border-radius:10px;padding:10px 12px;background:#FDFCFA;}
+  .lab-quick-name{font-weight:600;font-size:13.5px;}
+  .lab-quick-ref{display:block;font-size:11.5px;color:var(--ink-soft);margin-top:1px;}
+  .lab-quick-row{display:flex;align-items:center;gap:8px;margin-top:8px;flex-wrap:wrap;}
+  .lab-quick-row input{
+    border:1.3px solid var(--line);border-radius:7px;padding:8px 9px;font-size:14px;
+    background:#fff;color:var(--ink);width:80px;
+  }
+  .lab-quick-row input:focus{outline:none;border-color:var(--main);}
+  .lab-quick-row .lab-sys, .lab-quick-row .lab-dia{width:60px;}
+
+  .gauge-wrap{margin-top:6px;}
+  .gauge-label-row{display:flex;justify-content:space-between;font-size:12px;color:var(--ink-soft);margin-bottom:4px;}
+  .gauge{position:relative;height:10px;border-radius:6px;overflow:hidden;display:flex;border:1px solid var(--line);}
+  .gauge span{height:100%;}
+  .seg-under{background:#CFE0DE;}
+  .seg-normal{background:var(--ok);}
+  .seg-over{background:var(--warn);}
+  .seg-obese{background:var(--danger);}
+  .gauge-marker{position:absolute;top:-4px;width:2px;height:18px;background:var(--ink);transition:left .25s ease;}
+  .gauge-marker::after{
+    content:attr(data-val);position:absolute;top:-19px;left:50%;transform:translateX(-50%);
+    font-size:11px;font-weight:600;white-space:nowrap;background:var(--ink);color:#fff;padding:1px 5px;border-radius:4px;
+  }
+  .gauge-readout{margin-top:16px;font-size:13px;color:var(--ink-soft);}
+  .status-pill{display:inline-block;padding:2px 10px;border-radius:20px;font-size:12px;font-weight:600;}
+  .pill-under{background:#DCEAE8;color:#2D6A6A;}
+  .pill-normal{background:#DFEFE1;color:var(--ok);}
+  .pill-over{background:#F5E7CC;color:var(--warn);}
+  .pill-obese{background:#F5DBD8;color:var(--danger);}
+  .gain-note{margin-top:10px;font-size:12.5px;background:#F6E7EA;border:1px dashed #A8586B;border-radius:8px;padding:8px 10px;color:#7A3E4C;}
+
+  .actions{display:flex;gap:10px;justify-content:flex-end;margin-top:18px;flex-wrap:wrap;}
+  button{font-family:'IBM Plex Sans Thai',sans-serif;font-weight:600;font-size:14px;border-radius:8px;border:none;padding:10px 18px;cursor:pointer;transition:.15s ease;}
+  .btn-primary{background:var(--main);color:#fff;}
+  .btn-primary:hover{filter:brightness(1.08);}
+  .btn-ghost{background:transparent;color:var(--ink-soft);border:1.3px solid var(--line);}
+  .btn-ghost:hover{border-color:var(--ink-soft);color:var(--ink);}
+  .btn-small{padding:5px 10px;font-size:12.5px;border-radius:6px;}
+
+  .step-indicator{display:flex;gap:6px;margin-bottom:22px;}
+  .step-dot{flex:1;text-align:center;padding-bottom:9px;border-bottom:3px solid var(--line);font-size:12px;font-weight:600;color:var(--ink-soft);transition:.15s ease;}
+  .step-dot .num{display:inline-block;width:18px;height:18px;line-height:18px;border-radius:50%;background:var(--line);color:#fff;font-size:11px;margin-right:4px;}
+  .step-dot.active{color:var(--main);border-color:var(--main);}
+  .step-dot.active .num{background:var(--main);}
+  .step-dot.done{color:var(--ink);border-color:var(--main-soft);}
+  .step-dot.done .num{background:var(--main-soft);color:var(--main);}
+  @media (max-width:600px){ .step-dot span.label{display:none;} }
+
+  .form-step{display:none;}
+  .form-step.active{display:block;}
+
+  .ibw-note{font-size:12px;color:var(--ink-soft);margin-top:4px;}
+  .energy-total{font-family:'Prompt',sans-serif;font-weight:700;font-size:19px;color:var(--main);}
+
+  .ncd-table-wrap{overflow-x:auto;margin-top:10px;}
+  .ncd-table{border-collapse:collapse;font-size:12.5px;min-width:640px;width:100%;}
+  .ncd-table th{background:var(--main-soft);padding:10px 8px;font-size:12px;font-weight:600;text-align:center;vertical-align:top;border:1px solid var(--line);line-height:1.4;}
+  .ncd-table th.cat-header{text-align:left;font-size:14px;font-weight:700;white-space:nowrap;}
+  .ncd-table td{padding:8px;text-align:center;border:1px solid var(--line);vertical-align:middle;}
+  .ncd-table td.freq-label{text-align:left;font-weight:600;white-space:nowrap;background:#FAFAF7;}
+  .ncd-table label{display:flex;align-items:center;justify-content:center;gap:5px;cursor:pointer;font-weight:600;}
+  .ncd-total-row td{text-align:right;font-weight:700;background:var(--paper);padding:10px;}
+  .pill-veryhigh{background:#F1C7C7;color:#7A1F1F;}
+
+  .recall-meal-panel{padding:16px;}
+  .recall-meal-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;}
+  .recall-meal-title{font-family:'Prompt',sans-serif;font-size:15px;font-weight:600;}
+  .recall-meal-kcal{font-family:'Prompt',sans-serif;font-size:13px;font-weight:600;color:var(--main);background:var(--main-soft);padding:3px 10px;border-radius:20px;}
+  .recall-cards{display:flex;flex-direction:column;gap:10px;margin-bottom:10px;}
+  .recall-card{border:1px solid var(--line);border-radius:10px;padding:10px 12px;background:var(--paper);}
+  .recall-card-food{
+    width:100%;border:1.3px solid var(--line);border-radius:7px;padding:8px 10px;font-size:14px;
+    font-family:'IBM Plex Sans Thai',sans-serif;background:#fff;color:var(--ink);margin-bottom:8px;
+  }
+  .recall-card-food:focus{outline:none;border-color:var(--main);}
+  .recall-card-row{display:flex;align-items:center;gap:8px;flex-wrap:wrap;}
+  .recall-chips{display:none;}
+  .recall-chip{
+    border:1.3px solid var(--line);background:#fff;border-radius:20px;padding:6px 12px;font-size:12.5px;
+    cursor:pointer;color:var(--ink-soft);font-family:'IBM Plex Sans Thai',sans-serif;white-space:nowrap;
+  }
+  .recall-chip.active{background:var(--main);color:#fff;border-color:var(--main);font-weight:600;}
+  .recall-quickpicks{display:none;}
+  .recall-quickpicks .recall-chip{background:#fff;font-size:12px;}
+  .recall-quickpicks .recall-chip:hover{background:var(--main);color:#fff;border-color:var(--main);}
+  .recall-search-wrap{position:relative;}
+  .recall-suggest{
+    position:absolute;top:100%;left:0;right:0;z-index:20;background:#fff;border:1.3px solid var(--main);
+    border-radius:8px;margin-top:2px;max-height:220px;overflow-y:auto;box-shadow:0 4px 14px rgba(0,0,0,.12);
+  }
+  .recall-suggest-item{
+    padding:8px 12px;font-size:13px;cursor:pointer;display:flex;justify-content:space-between;align-items:center;
+    border-bottom:1px solid var(--line);
+  }
+  .recall-suggest-item:last-child{border-bottom:none;}
+  .recall-suggest-item:hover{background:var(--main-soft);}
+  .recall-suggest-item .grp-tag{display:none;}
+  .recall-stepper{display:flex;align-items:center;border:1.3px solid var(--line);border-radius:7px;overflow:hidden;}
+  .recall-stepper button{
+    width:28px;height:32px;border:none;background:var(--main-soft);color:var(--main);font-size:16px;
+    font-weight:700;cursor:pointer;line-height:1;
+  }
+  .recall-stepper button:hover{background:var(--main);color:#fff;}
+  .recall-card-units{
+    width:42px;text-align:center;border:none;font-size:13.5px;font-family:'IBM Plex Sans Thai',sans-serif;
+    padding:6px 2px;color:var(--ink);
+  }
+  .recall-card-units:focus{outline:none;}
+  .recall-card-kcal{font-size:12.5px;color:var(--ink-soft);white-space:nowrap;min-width:60px;text-align:right;}
+  .recall-card-remove{
+    width:28px;height:28px;border:1px solid var(--line);background:transparent;color:var(--danger);
+    border-radius:50%;cursor:pointer;font-size:14px;line-height:1;flex-shrink:0;
+  }
+  .recall-card-remove:hover{background:var(--danger);color:#fff;border-color:var(--danger);}
+
+  .summary-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:6px 14px;font-size:12.5px;}
+  @media (max-width:700px){.summary-grid{grid-template-columns:repeat(2,1fr);}}
+  .summary-grid div span{display:block;font-size:10.5px;color:var(--ink-soft);}
+  .summary-grid div b{font-family:'Prompt',sans-serif;font-size:13px;}
+  .summary-list{list-style:none;padding:0;margin:4px 0 0;font-size:12.5px;}
+  .summary-list li{padding:3px 0;border-bottom:1px dashed var(--line);}
+  .summary-list li:last-child{border-bottom:none;}
+  .summary-subhead{font-size:11px;font-weight:600;color:var(--ink-soft);margin:8px 0 3px;}
+  .summary-subhead:first-child{margin-top:0;}
+  .summary-kv-table td{padding:4px 10px;font-size:12.5px;}
+  .ibw-energy-table th{background:var(--main-soft);color:var(--main);font-family:'Prompt',sans-serif;font-size:11px;font-weight:700;padding:6px 8px;text-align:center;}
+  .ibw-energy-table td{text-align:center;font-family:'Prompt',sans-serif;font-weight:700;font-size:14px;padding:8px;}
+  .recall-summary-table th{background:var(--main-soft);color:var(--main);font-family:'Prompt',sans-serif;font-size:11px;font-weight:700;padding:6px 8px;text-align:center;}
+  .recall-summary-table td{text-align:left;vertical-align:top;font-size:12px;padding:8px;color:var(--ink);}
+  .summary-kv-table tr:not(.summary-kv-section) td:first-child{color:var(--ink-soft);width:55%;}
+  .summary-kv-table tr:not(.summary-kv-section) td:last-child{font-family:'Prompt',sans-serif;font-weight:600;text-align:right;}
+  .summary-kv-section td{background:var(--main-soft);font-family:'Prompt',sans-serif;font-weight:600;color:var(--main);font-size:11px;text-align:left;padding:4px 10px;}
+  .sum-recall-meal{margin-top:5px;}
+  .sum-recall-meal:first-child{margin-top:0;}
+  .sum-recall-meal-name{font-family:'Prompt',sans-serif;font-size:12px;font-weight:600;}
+  .sum-recall-note{font-size:12px;color:var(--ink-soft);margin-top:1px;}
+  .summary-empty{color:var(--ink-soft);font-size:12px;padding:3px 0;}
+  .summary-inline-text{font-size:12.5px;color:var(--ink);line-height:1.6;}
+  .sum7-editable{cursor:pointer;color:var(--main);text-decoration:underline;text-decoration-style:dotted;}
+  .sum7-editable:hover{color:var(--gold);}
+
+  .summary-doc{background:#fff;border:1px solid var(--line);border-radius:14px;padding:16px 18px;font-size:13px;}
+  .summary-doc-head{display:flex;justify-content:space-between;align-items:center;border-bottom:2px solid var(--ink);padding-bottom:8px;margin-bottom:2px;}
+  .summary-doc-head h3{margin:0;font-size:16px;}
+  .summary-doc h4{font-size:12.5px;font-weight:700;color:var(--main);margin:10px 0 4px;padding-top:8px;border-top:1px dashed var(--line);text-transform:uppercase;letter-spacing:.2px;}
+  .summary-doc h4:first-of-type{border-top:none;padding-top:0;}
+
+  @media print {
+    body{background:#fff;}
+    header.top p, .step-indicator, .actions, #formMsg, footer, .no-print{display:none !important;}
+    .app{max-width:100%;padding:0;}
+    .panel{border:1px solid #ccc;box-shadow:none;break-inside:avoid;margin-top:10px !important;}
+    .summary-doc{border:none;padding:0;}
+    .summary-doc h4{break-after:avoid;}
+    .summary-grid, .summary-list{break-inside:avoid;}
+    .print-only{display:block !important;}
+    .print-header{display:block;text-align:center;margin-bottom:14px;}
+  }
+  .print-only{display:none;}
+  .print-header{font-family:'Prompt',sans-serif;font-size:18px;font-weight:700;margin-bottom:4px;}
+
+  .form-msg{padding:10px 14px;border-radius:8px;font-size:13.5px;margin-bottom:16px;display:none;font-weight:600;}
+  .form-msg.error{background:#F5DBD8;color:var(--danger);border:1px solid var(--danger);}
+  .form-msg.success{background:#DFEFE1;color:var(--ok);border:1px solid var(--ok);}
+
+  .records-head{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:14px;}
+  .filters{display:flex;gap:8px;flex-wrap:wrap;align-items:center;}
+  .filters input[type=text]{padding:8px 10px;border:1.3px solid var(--line);border-radius:8px;font-size:13.5px;min-width:190px;}
+
+  .record-card{border:1px solid var(--line);border-left:4px solid var(--main);border-radius:10px;padding:14px 16px;margin-bottom:10px;background:#FDFCFA;}
+  .rc-top{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;align-items:flex-start;}
+  .rc-name{font-family:'Prompt',sans-serif;font-size:15px;font-weight:600;}
+  .rc-meta{font-size:12.5px;color:var(--ink-soft);margin-top:2px;}
+  .rc-tag{font-size:11px;font-weight:700;padding:2px 8px;border-radius:5px;letter-spacing:.3px;background:var(--main-soft);color:var(--main);}
+  .rc-body{margin-top:10px;font-size:13.5px;display:grid;grid-template-columns:repeat(4,1fr);gap:6px 14px;}
+  @media (max-width:700px){.rc-body{grid-template-columns:1fr 1fr;}}
+  .rc-body div span{display:block;color:var(--ink-soft);font-size:11.5px;}
+  .rc-plan{margin-top:10px;font-size:13.5px;background:var(--paper);border-radius:8px;padding:8px 10px;white-space:pre-wrap;}
+  .rc-actions{display:flex;gap:8px;margin-top:10px;}
+
+  .empty-state{text-align:center;padding:34px 10px;color:var(--ink-soft);}
+  .empty-state .glyph{font-size:26px;margin-bottom:8px;}
+  footer{text-align:center;color:var(--ink-soft);font-size:12px;margin-top:20px;}
+
+  /* ===== Modern UI refresh ===== */
+  :root{
+    --paper:#F1F5F9; --panel:#FFFFFF; --ink:#0F172A; --ink-soft:#64748B; --line:#E2E8F0;
+    --main:#0F766E; --main-soft:#E6F4F1; --gold:#0EA5A4;
+    --danger:#DC2626; --ok:#16A34A; --warn:#D97706;
+    --shadow:0 1px 2px rgba(15,23,42,.05),0 4px 16px rgba(15,23,42,.06);
+    --r:14px;
+  }
+  body{
+    background:radial-gradient(900px 380px at 85% -80px,#CCEFE9 0,transparent 70%),
+               radial-gradient(700px 320px at -10% -60px,#DBEAFE 0,transparent 70%),var(--paper);
+    background-attachment:fixed;font-size:14.5px;line-height:1.5;
+  }
+  .app{max-width:980px;padding:18px 16px 40px;}
+  header.top{border:none;padding:0;margin-bottom:14px;align-items:center;}
+  header.top h1{font-size:20px;font-weight:700;letter-spacing:-.2px;display:flex;align-items:center;gap:10px;margin:0;}
+  header.top h1::before{content:"🥗";display:grid;place-items:center;width:36px;height:36px;font-size:19px;
+    background:linear-gradient(135deg,#0F766E,#14B8A6);border-radius:11px;box-shadow:0 4px 10px rgba(15,118,110,.3);}
+  header.top p{display:none;}
+  .panel{border:1px solid rgba(226,232,240,.9);border-radius:18px;box-shadow:var(--shadow);padding:16px 18px;margin-bottom:14px;}
+  #mainPanelTitle{display:none !important;}
+  .panel h2{font-size:15px;margin-bottom:12px;}
+
+  /* stepper -> pill tabs */
+  .step-indicator{gap:4px;margin:0 0 14px;padding:4px;background:#F1F5F9;border-radius:14px;overflow-x:auto;scrollbar-width:none;}
+  .step-indicator::-webkit-scrollbar{display:none;}
+  .step-dot{border:none !important;border-radius:10px;padding:6px 4px;font-size:11.5px;line-height:1.25;white-space:normal;min-width:0;flex:1 1 0;
+    color:var(--ink-soft);transition:.18s ease;}
+  .step-dot:hover{background:rgba(255,255,255,.7);}
+  .step-dot .num{width:20px;height:20px;line-height:20px;margin-right:3px;background:#CBD5E1;font-size:11px;}
+  .step-dot.active{background:#fff;color:var(--main);box-shadow:0 1px 4px rgba(15,23,42,.12);}
+  .step-dot.active .num{background:var(--main);}
+  .step-dot.done{color:var(--ink);}
+  .step-dot.done .num{background:var(--main);color:#fff;}
+  .step-dot.done .num{font-size:0;} .step-dot.done .num::after{content:"✓";font-size:11px;}
+
+  /* inputs */
+  .grid{gap:10px;}
+  .field{gap:4px;}
+  .field label{font-size:12px;font-weight:600;color:#475569;}
+  .field input,.field select,.field textarea{border:1.5px solid var(--line);border-radius:10px;padding:8px 11px;background:#F8FAFC;font-size:14px;transition:.15s;}
+  .field input:hover,.field select:hover,.field textarea:hover{border-color:#CBD5E1;}
+  .field input:focus,.field select:focus,.field textarea:focus{background:#fff;border-color:var(--main);box-shadow:0 0 0 3px rgba(15,118,110,.15);}
+  input[type=checkbox],input[type=radio]{accent-color:var(--main);width:16px;height:16px;}
+  .gender-switch{border-radius:10px;border-color:var(--line);padding:3px;background:#F1F5F9;gap:3px;}
+  .gender-switch-opt{border-radius:8px;background:transparent;padding:6px 8px;}
+  .gender-switch-opt.active{background:var(--main);box-shadow:0 2px 6px rgba(15,118,110,.35);}
+  .preg-toggle{border-radius:12px;padding:9px 12px;margin-top:12px;border-color:#5EEAD4;background:#F0FDFA;}
+  .checkrow{gap:8px;}
+  .checkrow label{background:#F8FAFC;border:1.5px solid var(--line);border-radius:999px;padding:5px 12px;cursor:pointer;transition:.15s;}
+  .checkrow label:hover{border-color:var(--main);}
+  .checkrow label:has(input:checked){background:var(--main-soft);border-color:var(--main);color:var(--main);font-weight:600;}
+
+  /* tables & cards */
+  .lab-table-wrap,.summary-doc,.ncd-table-wrap{border-radius:12px;}
+  .lab-table th,.ncd-table th,.ibw-energy-table th,.recall-summary-table th{background:#F1F5F9;color:#475569;}
+  .lab-quick-item,.recall-card,.record-card{border-radius:12px;border-color:var(--line);background:#fff;transition:.15s;}
+  .lab-quick-item:hover,.recall-card:hover{border-color:#99D5CD;box-shadow:0 2px 10px rgba(15,118,110,.08);}
+  .recall-card{background:#F8FAFC;}
+  .lab-quick-row input,.recall-card-food{border-radius:9px;border-color:var(--line);}
+  .recall-meal-kcal{background:var(--main-soft);}
+  .lab-pill,.status-pill{font-weight:600;}
+  .summary-doc{border-radius:14px;box-shadow:none;background:#fff;}
+  .summary-doc-head{border-bottom:2px solid var(--main);}
+  .summary-doc h4{color:var(--main);}
+  .recall-suggest{border-radius:12px;border:1px solid var(--line);box-shadow:0 12px 28px rgba(15,23,42,.14);}
+  .recall-suggest-item{padding:9px 12px;}
+
+  /* buttons */
+  button{border-radius:10px;padding:9px 18px;}
+  .btn-primary{background:linear-gradient(135deg,#0F766E,#14B8A6);box-shadow:0 3px 10px rgba(15,118,110,.28);}
+  .btn-primary:hover{filter:none;transform:translateY(-1px);box-shadow:0 5px 14px rgba(15,118,110,.35);}
+  .btn-primary:active{transform:none;}
+  .btn-ghost{background:#fff;border:1.5px solid var(--line);color:#475569;}
+  .btn-ghost:hover{border-color:var(--main);color:var(--main);}
+  .actions{position:sticky;bottom:0;z-index:30;margin:14px -18px -16px;padding:10px 18px;
+    background:rgba(255,255,255,.88);backdrop-filter:blur(8px);border-top:1px solid var(--line);border-radius:0 0 18px 18px;}
+  .form-step.active{animation:stepIn .22s ease;}
+  @keyframes stepIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+  .form-msg{border-radius:10px;}
+  footer{font-size:11.5px;margin-top:8px;}
+  @media (max-width:600px){
+    .app{padding:12px 10px 30px;} .panel{padding:12px;border-radius:16px;}
+    .actions{margin:12px -12px -12px;padding:8px 12px;}
+    .step-dot .label{display:none;} .step-dot.active .label{display:inline;}
+  }
+  @media print{ body{background:#fff !important;} .panel{box-shadow:none;} }
+
+  /* ===== 24-hr Recall redesign ===== */
+  .form-step[data-step="3"].active{display:grid;grid-template-columns:1fr 1fr;gap:12px;align-items:start;}
+  .form-step[data-step="3"] .recall-bar{grid-column:1/-1;}
+  .form-step[data-step="3"] .recall-meal-panel{margin:0 !important;padding:12px;background:#fff;}
+  @media (max-width:760px){ .form-step[data-step="3"].active{grid-template-columns:1fr;} }
+  .recall-bar{position:sticky;top:8px;z-index:25;background:linear-gradient(135deg,#0F766E,#0E9F94);color:#fff;border-radius:14px;padding:12px 16px;box-shadow:0 6px 18px rgba(15,118,110,.28);}
+  .rb-main{display:flex;align-items:center;gap:22px;flex-wrap:wrap;}
+  .rb-label{font-size:11.5px;opacity:.85;}
+  .rb-total{font-family:'Prompt',sans-serif;font-size:28px;font-weight:700;line-height:1.1;}
+  .rb-total small{font-size:13px;font-weight:500;opacity:.85;}
+  .rb-tv{font-family:'Prompt',sans-serif;font-size:16px;font-weight:600;}
+  .rb-status{margin-left:auto;padding:4px 12px;border-radius:999px;background:rgba(255,255,255,.18);font-size:12.5px;font-weight:600;}
+  .rb-status:empty{display:none;}
+  .rb-status.ok{background:#fff;color:var(--ok);} .rb-status.warn{background:#FEF3C7;color:#B45309;}
+  .rb-track{height:6px;border-radius:6px;background:rgba(255,255,255,.25);margin-top:9px;overflow:hidden;}
+  .rb-fill{height:100%;width:0;border-radius:6px;background:#fff;transition:width .25s ease;}
+  .rb-hint{font-size:11.5px;opacity:.9;margin-top:7px;}
+  .recall-meal-head{margin-bottom:8px;}
+  .recall-meal-title{font-size:15px;}
+  .recall-meal-panel .field{margin-bottom:8px !important;}
+  .recall-meal-panel textarea{font-size:13px;padding:7px 10px;min-height:38px;}
+  .recall-cards{gap:6px;margin-bottom:8px;}
+  .recall-card{display:flex;align-items:center;gap:8px;flex-wrap:wrap;padding:6px;border-radius:12px;background:#F8FAFC;}
+  .recall-search-wrap{flex:1 1 150px;min-width:0;}
+  .recall-card-food{margin:0;border-radius:9px;padding:8px 10px;font-size:13.5px;}
+  .recall-card-row{flex:0 0 auto;flex-wrap:nowrap;}
+  .recall-stepper{background:#fff;border-radius:9px;}
+  .recall-stepper button{width:30px;height:34px;padding:0;border-radius:0;font-size:17px;}
+  .recall-card-units{width:38px;font-weight:600;}
+  .rc-qty-label{font-size:12px;color:var(--ink-soft);font-weight:600;}
+  .rc-unit{font-size:12px;color:var(--ink-soft);max-width:90px;line-height:1.2;}
+  .recall-card-kcal{min-width:64px;font-weight:600;color:var(--main);font-size:12.5px;}
+  .recall-meal-panel > .btn-small{width:100%;border:1.5px dashed #94A3B8;background:transparent;color:var(--ink-soft);padding:8px;font-size:13px;}
+  .recall-meal-panel > .btn-small:hover{border-color:var(--main);color:var(--main);background:var(--main-soft);}
+  .recall-suggest-item{gap:10px;}
+  .recall-suggest-item .rs-name{display:flex;flex-direction:column;line-height:1.3;}
+  .recall-suggest-item .rs-name small{color:var(--ink-soft);font-size:11px;}
+  .form-step[data-step="3"] > .panel:not(.recall-meal-panel){grid-column:1/-1;margin:0 !important;}
+  .recall-suggest-item .rs-kcal{font-size:12px;font-weight:600;color:var(--main);white-space:nowrap;}
+
+  /* ===== Formal summary (step 6) ===== */
+  .formal{background:#fff;border:1px solid var(--line);border-radius:14px;padding:18px 22px;font-size:12.5px;color:#111827;}
+  .formal-tools{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:10px;}
+  .formal-tip{font-size:11.5px;color:var(--ink-soft);}
+  .formal-head{text-align:center;border-bottom:2px solid #111827;padding-bottom:8px;margin-bottom:10px;}
+  .fh-org{font-size:12px;color:#374151;}
+  .fh-title{font-family:'Prompt',sans-serif;font-size:16px;font-weight:700;margin-top:2px;}
+  .fh-sub{font-size:11px;color:#6B7280;letter-spacing:.3px;}
+  .fsec{font-family:'Prompt',sans-serif;font-size:12.5px;font-weight:600;margin:9px 0 3px;padding:3px 8px;background:#EEF2F6;border-left:3px solid var(--main);}
+  .formal .ft{width:100%;border-collapse:collapse;table-layout:auto;}
+  .formal .ft th,.formal .ft td{border:1px solid #9CA3AF;padding:3px 7px;font-size:12px;vertical-align:top;text-align:left;}
+  .formal .ft th{background:#F3F4F6;font-weight:600;color:#1F2937;white-space:nowrap;}
+  .formal .ft td{font-weight:500;}
+  .formal .ft-center th,.formal .ft-center td{text-align:center;white-space:normal;}
+  .formal .ft-center td{font-family:'Prompt',sans-serif;font-weight:600;font-size:13px;}
+  .formal .ft-sub th{background:#F9FAFB;font-weight:500;font-size:12px;}
+  .formal .ft-gap{margin-top:6px;}
+  .formal .ft-lbl{width:15%;}
+  .formal .ft td[id="sumHighLabs"]{min-width:90px;}
+  .formal .ft-meals td{white-space:pre-wrap;word-break:break-word;font-weight:400;font-size:12px;}
+  .formal .ft td[colspan="3"]{white-space:normal;}
+  .formal .fcell-flush{padding:0 !important;}
+  .formal .fcell-flush .summary-empty{padding:5px 9px;font-size:12.5px;color:#374151;}
+  .formal .fcell-flush .lab-table-wrap{border:none;border-radius:0;}
+  .formal .fcell-flush .lab-table th{background:#F9FAFB;border:0;border-right:1px solid #D1D5DB;border-bottom:1px solid #D1D5DB;padding:4px 8px;font-size:11.5px;text-align:center;white-space:nowrap;}
+  .formal .fcell-flush .lab-table td{border:0;border-right:1px solid #D1D5DB;padding:4px 8px;font-size:12.5px;text-align:center;}
+  .formal .fcell-flush .lab-table th:last-child,.formal .fcell-flush .lab-table td:last-child{border-right:0;}
+  .formal .fcell-flush .lab-table td{color:var(--danger);font-weight:700;}
+  .formal .sum7-editable{color:#0F766E;}
+  .fsign{display:flex;justify-content:space-between;gap:20px;margin-top:16px;font-size:12.5px;}
+  .fsign div{display:flex;flex-direction:column;align-items:center;gap:2px;flex:1;}
+  .fsign small{color:#6B7280;font-size:11px;}
+  @media (max-width:600px){ .formal{padding:12px;} .formal .ft th{white-space:normal;} .formal .ft{font-size:12px;} .formal-tools{flex-wrap:wrap;} }
+  @media print{
+    @page{size:A4;margin:12mm;}
+    .formal{border:none;padding:0;font-size:11.5px;}
+    .formal .ft th,.formal .ft td{font-size:11.5px;padding:4px 7px;}
+    .fsec,.ft{break-inside:avoid;}
+    .formal .ft th,.fsec,.formal .ft-sub th{-webkit-print-color-adjust:exact;print-color-adjust:exact;}
+  }
+</style>
+</head>
+<body>
+<div class="app">
+
+  <header class="top">
+    <div>
+      <h1>ระบบบันทึกโภชนบำบัดผู้ป่วยนอก</h1>
+      <p>ฟอร์มเดียว ใช้บันทึกได้ทุกกรณี รวมถึงมารดาตั้งครรภ์ (ติ๊กเลือกเพิ่มเติมได้)</p>
+    </div>
+  </header>
+
+  <div class="panel">
+    <h2 id="mainPanelTitle"><span class="accent"></span>บันทึกข้อมูลผู้ป่วย</h2>
+
+    <form id="recordForm">
+      <div class="step-indicator">
+        <div class="step-dot active" data-step="1" onclick="goToStep(1)" style="cursor:pointer;"><span class="num">1</span><span class="label">ข้อมูลผู้ป่วย / BMI / ผลแลป</span></div>
+        <div class="step-dot" data-step="2" onclick="goToStep(2)" style="cursor:pointer;"><span class="num">2</span><span class="label">IBW & พลังงาน</span></div>
+        <div class="step-dot" data-step="3" onclick="goToStep(3)" style="cursor:pointer;"><span class="num">3</span><span class="label">24-hr Recall</span></div>
+        <div class="step-dot" data-step="4" onclick="goToStep(4)" style="cursor:pointer;"><span class="num">4</span><span class="label">ประเมิน NCDs</span></div>
+        <div class="step-dot" data-step="5" onclick="goToStep(5)" style="cursor:pointer;"><span class="num">5</span><span class="label">ปัญหา / อุปสรรค</span></div>
+        <div class="step-dot" data-step="6" onclick="goToStep(6)" style="cursor:pointer;"><span class="num">6</span><span class="label">สรุปผล</span></div>
+        <div class="step-dot" data-step="7" onclick="goToStep(7)" style="cursor:pointer;"><span class="num">7</span><span class="label">ข้อมูลระบุตัวผู้ป่วย</span></div>
+        <div class="step-dot" data-step="8" onclick="goToStep(8)" style="cursor:pointer;"><span class="num">8</span><span class="label">แดชบอร์ด</span></div>
+      </div>
+
+      <div id="formMsg" class="form-msg"></div>
+
+      <div class="form-step active" data-step="1">
+      <div class="grid">
+        <div class="field"><label>วันที่บันทึก</label><input type="date" id="f_date"></div>
+        <div class="field"><label>เลข HN</label><input type="text" id="f_hn" placeholder="เช่น 68-01234"></div>
+        <div class="field span2"><label>ชื่อ-นามสกุลผู้ป่วย</label><input type="text" id="f_name"></div>
+      </div>
+
+      <div class="grid" style="margin-top:14px;">
+        <div class="field"><label>อายุ (ปี)</label><input type="number" id="f_age" min="0" max="120"></div>
+        <div class="field"><label>เพศ</label>
+          <div class="gender-switch">
+            <button type="button" class="gender-switch-opt active" data-val="หญิง" onclick="setGenderSwitch('หญิง')">หญิง</button>
+            <button type="button" class="gender-switch-opt" data-val="ชาย" onclick="setGenderSwitch('ชาย')">ชาย</button>
+          </div>
+          <select id="f_gender" style="display:none;"><option value="หญิง">หญิง</option><option value="ชาย">ชาย</option></select>
+        </div>
+        <div class="field"><label>น้ำหนัก (kg)</label><input type="number" step="0.1" id="f_weight"></div>
+        <div class="field"><label>ส่วนสูง (cm)</label><input type="number" step="0.1" id="f_height"></div>
+      </div>
+      <div class="bmi-inline" id="bmiInline">BMI: <b>–</b></div>
+
+      <div class="grid" style="margin-top:14px;">
+        <div class="field span2"><label>แผนก</label><select id="f_dept"><option value="">— เลือกแผนก —</option><option value="OPD">OPD</option><option value="คลินิกเบาหวาน">คลินิกเบาหวาน</option><option value="คลินิกความดัน">คลินิกความดัน</option><option value="คลินิกไตเรื้อรัง">คลินิกไตเรื้อรัง</option><option value="คลินิกแม่-เด็ก">คลินิกแม่-เด็ก</option><option value="รพ.สต.">รพ.สต.</option></select></div>
+      </div>
+
+      <div class="preg-toggle">
+        <label><input type="checkbox" id="f_isPreg" onchange="togglePreg()"> ผู้ป่วยอยู่ระหว่างตั้งครรภ์ (แสดงฟิลด์เพิ่มเติม)</label>
+      </div>
+
+      <div class="grid c3 preg-extra" id="pregExtraRow">
+        <div class="field"><label>น้ำหนักก่อนตั้งครรภ์ (kg)</label><input type="number" step="0.1" id="f_prepregWeight"></div>
+        <div class="field"><label>อายุครรภ์ (สัปดาห์)</label><input type="number" id="f_ga" min="0" max="45"></div>
+        <div class="field"><label>ครรภ์ที่ (G/P)</label><input type="text" id="f_gp" placeholder="เช่น G2P1"></div>
+        <div class="field span4">
+          <label>ภาวะแทรกซ้อนที่พบ</label>
+          <div class="checkrow">
+            <label><input type="checkbox" name="compl" value="เบาหวานขณะตั้งครรภ์ (GDM)"> เบาหวานขณะตั้งครรภ์ (GDM)</label>
+            <label><input type="checkbox" name="compl" value="ความดันโลหิตสูง"> ความดันโลหิตสูง</label>
+            <label><input type="checkbox" name="compl" value="ภาวะซีด"> ภาวะซีด</label>
+            <label><input type="checkbox" name="compl" value="คลื่นไส้อาเจียนรุนแรง"> คลื่นไส้อาเจียนรุนแรง</label>
+            <label><input type="checkbox" name="compl" value="ครรภ์แฝด"> ครรภ์แฝด</label>
+          </div>
+        </div>
+      </div>
+
+      <div class="panel" style="background:var(--paper);padding:16px;margin:16px 0 0;" id="bmiExtraPanel">
+        <div class="gauge-wrap">
+          <div class="gauge-readout" id="currentBmiRow" style="display:none;">BMI ปัจจุบัน (จากน้ำหนักตอนนี้): <b id="currentBmiValue">–</b> <span id="currentBmiStatus" class="status-pill pill-normal">–</span></div>
+          <div class="gain-note" id="gainNote" style="display:none;"></div>
+        </div>
+      </div>
+
+      <div class="lab-section" style="margin-top:14px;">
+        <div class="lab-section-head">
+          <label>ผลตรวจทางห้องปฏิบัติการ (Lab)</label>
+        </div>
+        <div class="lab-quick-grid" id="labRows"></div>
+      </div>
+      </div><!-- /step 1 -->
+
+      <div class="form-step" data-step="2">
+      <span id="ibwValue" style="display:none;">–</span>
+      <div class="grid c2" style="margin-top:14px;">
+        <div class="field">
+          <label>ระดับความต้องการพลังงาน (kcal/kg IBW/วัน)</label>
+          <select id="f_energyFactor" onchange="computeEnergy()">
+            <option value="20">20 — ลดน้ำหนัก / ภาวะอ้วน</option>
+            <option value="25" selected>25 — ทั่วไป / มาตรฐาน</option>
+            <option value="30">30 — ต้องการพลังงานปานกลาง</option>
+            <option value="35">35 — ภาวะเครียด / บาดเจ็บ</option>
+            <option value="40">40 — ไฟไหม้ / ติดเชื้อรุนแรง</option>
+          </select>
+          <div class="bmi-inline" id="energyInline" style="margin-top:6px;">ความต้องการพลังงานโดยประมาณ: <b id="energyValue">–</b></div>
+          <div class="ibw-note" id="energyFormulaNote">กรอกส่วนสูงในหน้าข้อมูลผู้ป่วยก่อน</div>
+        </div>
+        <div class="field" id="pregEnergyField" style="display:none;">
+          <label>พลังงานสำหรับการตั้งครรภ์</label>
+          <label style="display:flex;align-items:center;gap:8px;font-weight:400;font-size:13.5px;margin-top:8px;">
+            <input type="checkbox" id="f_pregEnergyAddon" onchange="computeEnergy()"> เพิ่ม 300 kcal/วัน (ไตรมาส 2-3)
+          </label>
+        </div>
+      </div>
+
+      <div class="panel" style="background:var(--paper);padding:16px;margin-top:14px;">
+        <div class="gauge-label-row"><span>ความต้องการโปรตีน (Protein requirement)</span></div>
+        <div class="grid c2" style="margin-top:10px;">
+          <div class="field">
+            <label>g โปรตีน ต่อ kg IBW</label>
+            <input type="number" step="0.1" id="f_proteinPerKg" value="1.1" oninput="computeProtein()">
+            <div class="ibw-note" style="margin-top:0;">g/kg</div>
+          </div>
+        </div>
+
+        <div class="field" id="pregProteinField" style="display:none;margin-top:12px;">
+          <label style="display:flex;align-items:center;gap:8px;font-weight:400;font-size:13.5px;">
+            <input type="checkbox" id="f_pregProteinAddon" onchange="computeProtein()"> เพิ่มโปรตีนสำหรับการตั้งครรภ์ (ไตรมาส 2-3)
+          </label>
+          <div class="grid c2" style="margin-top:8px;">
+            <div class="field">
+              <label>ปริมาณที่เพิ่ม (g/วัน)</label>
+              <input type="number" id="f_pregProteinG" value="25" min="10" max="25" step="1" oninput="computeProtein()">
+              <div class="ibw-note" style="margin-top:0;">แนะนำ 10–25 g/วัน</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="grid c3" style="display:none;">
+          <div>
+            <b id="proteinTotalG">–</b>
+          </div>
+          <div>
+            <b id="proteinTotalKcal">–</b>
+          </div>
+          <div>
+            <b id="proteinPctOfEnergy">–</b>
+          </div>
+        </div>
+      </div>
+
+      <div class="panel" style="background:var(--paper);padding:16px;margin-top:14px;">
+        <div class="gauge-label-row"><span>สัดส่วนสารอาหาร C : P : F</span></div>
+        <div class="grid c3" style="margin-top:10px;">
+          <div class="field">
+            <label>คาร์โบไฮเดรต (%)</label>
+            <input type="number" id="f_pctCarb" value="55" min="0" max="100" oninput="computeCPF()">
+          </div>
+          <div class="field">
+            <label>โปรตีน (%)</label>
+            <input type="number" id="f_pctProteinAuto" value="" readonly style="background:var(--main-soft);font-weight:700;">
+          </div>
+          <div class="field">
+            <label>ไขมัน (%)</label>
+            <input type="number" id="f_pctFat" value="25" min="0" max="100" oninput="computeCPF()">
+          </div>
+        </div>
+        <div class="ibw-note" id="cpfSumNote" style="margin-top:8px;">กรอกข้อมูลผู้ป่วยและตั้งค่าพลังงานก่อน</div>
+
+        <div class="grid c3" style="margin-top:14px;">
+          <div style="text-align:center;border:1px solid var(--line);border-radius:10px;padding:12px;">
+            <span style="display:block;font-size:11.5px;color:var(--ink-soft);">คาร์โบไฮเดรต</span>
+            <b id="cpfCarbG" style="font-family:'Prompt',sans-serif;font-size:17px;">–</b>
+            <span style="display:block;font-size:11px;color:var(--ink-soft);" id="cpfCarbKcal">– kcal</span>
+          </div>
+          <div style="text-align:center;border:1px solid var(--line);border-radius:10px;padding:12px;">
+            <span style="display:block;font-size:11.5px;color:var(--ink-soft);">โปรตีน</span>
+            <b id="cpfProteinG" style="font-family:'Prompt',sans-serif;font-size:17px;">–</b>
+            <span style="display:block;font-size:11px;color:var(--ink-soft);" id="cpfProteinKcal">– kcal</span>
+          </div>
+          <div style="text-align:center;border:1px solid var(--line);border-radius:10px;padding:12px;">
+            <span style="display:block;font-size:11.5px;color:var(--ink-soft);">ไขมัน</span>
+            <b id="cpfFatG" style="font-family:'Prompt',sans-serif;font-size:17px;">–</b>
+            <span style="display:block;font-size:11px;color:var(--ink-soft);" id="cpfFatKcal">– kcal</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="panel" style="background:var(--paper);padding:16px;margin-top:14px;">
+        <div class="gauge-label-row"><span>ตารางอาหารแลกเปลี่ยน (Food Exchange List)</span></div>
+        <div class="ibw-note" style="margin-top:4px;">คำนวณอัตโนมัติจากพลังงานและสัดส่วนสารอาหารด้านบน — ปรับจำนวนหน่วยนม/ผัก/ผลไม้ได้ ส่วนข้าว-แป้ง/เนื้อสัตว์/ไขมัน ระบบคำนวณให้ครบตามที่เหลือ (ค่าอ้างอิงจากรายการอาหารแลกเปลี่ยนไทย มาตรฐานสมาคมนักกำหนดอาหารแห่งประเทศไทย)</div>
+
+        <div class="lab-table-wrap" style="margin-top:12px;">
+          <table class="lab-table">
+            <thead>
+              <tr><th>หมวดอาหาร</th><th>จำนวนหน่วย</th><th>คาร์โบไฮเดรต</th><th>โปรตีน</th><th>ไขมัน</th></tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td class="lab-item-name">นม (ไขมันต่ำ)</td>
+                <td><input type="number" step="0.5" min="0" id="f_exMilk" value="1" onchange="computeExchange()" style="width:60px;border:1.3px solid var(--line);border-radius:6px;padding:5px 6px;font-size:13px;"></td>
+                <td id="exMilkCho">–</td><td id="exMilkPro">–</td><td id="exMilkFat">–</td>
+              </tr>
+              <tr>
+                <td class="lab-item-name">ผัก</td>
+                <td><input type="number" step="0.5" min="0" id="f_exVeg" value="3" onchange="computeExchange()" style="width:60px;border:1.3px solid var(--line);border-radius:6px;padding:5px 6px;font-size:13px;"></td>
+                <td id="exVegCho">–</td><td id="exVegPro">–</td><td id="exVegFat">–</td>
+              </tr>
+              <tr>
+                <td class="lab-item-name">ผลไม้</td>
+                <td><input type="number" step="0.5" min="0" id="f_exFruit" value="3" onchange="computeExchange()" style="width:60px;border:1.3px solid var(--line);border-radius:6px;padding:5px 6px;font-size:13px;"></td>
+                <td id="exFruitCho">–</td><td id="exFruitPro">–</td><td id="exFruitFat">–</td>
+              </tr>
+              <tr>
+                <td class="lab-item-name">น้ำตาล (5% ของพลังงานรวม)</td>
+                <td><b id="exSugarCount">–</b></td>
+                <td id="exSugarCho">–</td><td id="exSugarPro">–</td><td id="exSugarFat">–</td>
+              </tr>
+              <tr>
+                <td class="lab-item-name">ข้าว-แป้ง</td>
+                <td><b id="exStarchCount">–</b></td>
+                <td id="exStarchCho">–</td><td id="exStarchPro">–</td><td id="exStarchFat">–</td>
+              </tr>
+              <tr>
+                <td class="lab-item-name">เนื้อสัตว์ (ไขมันปานกลาง)</td>
+                <td><b id="exMeatCount">–</b></td>
+                <td id="exMeatCho">–</td><td id="exMeatPro">–</td><td id="exMeatFat">–</td>
+              </tr>
+              <tr>
+                <td class="lab-item-name">ไขมัน</td>
+                <td><b id="exFatCount">–</b></td>
+                <td id="exFatCho">–</td><td id="exFatPro">–</td><td id="exFatFat">–</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="ibw-note" id="exchangeSummary" style="margin-top:10px;"></div>
+      </div>
+      </div><!-- /step 2 -->
+
+      <div class="form-step" data-step="3">
+      <div class="recall-bar">
+        <div class="rb-main">
+          <div><div class="rb-label">พลังงานรวมที่ได้รับ (24 ชม.)</div><div class="rb-total"><span id="rbTotal">0</span> <small>kcal</small></div></div>
+          <div class="rb-target"><div class="rb-label">เป้าหมาย</div><div class="rb-tv" id="rbTarget">–</div></div>
+          <div class="rb-status" id="rbStatus"></div>
+        </div>
+        <div class="rb-track"><div class="rb-fill" id="rbFill"></div></div>
+        <div class="rb-hint">💡 พิมพ์ชื่ออาหารในช่อง แล้วเลือกจากรายการ (กด Enter เลือกอันแรก) จากนั้นปรับจำนวนด้วย − / +</div>
+      </div>
+
+      <div class="panel recall-meal-panel" data-meal="มื้อเช้า">
+        <div class="recall-meal-head">
+          <span class="recall-meal-title">🌅 มื้อเช้า</span>
+          <span class="recall-meal-kcal" id="mealKcal_เช้า">– kcal</span>
+        </div>
+        <div class="field" style="margin-bottom:10px;">
+          <label>รายการอาหารในมื้อ</label>
+          <textarea id="f_recallFree_เช้า" placeholder="พิมพ์รายการอาหารที่รับประทานในมื้อนี้ เช่น ข้าวสวย ไข่ดาว น้ำเปล่า" rows="1" style="min-height:38px;"></textarea>
+        </div>
+        <div class="recall-cards" id="mealCards_เช้า"></div>
+        <button type="button" class="btn-ghost btn-small" onclick="addRecallCard('มื้อเช้า',{},true)">＋ เพิ่มอาหาร</button>
+      </div>
+
+      <div class="panel recall-meal-panel" data-meal="มื้อกลางวัน">
+        <div class="recall-meal-head">
+          <span class="recall-meal-title">☀️ มื้อกลางวัน</span>
+          <span class="recall-meal-kcal" id="mealKcal_กลางวัน">– kcal</span>
+        </div>
+        <div class="field" style="margin-bottom:10px;">
+          <label>รายการอาหารในมื้อ</label>
+          <textarea id="f_recallFree_กลางวัน" placeholder="พิมพ์รายการอาหารที่รับประทานในมื้อนี้ เช่น ข้าวสวย ไข่ดาว น้ำเปล่า" rows="1" style="min-height:38px;"></textarea>
+        </div>
+        <div class="recall-cards" id="mealCards_กลางวัน"></div>
+        <button type="button" class="btn-ghost btn-small" onclick="addRecallCard('มื้อกลางวัน',{},true)">＋ เพิ่มอาหาร</button>
+      </div>
+
+      <div class="panel recall-meal-panel" data-meal="มื้อเย็น">
+        <div class="recall-meal-head">
+          <span class="recall-meal-title">🌙 มื้อเย็น</span>
+          <span class="recall-meal-kcal" id="mealKcal_เย็น">– kcal</span>
+        </div>
+        <div class="field" style="margin-bottom:10px;">
+          <label>รายการอาหารในมื้อ</label>
+          <textarea id="f_recallFree_เย็น" placeholder="พิมพ์รายการอาหารที่รับประทานในมื้อนี้ เช่น ข้าวสวย ไข่ดาว น้ำเปล่า" rows="1" style="min-height:38px;"></textarea>
+        </div>
+        <div class="recall-cards" id="mealCards_เย็น"></div>
+        <button type="button" class="btn-ghost btn-small" onclick="addRecallCard('มื้อเย็น',{},true)">＋ เพิ่มอาหาร</button>
+      </div>
+
+      <div class="panel recall-meal-panel" data-meal="ของว่าง/อื่นๆ">
+        <div class="recall-meal-head">
+          <span class="recall-meal-title">🍪 ของว่าง/อื่นๆ</span>
+          <span class="recall-meal-kcal" id="mealKcal_ของว่าง">– kcal</span>
+        </div>
+        <div class="field" style="margin-bottom:10px;">
+          <label>รายการอาหารในมื้อ</label>
+          <textarea id="f_recallFree_ของว่าง" placeholder="พิมพ์รายการอาหารที่รับประทานในมื้อนี้ เช่น ผลไม้ ขนม" rows="1" style="min-height:38px;"></textarea>
+        </div>
+        <div class="recall-cards" id="mealCards_ของว่าง"></div>
+        <button type="button" class="btn-ghost btn-small" onclick="addRecallCard('ของว่าง/อื่นๆ',{},true)">＋ เพิ่มอาหาร</button>
+      </div>
+
+      <div class="panel" style="background:var(--paper);padding:16px;margin-top:14px;">
+        <div class="gauge-label-row"><span>เปรียบเทียบสัดส่วนอาหารกับ 24-hour Dietary Recall</span></div>
+        <div class="ibw-note" style="margin-top:4px;">เทียบสิ่งที่ผู้ป่วยได้รับจริงจาก Recall กับเป้าหมายจากหน้า 2 (ความต้องการพลังงานโดยประมาณ และสัดส่วนสารอาหาร C:P:F)</div>
+
+        <div class="lab-table-wrap" style="margin-top:12px;">
+          <table class="lab-table">
+            <thead>
+              <tr><th>สารอาหาร</th><th>เป้าหมาย (หน้า 2)</th><th>ได้รับจริง</th><th>ผลต่าง</th></tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td class="lab-item-name">คาร์โบไฮเดรต</td>
+                <td id="cmpCarbTarget">–</td><td id="cmpCarbActual">–</td><td id="cmpCarbDiff">–</td>
+              </tr>
+              <tr>
+                <td class="lab-item-name">โปรตีน</td>
+                <td id="cmpProTarget">–</td><td id="cmpProActual">–</td><td id="cmpProDiff">–</td>
+              </tr>
+              <tr>
+                <td class="lab-item-name">ไขมัน</td>
+                <td id="cmpFatTarget">–</td><td id="cmpFatActual">–</td><td id="cmpFatDiff">–</td>
+              </tr>
+              <tr>
+                <td class="lab-item-name">พลังงาน (kcal)</td>
+                <td id="cmpKcalTarget">–</td><td id="cmpKcalActual">–</td><td id="cmpKcalDiff">–</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="ibw-note" id="recallVsTarget" style="margin-top:10px;">ยังไม่ได้ตั้งค่าพลังงานเป้าหมายในหน้า IBW & พลังงาน</div>
+      </div>
+
+      <div class="panel" style="background:var(--paper);padding:16px;margin-top:14px;">
+        <div class="grid">
+          <div class="field span4">
+            <label>หมายเหตุ / ข้อสังเกตจากการซักประวัติ 24-hour recall</label>
+            <textarea id="f_recallNote" placeholder="เช่น รูปแบบการกินไม่สม่ำเสมอ, ข้ามมื้ออาหาร, สัดส่วนอาหารกลุ่มใดกลุ่มหนึ่งมากเกินไป ฯลฯ"></textarea>
+          </div>
+        </div>
+      </div>
+      </div><!-- /step 3 -->
+      <div class="form-step" data-step="4">
+      <div class="panel" style="background:var(--paper);padding:16px;margin:0;">
+        <div class="gauge-label-row"><span>แบบประเมินพฤติกรรมการบริโภคอาหาร หวาน มัน เค็ม (Eat Test)</span></div>
+        <div class="ibw-note">ข้อมูลจากสำนักงานกองทุนสนับสนุนการสร้างเสริมสุขภาพ (สสส.) — เลือกคำตอบที่ตรงกับความถี่ในการทำพฤติกรรมแต่ละข้อของผู้ป่วย</div>
+      </div>
+
+      <div class="panel" style="background:var(--paper);padding:16px;margin-top:14px;">
+        <div class="ncd-table-wrap">
+          <table class="ncd-table">
+            <thead>
+              <tr>
+                <th class="cat-header">🍯 หวาน</th>
+                <th>ดื่มน้ำเปล่า กาแฟดำ ชาไม่ใส่น้ำตาล</th>
+                <th>ดื่มน้ำอัดลม กาแฟ 3in1 กาแฟเย็น กาแฟปั่น เครื่องดื่มชง น้ำหวาน หรือนมเปรี้ยว</th>
+                <th>ดื่มน้ำผัก ผลไม้สำเร็จรูป</th>
+                <th>กินไอศกรีม เบเกอรี่ หรือขนมหวานไทย</th>
+                <th>เติมน้ำตาล น้ำผึ้ง น้ำเชื่อม เพิ่มลงในอาหาร</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td class="freq-label">ทุกวัน/เกือบทุกวัน</td>
+                <td><label><input type="radio" name="ncdSweet1" value="1" onchange="computeNCD()">1</label></td>
+                <td><label><input type="radio" name="ncdSweet2" value="3" onchange="computeNCD()">3</label></td>
+                <td><label><input type="radio" name="ncdSweet3" value="3" onchange="computeNCD()">3</label></td>
+                <td><label><input type="radio" name="ncdSweet4" value="3" onchange="computeNCD()">3</label></td>
+                <td><label><input type="radio" name="ncdSweet5" value="3" onchange="computeNCD()">3</label></td>
+              </tr>
+              <tr>
+                <td class="freq-label">3-4 ครั้งต่อสัปดาห์</td>
+                <td><label><input type="radio" name="ncdSweet1" value="2" onchange="computeNCD()">2</label></td>
+                <td><label><input type="radio" name="ncdSweet2" value="2" onchange="computeNCD()">2</label></td>
+                <td><label><input type="radio" name="ncdSweet3" value="2" onchange="computeNCD()">2</label></td>
+                <td><label><input type="radio" name="ncdSweet4" value="2" onchange="computeNCD()">2</label></td>
+                <td><label><input type="radio" name="ncdSweet5" value="2" onchange="computeNCD()">2</label></td>
+              </tr>
+              <tr>
+                <td class="freq-label">แทบไม่ทำ/ไม่ทำเลย</td>
+                <td><label><input type="radio" name="ncdSweet1" value="3" onchange="computeNCD()">3</label></td>
+                <td><label><input type="radio" name="ncdSweet2" value="1" onchange="computeNCD()">1</label></td>
+                <td><label><input type="radio" name="ncdSweet3" value="1" onchange="computeNCD()">1</label></td>
+                <td><label><input type="radio" name="ncdSweet4" value="1" onchange="computeNCD()">1</label></td>
+                <td><label><input type="radio" name="ncdSweet5" value="1" onchange="computeNCD()">1</label></td>
+              </tr>
+            </tbody>
+            <tfoot>
+              <tr class="ncd-total-row"><td colspan="6">รวมคะแนนทั้งหมด: <span id="ncdSweetScore">–</span> คะแนน &nbsp; <span class="status-pill pill-normal" id="ncdSweetRisk">–</span></td></tr>
+            </tfoot>
+          </table>
+        </div>
+      </div>
+
+      <div class="panel" style="background:var(--paper);padding:16px;margin-top:14px;">
+        <div class="ncd-table-wrap">
+          <table class="ncd-table">
+            <thead>
+              <tr>
+                <th class="cat-header">🥓 ไขมัน</th>
+                <th>เลือกกินเนื้อสัตว์ติดมัน ติดหนัง มีไขมันแทรก</th>
+                <th>กินอาหารทอด อาหารฟาสต์ฟู้ด อาหารผัดน้ำมัน</th>
+                <th>กินอาหารจานเดียวไขมันสูง หรืออาหารประเภทแกงกะทิ</th>
+                <th>ดื่มเครื่องดื่มที่ชงผสมนมข้นหวาน ครีมเทียม วิปปิ้งครีม</th>
+                <th>ซดน้ำแกง ราดน้ำแกงหรือน้ำผัดลงในข้าว</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td class="freq-label">ทุกวัน/เกือบทุกวัน</td>
+                <td><label><input type="radio" name="ncdFat1" value="3" onchange="computeNCD()">3</label></td>
+                <td><label><input type="radio" name="ncdFat2" value="3" onchange="computeNCD()">3</label></td>
+                <td><label><input type="radio" name="ncdFat3" value="3" onchange="computeNCD()">3</label></td>
+                <td><label><input type="radio" name="ncdFat4" value="3" onchange="computeNCD()">3</label></td>
+                <td><label><input type="radio" name="ncdFat5" value="3" onchange="computeNCD()">3</label></td>
+              </tr>
+              <tr>
+                <td class="freq-label">3-4 ครั้งต่อสัปดาห์</td>
+                <td><label><input type="radio" name="ncdFat1" value="2" onchange="computeNCD()">2</label></td>
+                <td><label><input type="radio" name="ncdFat2" value="2" onchange="computeNCD()">2</label></td>
+                <td><label><input type="radio" name="ncdFat3" value="2" onchange="computeNCD()">2</label></td>
+                <td><label><input type="radio" name="ncdFat4" value="2" onchange="computeNCD()">2</label></td>
+                <td><label><input type="radio" name="ncdFat5" value="2" onchange="computeNCD()">2</label></td>
+              </tr>
+              <tr>
+                <td class="freq-label">แทบไม่ทำ/ไม่ทำเลย</td>
+                <td><label><input type="radio" name="ncdFat1" value="1" onchange="computeNCD()">1</label></td>
+                <td><label><input type="radio" name="ncdFat2" value="1" onchange="computeNCD()">1</label></td>
+                <td><label><input type="radio" name="ncdFat3" value="1" onchange="computeNCD()">1</label></td>
+                <td><label><input type="radio" name="ncdFat4" value="1" onchange="computeNCD()">1</label></td>
+                <td><label><input type="radio" name="ncdFat5" value="1" onchange="computeNCD()">1</label></td>
+              </tr>
+            </tbody>
+            <tfoot>
+              <tr class="ncd-total-row"><td colspan="6">รวมคะแนนทั้งหมด: <span id="ncdFatScore">–</span> คะแนน &nbsp; <span class="status-pill pill-normal" id="ncdFatRisk">–</span></td></tr>
+            </tfoot>
+          </table>
+        </div>
+      </div>
+
+      <div class="panel" style="background:var(--paper);padding:16px;margin-top:14px;">
+        <div class="ncd-table-wrap">
+          <table class="ncd-table">
+            <thead>
+              <tr>
+                <th class="cat-header">🧂 โซเดียม</th>
+                <th>ชิมอาหารก่อนปรุงรสเพิ่มด้วยน้ำปลา ซีอิ๊ว ซอส หรือเครื่องปรุงรส</th>
+                <th>ใช้สมุนไพรหรือเครื่องเทศเป็นส่วนประกอบอาหารแทนเครื่องปรุง</th>
+                <th>กินเนื้อสัตว์แปรรูป ได้แก่ ไส้กรอก หมูยอ แหนม ปลาเค็ม กุ้งแห้ง ปลาร้า</th>
+                <th>กินบะหมี่ โจ๊กกึ่งสำเร็จรูป หรืออาหารกล่องแช่แข็ง</th>
+                <th>กินผักผลไม้ดองหรือผลไม้แช่อิ่ม จิ้มพริกเกลือน้ำปลาหวาน</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td class="freq-label">ทุกวัน/เกือบทุกวัน</td>
+                <td><label><input type="radio" name="ncdSalt1" value="1" onchange="computeNCD()">1</label></td>
+                <td><label><input type="radio" name="ncdSalt2" value="1" onchange="computeNCD()">1</label></td>
+                <td><label><input type="radio" name="ncdSalt3" value="3" onchange="computeNCD()">3</label></td>
+                <td><label><input type="radio" name="ncdSalt4" value="3" onchange="computeNCD()">3</label></td>
+                <td><label><input type="radio" name="ncdSalt5" value="3" onchange="computeNCD()">3</label></td>
+              </tr>
+              <tr>
+                <td class="freq-label">3-4 ครั้งต่อสัปดาห์</td>
+                <td><label><input type="radio" name="ncdSalt1" value="2" onchange="computeNCD()">2</label></td>
+                <td><label><input type="radio" name="ncdSalt2" value="2" onchange="computeNCD()">2</label></td>
+                <td><label><input type="radio" name="ncdSalt3" value="2" onchange="computeNCD()">2</label></td>
+                <td><label><input type="radio" name="ncdSalt4" value="2" onchange="computeNCD()">2</label></td>
+                <td><label><input type="radio" name="ncdSalt5" value="2" onchange="computeNCD()">2</label></td>
+              </tr>
+              <tr>
+                <td class="freq-label">แทบไม่ทำ/ไม่ทำเลย</td>
+                <td><label><input type="radio" name="ncdSalt1" value="3" onchange="computeNCD()">3</label></td>
+                <td><label><input type="radio" name="ncdSalt2" value="3" onchange="computeNCD()">3</label></td>
+                <td><label><input type="radio" name="ncdSalt3" value="1" onchange="computeNCD()">1</label></td>
+                <td><label><input type="radio" name="ncdSalt4" value="1" onchange="computeNCD()">1</label></td>
+                <td><label><input type="radio" name="ncdSalt5" value="1" onchange="computeNCD()">1</label></td>
+              </tr>
+            </tbody>
+            <tfoot>
+              <tr class="ncd-total-row"><td colspan="6">รวมคะแนนทั้งหมด: <span id="ncdSaltScore">–</span> คะแนน &nbsp; <span class="status-pill pill-normal" id="ncdSaltRisk">–</span></td></tr>
+            </tfoot>
+          </table>
+        </div>
+      </div>
+      <div class="ibw-note" style="margin-top:8px;">เกณฑ์: ≤5 เสี่ยงต่ำ · 6–9 เสี่ยงปานกลาง · 10–13 เสี่ยงสูง · 14–15 เสี่ยงสูงมาก (พิจารณาแยกคะแนนแต่ละหมวด — บางข้อเป็นพฤติกรรมที่ดี ทำบ่อยจะได้คะแนนต่ำ)</div>
+      </div><!-- /step 4 -->
+      <div class="form-step" data-step="5">
+      <div class="panel" style="background:var(--paper);padding:16px;margin:0;">
+        <div class="gauge-label-row"><span>ปัญหา/อุปสรรคในการปฏิบัติตามแผนโภชนบำบัด</span></div>
+        <div class="ibw-note" style="margin-top:4px;">แยกตามหมวด — ติ๊กได้หลายข้อในแต่ละหมวด</div>
+      </div>
+
+      <div class="panel" style="background:var(--paper);padding:16px;margin-top:14px;">
+        <div class="gauge-label-row"><span>หมวดร่างกาย/อาการ</span></div>
+        <div class="checkrow" style="margin-top:10px;">
+          <label><input type="checkbox" name="probPhysical" value="เคี้ยวลำบาก/ปัญหาช่องปาก-ฟัน"> เคี้ยวลำบาก/ปัญหาช่องปาก-ฟัน</label>
+          <label><input type="checkbox" name="probPhysical" value="เบื่ออาหาร/รับประทานได้น้อย"> เบื่ออาหาร/รับประทานได้น้อย</label>
+          <label><input type="checkbox" name="probPhysical" value="คลื่นไส้/อาเจียน"> คลื่นไส้/อาเจียน</label>
+          <label><input type="checkbox" name="probPhysical" value="กลืนลำบาก"> กลืนลำบาก</label>
+          <label><input type="checkbox" name="probPhysical" value="ท้องผูก/ท้องเสีย"> ท้องผูก/ท้องเสีย</label>
+          <label><input type="checkbox" name="probPhysical" value="น้ำหนักลดโดยไม่ตั้งใจ"> น้ำหนักลดโดยไม่ตั้งใจ</label>
+          <label><input type="checkbox" name="probPhysical" value="รสชาติ/กลิ่นอาหารเปลี่ยนไป"> รสชาติ/กลิ่นอาหารเปลี่ยนไป</label>
+          <label><input type="checkbox" name="probPhysical" value="การเจ็บปวดตามร่างกาย"> การเจ็บปวดตามร่างกาย</label>
+          <label><input type="checkbox" name="probPhysical" value="นอนไม่หลับ/พักผ่อนไม่เพียงพอ"> นอนไม่หลับ/พักผ่อนไม่เพียงพอ</label>
+          <label><input type="checkbox" name="probPhysical" value="ความเครียด"> ความเครียด</label>
+          <label><input type="checkbox" name="probPhysical" value="กรดไหลย้อน"> กรดไหลย้อน</label>
+        </div>
+      </div>
+
+      <div class="panel" style="background:var(--paper);padding:16px;margin-top:14px;">
+        <div class="gauge-label-row"><span>หมวดความรู้/พฤติกรรม</span></div>
+        <div class="checkrow" style="margin-top:10px;">
+          <label><input type="checkbox" name="probBehavior" value="ขาดความรู้ความเข้าใจเรื่องโภชนาการ"> ขาดความรู้ความเข้าใจเรื่องโภชนาการ</label>
+          <label><input type="checkbox" name="probBehavior" value="ยา: รับประทานยาไม่ถูกต้อง"> ยา: รับประทานยาไม่ถูกต้อง</label>
+          <label><input type="checkbox" name="probBehavior" value="ไม่ให้ความร่วมมือ/ไม่ปฏิบัติตามคำแนะนำ"> ไม่ให้ความร่วมมือ/ไม่ปฏิบัติตามคำแนะนำ</label>
+          <label><input type="checkbox" name="probBehavior" value="รับประทานอาหารไม่ตรงเวลา"> รับประทานอาหารไม่ตรงเวลา</label>
+        </div>
+      </div>
+
+      <div class="panel" style="background:var(--paper);padding:16px;margin-top:14px;">
+        <div class="gauge-label-row"><span>หมวดเศรษฐกิจ/สังคม</span></div>
+        <div class="checkrow" style="margin-top:10px;">
+          <label><input type="checkbox" name="probSocial" value="ข้อจำกัดด้านเศรษฐกิจ/ค่าใช้จ่ายอาหาร"> ข้อจำกัดด้านเศรษฐกิจ/ค่าใช้จ่ายอาหาร</label>
+          <label><input type="checkbox" name="probSocial" value="อาศัยอยู่คนเดียว"> อาศัยอยู่คนเดียว</label>
+          <label><input type="checkbox" name="probSocial" value="ไม่มีผู้ดูแล/ช่วยเตรียมอาหาร"> ไม่มีผู้ดูแล/ช่วยเตรียมอาหาร</label>
+          <label><input type="checkbox" name="probSocial" value="เข้าถึงอาหารที่เหมาะสมได้ยาก"> เข้าถึงอาหารที่เหมาะสมได้ยาก</label>
+          <label><input type="checkbox" name="probSocial" value="ข้อจำกัดทางวัฒนธรรม/ศาสนา"> ข้อจำกัดทางวัฒนธรรม/ศาสนา</label>
+          <label><input type="checkbox" name="probSocial" value="ดูแลผู้ป่วยติดเตียง"> ดูแลผู้ป่วยติดเตียง</label>
+          <label><input type="checkbox" name="probSocial" value="ดูแล เลี้ยงดูเด็กต่ำกว่า 5 ปี"> ดูแล เลี้ยงดูเด็กต่ำกว่า 5 ปี</label>
+        </div>
+      </div>
+
+      <div class="panel" style="background:var(--paper);padding:16px;margin-top:14px;">
+        <div class="gauge-label-row"><span>การให้คำแนะนำโภชนาการ (Advice)</span></div>
+        <div class="checkrow" style="margin-top:10px;">
+          <label><input type="checkbox" name="advice" value="DM diet"> DM diet</label>
+          <label><input type="checkbox" name="advice" value="CKD diet"> CKD diet</label>
+          <label><input type="checkbox" name="advice" value="DASH diet"> DASH diet</label>
+          <label><input type="checkbox" id="f_advice_other_chk" onchange="toggleAdviceOther()"> อื่นๆ</label>
+        </div>
+        <input type="text" id="f_advice_other" placeholder="ระบุคำแนะนำโภชนาการอื่นๆ" style="display:none;margin-top:10px;">
+      </div>
+
+      <div class="panel" style="background:var(--paper);padding:16px;margin-top:14px;">
+        <div class="grid">
+          <div class="field span4">
+            <label>รายละเอียดเพิ่มเติม / แนวทางแก้ไข</label>
+            <textarea id="f_problemNote" placeholder="อธิบายปัญหาหรืออุปสรรคเพิ่มเติม และแนวทางที่วางแผนแก้ไข"></textarea>
+          </div>
+        </div>
+      </div>
+      </div><!-- /step 5 -->
+
+      <div class="form-step" data-step="6">
+      <div class="formal">
+        <div class="formal-tools no-print">
+          <span class="formal-tip">เอกสารสรุปผลการให้โภชนบำบัด · แตะชื่อผู้ป่วยเพื่อดูข้อมูลระบุตัวตน</span>
+          <button type="button" class="btn-ghost btn-small" onclick="window.print()">🖨️ พิมพ์เอกสาร</button>
+        </div>
+        <div class="formal-head">
+          <div class="fh-org">โรงพยาบาลเจริญศิลป์ · กลุ่มงานโภชนศาสตร์</div>
+          <div class="fh-title">แบบบันทึกการให้โภชนบำบัดผู้ป่วยนอก</div>
+                  </div>
+
+        <div class="fsec">1. ข้อมูลผู้รับบริการ</div>
+        <table class="ft">
+          <tr><th>วันที่</th><td id="sumDate">–</td><th>HN</th><td id="sumHn">–</td><th>ชื่อ-สกุล</th><td id="sumName" class="sum7-editable" onclick="goToStep(7)" title="แตะเพื่อดูรายละเอียด">–</td><th>แผนก</th><td id="sumDept">–</td></tr>
+          <tr><th>เพศ</th><td id="sumGender">–</td><th>อายุ</th><td id="sumAge">–</td><th>BMI</th><td id="sumBmi">–</td><th>Lab สูง</th><td id="sumHighLabs" class="fcell-flush"><div class="summary-empty">–</div></td></tr>
+        </table>
+
+        <div class="fsec">2. ความต้องการพลังงานและสารอาหาร</div>
+        <table class="ft ft-center">
+          <thead><tr><th>IBW</th><th>พลังงาน/วัน</th><th>โปรตีน/วัน</th><th>คาร์โบไฮเดรต</th><th>โปรตีน (P)</th><th>ไขมัน</th></tr></thead>
+          <tbody><tr><td id="sumIbw">–</td><td id="sumEnergyTarget">–</td><td id="sumProteinTarget">–</td><td id="sumCarbTarget">–</td><td id="sumProTarget2">–</td><td id="sumFatTarget">–</td></tr></tbody>
+        </table>
+        <table class="ft ft-center ft-gap">
+          <thead><tr><th>นม</th><th>ผัก</th><th>ผลไม้</th><th>น้ำตาล</th><th>ข้าว-แป้ง</th><th>เนื้อสัตว์</th><th>ไขมัน</th></tr></thead>
+          <tbody><tr>
+            <td id="sumExMilk">–</td><td id="sumExVeg">–</td><td id="sumExFruit">–</td><td id="sumExSugar">–</td>
+            <td id="sumExStarch">–</td><td id="sumExMeat">–</td><td id="sumExFat">–</td>
+          </tr></tbody>
+        </table>
+
+        <div class="fsec">3. การบริโภคอาหาร (24-hr Recall)</div>
+        <table class="ft">
+          <tr><th>พลังงานที่ได้รับจริง</th><td id="sumRecallKcal">–</td><th>ผลต่างจากเป้าหมาย</th><td id="sumEnergyDiff">–</td></tr>
+        </table>
+        <table class="ft ft-gap ft-meals">
+          <thead><tr><th>เช้า</th><th>กลางวัน</th><th>เย็น</th><th>ว่าง/อื่นๆ</th></tr></thead>
+          <tbody><tr>
+            <td id="sumRecall_เช้า">–</td><td id="sumRecall_กลางวัน">–</td><td id="sumRecall_เย็น">–</td><td id="sumRecall_ของว่าง">–</td>
+          </tr></tbody>
+        </table>
+
+        <div class="fsec">4. ประเมินพฤติกรรม ปัญหา และคำแนะนำ</div>
+        <table class="ft">
+          <tr><th class="ft-lbl">Eat Test</th><td>หวาน: <b id="sumNcdSweet">–</b> &nbsp;·&nbsp; มัน: <b id="sumNcdFat">–</b> &nbsp;·&nbsp; เค็ม: <b id="sumNcdSalt">–</b></td></tr>
+          <tr><th class="ft-lbl">ปัญหา/อุปสรรค</th><td id="sumProblems">–</td></tr>
+          <tr><th class="ft-lbl">คำแนะนำ</th><td id="sumAdvice">–</td></tr>
+        </table>
+
+        <div class="fsign">
+          <div><span>ลงชื่อ ........................................ นักกำหนดอาหาร</span></div>
+          <div><span>วันที่ ......../......../........</span></div>
+        </div>
+      </div>
+      </div><!-- /step 6 -->
+
+      <div class="form-step" data-step="7">
+      <div class="summary-doc">
+        <div class="summary-doc-head" style="justify-content:flex-end;">
+          <button type="button" class="btn-ghost btn-small no-print" onclick="window.print()">🖨️ พิมพ์เอกสาร</button>
+        </div>
+        <h4>ข้อมูลระบุตัวผู้ป่วย</h4>
+        <div class="summary-grid">
+          <div><span>วันที่บันทึก</span><b id="sum7Date">–</b></div>
+          <div><span>รายชื่อผู้ป่วย</span><b id="sum7Name" class="sum7-editable" onclick="editFromStep7()" title="แตะเพื่อแก้ไขข้อมูล">–</b></div>
+          <div><span>อายุ</span><b id="sum7Age">–</b></div>
+          <div><span>BMI</span><b id="sum7Bmi">–</b></div>
+        </div>
+      </div>
+      </div><!-- /step 7 -->
+
+      <div class="form-step" data-step="8">
+      <div class="print-only print-header">แดชบอร์ดสรุปข้อมูลผู้รับบริการรายเดือน</div>
+      <div class="summary-doc">
+        <div class="summary-doc-head no-print" style="justify-content:space-between;">
+          <div class="field" style="max-width:200px;margin:0;">
+            <label>เลือกเดือน</label>
+            <input type="month" id="dashMonth" onchange="renderDashboard()">
+          </div>
+          <button type="button" class="btn-ghost btn-small" onclick="window.print()">🖨️ พิมพ์แดชบอร์ด</button>
+        </div>
+
+        <h4>ภาพรวมผู้รับบริการ</h4>
+        <div class="summary-grid">
+          <div><span>จำนวนผู้รับบริการ</span><b id="dashTotal">–</b></div>
+          <div><span>เพศชาย</span><b id="dashMale">–</b></div>
+          <div><span>เพศหญิง</span><b id="dashFemale">–</b></div>
+          <div><span>อายุเฉลี่ย</span><b id="dashAvgAge">–</b></div>
+        </div>
+
+        <h4>ผลตรวจทางห้องปฏิบัติการ (Lab) ที่ผิดปกติ</h4>
+        <div id="dashLabTable"><div class="summary-empty">ยังไม่มีข้อมูล</div></div>
+
+        <h4>คะแนนแบบประเมินพฤติกรรมการบริโภคอาหาร หวาน มัน เค็ม (Eat Test) เฉลี่ย</h4>
+        <div class="summary-grid">
+          <div><span>หมวดหวาน</span><b id="dashNcdSweet">–</b></div>
+          <div><span>หมวดมัน</span><b id="dashNcdFat">–</b></div>
+          <div><span>หมวดเค็ม</span><b id="dashNcdSalt">–</b></div>
+        </div>
+
+        <h4>ปัญหา/อุปสรรคในการปฏิบัติตามแผนโภชนบำบัดที่พบบ่อย</h4>
+        <div id="dashProblems"><div class="summary-empty">ยังไม่มีข้อมูล</div></div>
+      </div>
+      </div><!-- /step 8 -->
+
+      <input type="hidden" id="f_editId">
+      <div class="actions">
+        <button type="button" class="btn-ghost" id="btnBack" style="display:none;" onclick="prevStep()">ย้อนกลับ</button>
+        <button type="button" class="btn-primary" id="btnNext" onclick="nextStep()">หน้าถัดไป</button>
+        <button type="submit" class="btn-primary" id="btnSubmit" style="display:none;">บันทึกข้อมูล</button>
+      </div>
+    </form>
+  </div>
+
+  <footer>ข้อมูลถูกบันทึกไว้ในเครื่องของผู้ใช้งานนี้เท่านั้น</footer>
+</div>
+
+<script>
+window.addEventListener("error",function(e){var b=document.createElement("div");b.style.cssText="position:fixed;top:0;left:0;right:0;background:#b3261e;color:#fff;padding:8px 12px;font-size:13px;z-index:9999";b.textContent="เกิดข้อผิดพลาด: "+e.message;document.body&&document.body.appendChild(b);});
+let records = [];
+let lastEnergyTotal = null;
+let lastCarbG = null;
+let lastProteinG = null;
+let lastFatG = null;
+let editingId = null;
+const STORAGE_KEY = 'nutrition-records-unified';
+
+async function loadRecords(){
+  try{
+    if(window.storage){
+      const res = await window.storage.get(STORAGE_KEY, false);
+      records = res && res.value ? JSON.parse(res.value) : [];
+    } else {
+      const v = localStorage.getItem(STORAGE_KEY);
+      records = v ? JSON.parse(v) : [];
+    }
+  }catch(e){ records = []; }
+}
+
+async function saveRecords(){
+  try{
+    if(window.storage) await window.storage.set(STORAGE_KEY, JSON.stringify(records), false);
+    else localStorage.setItem(STORAGE_KEY, JSON.stringify(records));
+  }catch(e){
+    console.error('Storage error', e);
+    showMsg('ไม่สามารถบันทึกข้อมูลได้ กรุณาลองใหม่อีกครั้ง', 'error');
+  }
+}
+
+function showMsg(text, type){
+  const el = document.getElementById('formMsg');
+  el.textContent = text;
+  el.className = 'form-msg ' + type;
+  el.style.display = 'block';
+  window.scrollTo({top:0, behavior:'smooth'});
+}
+
+function hideMsg(){
+  document.getElementById('formMsg').style.display = 'none';
+}
+
+let currentStep = 1;
+const TOTAL_STEPS = 8;
+
+function renderDashboard(){
+  const monthInput = document.getElementById('dashMonth');
+  if(!monthInput.value){
+    const now = new Date();
+    monthInput.value = now.getFullYear() + '-' + String(now.getMonth()+1).padStart(2,'0');
+  }
+  const month = monthInput.value; // "YYYY-MM"
+  const filtered = records.filter(r => r.date && r.date.startsWith(month));
+
+  document.getElementById('dashTotal').textContent = filtered.length;
+
+  let maleCount = 0, femaleCount = 0, ageSum = 0, ageCount = 0;
+  filtered.forEach(r=>{
+    if(r.gender === 'ชาย') maleCount++;
+    else if(r.gender === 'หญิง') femaleCount++;
+    const age = parseFloat(r.age);
+    if(!isNaN(age)){ ageSum += age; ageCount++; }
+  });
+  document.getElementById('dashMale').textContent = maleCount;
+  document.getElementById('dashFemale').textContent = femaleCount;
+  document.getElementById('dashAvgAge').textContent = ageCount ? (ageSum/ageCount).toFixed(1) + ' ปี' : '–';
+
+  const labStats = {};
+  LAB_PRESETS.forEach(p=>{ labStats[p.name] = { label: p.label, abnormal: 0, total: 0 }; });
+  filtered.forEach(r=>{
+    (r.labs || []).forEach(l=>{
+      if(labStats[l.key]){
+        labStats[l.key].total++;
+        if(l.interp && l.interp !== 'ปกติ') labStats[l.key].abnormal++;
+      }
+    });
+  });
+  const labRows = Object.values(labStats).filter(s=>s.total > 0);
+  const labTableEl = document.getElementById('dashLabTable');
+  if(!labRows.length){
+    labTableEl.innerHTML = '<div class="summary-empty">ยังไม่มีข้อมูลผลตรวจในเดือนนี้</div>';
+  } else {
+    labTableEl.innerHTML = `<table class="lab-table summary-kv-table"><tbody>` +
+      labRows.map(s=>{
+        const pct = Math.round((s.abnormal/s.total)*100);
+        return `<tr><td>${s.label}</td><td>${s.abnormal}/${s.total} คน (${pct}%)</td></tr>`;
+      }).join('') + `</tbody></table>`;
+  }
+
+  ['Sweet','Fat','Salt'].forEach(cat=>{
+    const key = 'ncd'+cat+'Score';
+    const vals = filtered.map(r=>r[key]).filter(v=>typeof v === 'number' && !isNaN(v));
+    const el = document.getElementById('dashNcd'+cat);
+    if(!vals.length){ el.textContent = '–'; return; }
+    const avg = vals.reduce((a,b)=>a+b,0)/vals.length;
+    const info = ncdRiskInfo(avg);
+    el.textContent = avg.toFixed(1) + ' คะแนน (' + info.label + ')';
+  });
+
+  const probFreq = {};
+  filtered.forEach(r=>{
+    ['probPhysical','probBehavior','probSocial'].forEach(field=>{
+      (r[field] || []).forEach(v=>{
+        probFreq[v] = (probFreq[v] || 0) + 1;
+      });
+    });
+  });
+  const probEntries = Object.entries(probFreq).sort((a,b)=>b[1]-a[1]);
+  const probEl = document.getElementById('dashProblems');
+  if(!probEntries.length){
+    probEl.innerHTML = '<div class="summary-empty">ยังไม่มีข้อมูลปัญหา/อุปสรรคในเดือนนี้</div>';
+  } else {
+    probEl.innerHTML = '<ul class="summary-list">' +
+      probEntries.map(([name,count])=>`<li>${escapeAttr(name)} — ${count} คน</li>`).join('') +
+      '</ul>';
+  }
+}
+
+function renderStep7(){
+  document.getElementById('sum7Date').textContent = document.getElementById('f_date').value || '–';
+  document.getElementById('sum7Name').textContent = document.getElementById('f_name').value || '–';
+  document.getElementById('sum7Age').textContent = document.getElementById('f_age').value || '–';
+  const bmiInlineText = document.getElementById('bmiInline').textContent.replace(/^BMI:\s*/, '').trim();
+  document.getElementById('sum7Bmi').textContent = (bmiInlineText && bmiInlineText !== '–') ? bmiInlineText : '–';
+}
+
+function editFromStep7(){
+  goToStep(1);
+  const nameInput = document.getElementById('f_name');
+  nameInput.focus();
+  nameInput.select();
+}
+
+function renderSummary(){
+  document.getElementById('sumDate').textContent = document.getElementById('f_date').value || '–';
+  document.getElementById('sumHn').textContent = document.getElementById('f_hn').value || '–';
+  document.getElementById('sumName').textContent = document.getElementById('f_name').value || '–';
+  const isPreg = document.getElementById('f_isPreg').checked;
+  const genderTxt = (document.getElementById('f_gender').value || '') + (isPreg ? ' (ตั้งครรภ์)' : '');
+  document.getElementById('sumGender').textContent = genderTxt.trim() || '–';
+  document.getElementById('sumDept').textContent = document.getElementById('f_dept').value || '–';
+  document.getElementById('sumAge').textContent = document.getElementById('f_age').value || '–';
+  const bmiInlineText = document.getElementById('bmiInline').textContent.replace(/^BMI:\s*/, '').trim();
+  document.getElementById('sumBmi').textContent = (bmiInlineText && bmiInlineText !== '–') ? bmiInlineText : '–';
+
+  const highLabsEl = document.getElementById('sumHighLabs');
+  const highItems = [];
+  LAB_PRESETS.forEach(p=>{
+    const pill = document.getElementById('pill_'+p.name);
+    if(pill && pill.classList.contains('high')){
+      let valTxt = '';
+      if(p.type === 'bp'){
+        const row = document.querySelector(`[data-name="${p.name}"]`);
+        const sys = row.querySelector('.lab-sys').value;
+        const dia = row.querySelector('.lab-dia').value;
+        valTxt = `${sys||'-'}/${dia||'-'} ${p.unit}`;
+      } else {
+        const row = document.querySelector(`[data-name="${p.name}"]`);
+        const val = row.querySelector('.lab-val').value;
+        valTxt = `${val} ${p.unit}`;
+      }
+      highItems.push({ label: p.label, valTxt });
+    }
+  });
+  if(!highItems.length){
+    highLabsEl.innerHTML = '<div class="summary-empty">ไม่พบผลตรวจที่สูงกว่าปกติ</div>';
+  } else {
+    const theadHtml = '<tr>' + highItems.map(h=>`<th>${h.label}</th>`).join('') + '</tr>';
+    const tbodyHtml = '<tr>' + highItems.map(h=>`<td>${h.valTxt}</td>`).join('') + '</tr>';
+    highLabsEl.innerHTML = `<div class="lab-table-wrap" style="overflow-x:auto;"><table class="lab-table ibw-energy-table" style="min-width:${highItems.length*110}px;"><thead>${theadHtml}</thead><tbody>${tbodyHtml}</tbody></table></div>`;
+  }
+
+  document.getElementById('sumIbw').textContent = document.getElementById('ibwValue').textContent;
+  document.getElementById('sumEnergyTarget').textContent = document.getElementById('energyValue').textContent;
+  const proteinG = document.getElementById('proteinTotalG').textContent;
+  const proteinKcal = document.getElementById('proteinTotalKcal').textContent;
+  document.getElementById('sumProteinTarget').textContent = (proteinG !== '–') ? `${proteinG} g (${proteinKcal} kcal)` : '–';
+
+  document.getElementById('sumCarbTarget').textContent = document.getElementById('cpfCarbG').textContent;
+  document.getElementById('sumProTarget2').textContent = document.getElementById('cpfProteinG').textContent;
+  document.getElementById('sumFatTarget').textContent = document.getElementById('cpfFatG').textContent;
+
+  document.getElementById('sumExMilk').textContent = document.getElementById('f_exMilk').value + ' หน่วย';
+  document.getElementById('sumExVeg').textContent = document.getElementById('f_exVeg').value + ' หน่วย';
+  document.getElementById('sumExFruit').textContent = document.getElementById('f_exFruit').value + ' หน่วย';
+  document.getElementById('sumExSugar').textContent = document.getElementById('exSugarCount').textContent + ' หน่วย';
+  document.getElementById('sumExStarch').textContent = document.getElementById('exStarchCount').textContent + ' หน่วย';
+  document.getElementById('sumExMeat').textContent = document.getElementById('exMeatCount').textContent + ' หน่วย';
+  document.getElementById('sumExFat').textContent = document.getElementById('exFatCount').textContent + ' หน่วย';
+
+  document.getElementById('sumRecallKcal').textContent = document.getElementById('cmpKcalActual').textContent;
+  document.getElementById('sumEnergyDiff').innerHTML = document.getElementById('cmpKcalDiff').innerHTML;
+
+  const mealFreeKeys = ['เช้า','กลางวัน','เย็น','ของว่าง'];
+  mealFreeKeys.forEach(key=>{
+    const freeText = document.getElementById('f_recallFree_'+key).value.trim();
+    document.getElementById('sumRecall_'+key).textContent = freeText || '–';
+  });
+
+  const probEl = document.getElementById('sumProblems');
+  const probItems = [];
+  document.querySelectorAll('input[name=probPhysical]:checked').forEach(c=>probItems.push(c.value));
+  document.querySelectorAll('input[name=probBehavior]:checked').forEach(c=>probItems.push(c.value));
+  document.querySelectorAll('input[name=probSocial]:checked').forEach(c=>probItems.push(c.value));
+  probEl.textContent = probItems.length ? probItems.join(', ') : 'ไม่พบปัญหา/อุปสรรค';
+
+  const adviceEl = document.getElementById('sumAdvice');
+  const adviceItems = Array.from(document.querySelectorAll('input[name=advice]:checked')).map(c=>c.value);
+  if(document.getElementById('f_advice_other_chk').checked && document.getElementById('f_advice_other').value.trim()){
+    adviceItems.push(document.getElementById('f_advice_other').value.trim());
+  }
+  adviceEl.textContent = adviceItems.length ? adviceItems.join(', ') : 'ยังไม่ได้เลือกคำแนะนำ';
+
+  const sweetScore = document.getElementById('ncdSweetScore').textContent;
+  const sweetRisk = document.getElementById('ncdSweetRisk').textContent;
+  document.getElementById('sumNcdSweet').textContent = (sweetScore !== '–') ? `${sweetScore} คะแนน (${sweetRisk})` : '–';
+  const fatScore = document.getElementById('ncdFatScore').textContent;
+  const fatRisk = document.getElementById('ncdFatRisk').textContent;
+  document.getElementById('sumNcdFat').textContent = (fatScore !== '–') ? `${fatScore} คะแนน (${fatRisk})` : '–';
+  const saltScore = document.getElementById('ncdSaltScore').textContent;
+  const saltRisk = document.getElementById('ncdSaltRisk').textContent;
+  document.getElementById('sumNcdSalt').textContent = (saltScore !== '–') ? `${saltScore} คะแนน (${saltRisk})` : '–';
+}
+
+function goToStep(n){
+  currentStep = n;
+  document.querySelectorAll('.form-step').forEach(el=>{
+    el.classList.toggle('active', parseInt(el.dataset.step)===n);
+  });
+  document.querySelectorAll('.step-dot').forEach(el=>{
+    const s = parseInt(el.dataset.step);
+    el.classList.toggle('active', s===n);
+    el.classList.toggle('done', s<n);
+  });
+  document.getElementById('btnBack').style.display = n>1 ? 'inline-block' : 'none';
+  document.getElementById('btnNext').style.display = (n<TOTAL_STEPS && n!==6) ? 'inline-block' : 'none';
+  document.getElementById('btnSubmit').style.display = n===6 ? 'inline-block' : 'none';
+  document.getElementById('mainPanelTitle').style.display = n===TOTAL_STEPS ? 'none' : 'block';
+  if(n===1) computeGauge();
+  if(n===2) computeIBW();
+  if(n===6) renderSummary();
+  if(n===7) renderStep7();
+  if(n===8) renderDashboard();
+  window.scrollTo({top:0, behavior:'smooth'});
+}
+
+function nextStep(){
+  hideMsg();
+  if(currentStep < TOTAL_STEPS) goToStep(currentStep+1);
+}
+
+function prevStep(){
+  if(currentStep > 1) goToStep(currentStep-1);
+}
+
+function calcIBW(){
+  const heightCm = parseFloat(document.getElementById('f_height').value);
+  const gender = document.getElementById('f_gender').value;
+  if(!heightCm) return null;
+  return gender === 'ชาย' ? (heightCm - 100) : (heightCm - 105);
+}
+
+function computeIBW(){
+  const ibw = calcIBW();
+  document.getElementById('ibwValue').textContent = ibw ? ibw.toFixed(1) + ' kg' : '–';
+  computeEnergy();
+}
+
+function computeEnergy(){
+  const ibw = calcIBW();
+  const factor = parseFloat(document.getElementById('f_energyFactor').value);
+  const isPreg = document.getElementById('f_isPreg').checked;
+  document.getElementById('pregEnergyField').style.display = isPreg ? 'block' : 'none';
+  const addon = (isPreg && document.getElementById('f_pregEnergyAddon').checked) ? 300 : 0;
+  const energyEl = document.getElementById('energyValue');
+  const noteEl = document.getElementById('energyFormulaNote');
+  if(!ibw){
+    energyEl.textContent = '–';
+    noteEl.textContent = 'กรอกส่วนสูงในหน้าข้อมูลผู้ป่วยก่อน';
+    lastEnergyTotal = null;
+    computeProtein();
+    return;
+  }
+  const total = Math.round(ibw*factor + addon);
+  energyEl.textContent = total.toLocaleString() + ' kcal/วัน';
+  noteEl.textContent = `IBW ${ibw.toFixed(1)} kg × ${factor} kcal/kg` + (addon ? ` + ${addon} kcal (ตั้งครรภ์)` : '') + ` = ${total.toLocaleString()} kcal/วัน`;
+  lastEnergyTotal = total;
+  computeProtein();
+}
+
+function computeProtein(){
+  const ibw = calcIBW();
+  const perKg = parseFloat(document.getElementById('f_proteinPerKg').value) || 0;
+  const totalGEl = document.getElementById('proteinTotalG');
+  const totalKcalEl = document.getElementById('proteinTotalKcal');
+  const pctEl = document.getElementById('proteinPctOfEnergy');
+  const autoField = document.getElementById('f_pctProteinAuto');
+  const isPreg = document.getElementById('f_isPreg').checked;
+  const pregField = document.getElementById('pregProteinField');
+  pregField.style.display = isPreg ? 'block' : 'none';
+  const pregAddonG = (isPreg && document.getElementById('f_pregProteinAddon').checked)
+    ? (parseFloat(document.getElementById('f_pregProteinG').value) || 0)
+    : 0;
+
+  if(!ibw){
+    totalGEl.textContent = '–';
+    totalKcalEl.textContent = '–';
+    pctEl.textContent = '–';
+    autoField.value = '';
+    computeCPF();
+    return;
+  }
+
+  const baseProteinG = Math.round(ibw * perKg * 10) / 10;
+  const proteinG = Math.round((baseProteinG + pregAddonG) * 10) / 10;
+  const proteinKcal = Math.round(proteinG * 4);
+  totalGEl.textContent = proteinG.toFixed(1) + (pregAddonG ? ` (${baseProteinG.toFixed(1)} + ${pregAddonG} ตั้งครรภ์)` : '');
+  totalKcalEl.textContent = proteinKcal.toLocaleString();
+
+  if(lastEnergyTotal){
+    const pct = Math.round((proteinKcal / lastEnergyTotal) * 100);
+    pctEl.textContent = pct + '%';
+    autoField.value = pct;
+  } else {
+    pctEl.textContent = '–';
+    autoField.value = '';
+  }
+  computeCPF();
+}
+
+function computeCPF(){
+  const pc = parseFloat(document.getElementById('f_pctCarb').value) || 0;
+  const pp = parseFloat(document.getElementById('f_pctProteinAuto').value) || 0;
+  const pf = parseFloat(document.getElementById('f_pctFat').value) || 0;
+  const sum = pc + pp + pf;
+  const sumNote = document.getElementById('cpfSumNote');
+
+  const carbGEl = document.getElementById('cpfCarbG');
+  const carbKcalEl = document.getElementById('cpfCarbKcal');
+  const proteinGEl = document.getElementById('cpfProteinG');
+  const proteinKcalEl = document.getElementById('cpfProteinKcal');
+  const fatGEl = document.getElementById('cpfFatG');
+  const fatKcalEl = document.getElementById('cpfFatKcal');
+
+  if(!lastEnergyTotal){
+    sumNote.textContent = 'กรอกข้อมูลผู้ป่วยและตั้งค่าพลังงานก่อน';
+    sumNote.style.color = 'var(--ink-soft)';
+    carbGEl.textContent = '–'; carbKcalEl.textContent = '– kcal';
+    proteinGEl.textContent = '–'; proteinKcalEl.textContent = '– kcal';
+    fatGEl.textContent = '–'; fatKcalEl.textContent = '– kcal';
+    lastCarbG = null; lastProteinG = null; lastFatG = null;
+    computeExchange();
+    if(typeof computeRecallSummary === 'function' && document.getElementById('mealCards_เช้า')) computeRecallSummary();
+    return;
+  }
+
+  const ok = Math.abs(sum - 100) < 0.5;
+  sumNote.innerHTML = `รวม ${sum.toFixed(1)}% ${ok ? '✓' : '⚠'} (โปรตีน ${pp}% มาจากความต้องการโปรตีนด้านบน ปรับคาร์โบไฮเดรต/ไขมันให้รวมครบ 100%)`;
+  sumNote.style.color = ok ? 'var(--ok)' : 'var(--danger)';
+
+  const carbKcal = Math.round(lastEnergyTotal * pc/100);
+  const proteinKcal = Math.round(lastEnergyTotal * pp/100);
+  const fatKcal = Math.round(lastEnergyTotal * pf/100);
+  const carbG = Math.round(carbKcal / 4);
+  const proteinG = Math.round(proteinKcal / 4);
+  const fatG = Math.round(fatKcal / 9);
+
+  carbGEl.textContent = carbG + ' g';
+  carbKcalEl.textContent = carbKcal.toLocaleString() + ' kcal';
+  proteinGEl.textContent = proteinG + ' g';
+  proteinKcalEl.textContent = proteinKcal.toLocaleString() + ' kcal';
+  fatGEl.textContent = fatG + ' g';
+  fatKcalEl.textContent = fatKcal.toLocaleString() + ' kcal';
+
+  lastCarbG = carbG; lastProteinG = proteinG; lastFatG = fatG;
+  computeExchange();
+  if(typeof computeRecallSummary === 'function' && document.getElementById('mealCards_เช้า')) computeRecallSummary();
+}
+
+// ค่าอ้างอิงจากรายการอาหารแลกเปลี่ยนไทย (Thai Food Exchange List)
+// อ้างอิงมาตรฐานสมาคมนักกำหนดอาหารแห่งประเทศไทย / ชมรมนักกำหนดอาหาร
+const EXCHANGE_TABLE = {
+  milk:   { label: 'นม (ไขมันต่ำ)',        cho: 12, pro: 8, fat: 5 },
+  veg:    { label: 'ผัก',                  cho: 5,  pro: 2, fat: 0 },
+  fruit:  { label: 'ผลไม้',                 cho: 15, pro: 0, fat: 0 },
+  starch: { label: 'ข้าว-แป้ง',             cho: 18, pro: 2, fat: 0 },
+  meat:   { label: 'เนื้อสัตว์ (ไขมันปานกลาง)', cho: 0, pro: 7, fat: 5 },
+  fat:    { label: 'ไขมัน',                  cho: 0,  pro: 0, fat: 5 },
+  sugar:  { label: 'น้ำตาล (นับเป็นคาร์โบไฮเดรต)', cho: 5,  pro: 0, fat: 0 },
+  dish:   { label: 'อาหารจานเดียว/เมนูสำเร็จรูป', cho: 0, pro: 0, fat: 0 }
+};
+
+function exchangeKcal(item, ex){
+  return Math.round((item.cho*4 + item.pro*4 + item.fat*9) * ex);
+}
+
+function computeExchange(){
+  const summaryEl = document.getElementById('exchangeSummary');
+  if(lastCarbG === null || lastProteinG === null || lastFatG === null){
+    ['Milk','Veg','Fruit','Sugar','Starch','Meat','Fat'].forEach(k=>{
+      document.getElementById('ex'+k+'Cho').textContent = '–';
+      document.getElementById('ex'+k+'Pro').textContent = '–';
+      document.getElementById('ex'+k+'Fat').textContent = '–';
+    });
+    document.getElementById('exStarchCount').textContent = '–';
+    document.getElementById('exMeatCount').textContent = '–';
+    document.getElementById('exFatCount').textContent = '–';
+    document.getElementById('exSugarCount').textContent = '–';
+    summaryEl.textContent = 'กรอกข้อมูลผู้ป่วยและตั้งค่าพลังงาน/สัดส่วนสารอาหารก่อน';
+    summaryEl.style.color = 'var(--ink-soft)';
+    return;
+  }
+
+  const milkEx = parseFloat(document.getElementById('f_exMilk').value) || 0;
+  const vegEx = parseFloat(document.getElementById('f_exVeg').value) || 0;
+  const fruitEx = parseFloat(document.getElementById('f_exFruit').value) || 0;
+
+  const milkTot = { cho: EXCHANGE_TABLE.milk.cho*milkEx, pro: EXCHANGE_TABLE.milk.pro*milkEx, fat: EXCHANGE_TABLE.milk.fat*milkEx };
+  const vegTot = { cho: EXCHANGE_TABLE.veg.cho*vegEx, pro: EXCHANGE_TABLE.veg.pro*vegEx, fat: 0 };
+  const fruitTot = { cho: EXCHANGE_TABLE.fruit.cho*fruitEx, pro: 0, fat: 0 };
+
+  const sugarKcalTarget = lastEnergyTotal * 0.05;
+  const sugarEx = Math.max(0, Math.round((sugarKcalTarget / 20) * 2) / 2);
+  const sugarTot = { cho: EXCHANGE_TABLE.sugar.cho*sugarEx, pro: 0, fat: 0 };
+
+  const remainingCho = lastCarbG - milkTot.cho - vegTot.cho - fruitTot.cho - sugarTot.cho;
+  const starchEx = Math.max(0, Math.round((remainingCho / EXCHANGE_TABLE.starch.cho) * 2) / 2);
+  const starchTot = { cho: EXCHANGE_TABLE.starch.cho*starchEx, pro: EXCHANGE_TABLE.starch.pro*starchEx, fat: 0 };
+
+  const remainingProtein = lastProteinG - milkTot.pro - vegTot.pro - starchTot.pro;
+  const meatEx = Math.max(0, Math.round((remainingProtein / EXCHANGE_TABLE.meat.pro) * 2) / 2);
+  const meatTot = { cho: 0, pro: EXCHANGE_TABLE.meat.pro*meatEx, fat: EXCHANGE_TABLE.meat.fat*meatEx };
+
+  const remainingFat = lastFatG - milkTot.fat - meatTot.fat;
+  const fatEx = Math.max(0, Math.round((remainingFat / EXCHANGE_TABLE.fat.fat) * 2) / 2);
+  const fatTot = { cho: 0, pro: 0, fat: EXCHANGE_TABLE.fat.fat*fatEx };
+
+  const rows = [
+    { key:'Milk', tot: milkTot, item: EXCHANGE_TABLE.milk, ex: milkEx },
+    { key:'Veg', tot: vegTot, item: EXCHANGE_TABLE.veg, ex: vegEx },
+    { key:'Fruit', tot: fruitTot, item: EXCHANGE_TABLE.fruit, ex: fruitEx },
+    { key:'Sugar', tot: sugarTot, item: EXCHANGE_TABLE.sugar, ex: sugarEx },
+    { key:'Starch', tot: starchTot, item: EXCHANGE_TABLE.starch, ex: starchEx },
+    { key:'Meat', tot: meatTot, item: EXCHANGE_TABLE.meat, ex: meatEx },
+    { key:'Fat', tot: fatTot, item: EXCHANGE_TABLE.fat, ex: fatEx }
+  ];
+
+  let sumCho = 0, sumPro = 0, sumFat = 0, sumKcal = 0;
+  rows.forEach(r=>{
+    const kcal = exchangeKcal(r.item, r.ex);
+    sumCho += r.tot.cho; sumPro += r.tot.pro; sumFat += r.tot.fat; sumKcal += kcal;
+    document.getElementById('ex'+r.key+'Cho').textContent = r.tot.cho.toFixed(0) + ' g';
+    document.getElementById('ex'+r.key+'Pro').textContent = r.tot.pro.toFixed(0) + ' g';
+    document.getElementById('ex'+r.key+'Fat').textContent = r.tot.fat.toFixed(0) + ' g';
+  });
+  document.getElementById('exStarchCount').textContent = starchEx;
+  document.getElementById('exMeatCount').textContent = meatEx;
+  document.getElementById('exFatCount').textContent = fatEx;
+  document.getElementById('exSugarCount').textContent = sugarEx;
+
+  const diffKcal = sumKcal - lastEnergyTotal;
+  const diffOk = Math.abs(diffKcal) <= Math.max(50, lastEnergyTotal*0.05);
+  summaryEl.innerHTML = `รวม: คาร์โบไฮเดรต ${sumCho.toFixed(0)} g · โปรตีน ${sumPro.toFixed(0)} g · ไขมัน ${sumFat.toFixed(0)} g · <b>${sumKcal.toLocaleString()} kcal</b>`
+    + ` <span style="color:${diffOk?'var(--ok)':'var(--warn)'};">(เทียบกับเป้าหมาย ${lastEnergyTotal.toLocaleString()} kcal ${diffOk?'✓ ใกล้เคียง':'⚠ ต่างกัน '+ (diffKcal>0?'+':'') + diffKcal.toLocaleString()+' kcal'})</span>`;
+}
+
+function toggleAdviceOther(){
+  const on = document.getElementById('f_advice_other_chk').checked;
+  const inp = document.getElementById('f_advice_other');
+  inp.style.display = on ? 'block' : 'none';
+  if(on) inp.focus(); else inp.value = '';
+}
+
+function setGenderSwitch(val){
+  document.getElementById('f_gender').value = val;
+  document.querySelectorAll('.gender-switch-opt').forEach(btn=>{
+    btn.classList.toggle('active', btn.dataset.val === val);
+  });
+  computeIBW();
+}
+
+function togglePreg(){
+  const on = document.getElementById('f_isPreg').checked;
+  const row = document.getElementById('pregExtraRow');
+  row.classList.toggle('show', on);
+  computeGauge();
+  computeEnergy();
+}
+
+function ncdRiskInfo(score){
+  if(score <= 5) return {label:'เสี่ยงต่ำ', pill:'pill-normal'};
+  if(score <= 9) return {label:'เสี่ยงปานกลาง', pill:'pill-over'};
+  if(score <= 13) return {label:'เสี่ยงสูง', pill:'pill-obese'};
+  return {label:'เสี่ยงสูงมาก', pill:'pill-veryhigh'};
+}
+
+function sumNcdGroup(prefix, count){
+  let sum = 0, answered = 0;
+  for(let i=1; i<=count; i++){
+    const checked = document.querySelector(`input[name="${prefix}${i}"]:checked`);
+    if(checked){ sum += parseInt(checked.value); answered++; }
+  }
+  return { sum, answered, complete: answered === count };
+}
+
+function computeNCD(){
+  const groups = [
+    { prefix:'ncdSweet', scoreEl:'ncdSweetScore', riskEl:'ncdSweetRisk' },
+    { prefix:'ncdFat', scoreEl:'ncdFatScore', riskEl:'ncdFatRisk' },
+    { prefix:'ncdSalt', scoreEl:'ncdSaltScore', riskEl:'ncdSaltRisk' }
+  ];
+  groups.forEach(g=>{
+    const res = sumNcdGroup(g.prefix, 5);
+    const scoreEl = document.getElementById(g.scoreEl);
+    const riskEl = document.getElementById(g.riskEl);
+    if(res.answered === 0){
+      scoreEl.textContent = '–';
+      riskEl.textContent = '–';
+      riskEl.className = 'status-pill pill-normal';
+      return;
+    }
+    scoreEl.textContent = res.sum + (res.complete ? '' : ` (ตอบแล้ว ${res.answered}/5)`);
+    if(res.complete){
+      const info = ncdRiskInfo(res.sum);
+      riskEl.textContent = info.label;
+      riskEl.className = 'status-pill ' + info.pill;
+    } else {
+      riskEl.textContent = 'ตอบไม่ครบ';
+      riskEl.className = 'status-pill pill-over';
+    }
+  });
+}
+
+function bmiCategory(bmi){
+  if(bmi < 18.5) return {key:'under', label:'น้ำหนักน้อย/ผอม', pill:'pill-under'};
+  if(bmi < 23) return {key:'normal', label:'ปกติ', pill:'pill-normal'};
+  if(bmi < 25) return {key:'over', label:'น้ำหนักเกิน', pill:'pill-over'};
+  return {key:'obese', label:'อ้วน', pill:'pill-obese'};
+}
+
+function computeGauge(){
+  const isPreg = document.getElementById('f_isPreg').checked;
+  const heightCm = parseFloat(document.getElementById('f_height').value);
+  const weightField = isPreg
+    ? parseFloat(document.getElementById('f_prepregWeight').value)
+    : parseFloat(document.getElementById('f_weight').value);
+
+  const gainNote = document.getElementById('gainNote');
+  const currentBmiRow = document.getElementById('currentBmiRow');
+  const currentBmiValueEl = document.getElementById('currentBmiValue');
+  const currentBmiStatusEl = document.getElementById('currentBmiStatus');
+  const bmiInlineEl = document.getElementById('bmiInline');
+  const bmiExtraPanel = document.getElementById('bmiExtraPanel');
+
+  bmiExtraPanel.style.display = isPreg ? 'block' : 'none';
+
+  // Current BMI (from current weight) — shown for pregnant patients independently
+  // of whether pre-pregnancy weight has been entered yet.
+  if(isPreg && heightCm > 0){
+    const currentWeight = parseFloat(document.getElementById('f_weight').value);
+    if(currentWeight){
+      const hM0 = heightCm/100;
+      const currentBmi = currentWeight / (hM0*hM0);
+      const currentCat = bmiCategory(currentBmi);
+      currentBmiValueEl.textContent = currentBmi.toFixed(1) + ' kg/m²';
+      currentBmiStatusEl.textContent = currentCat.label;
+      currentBmiStatusEl.className = 'status-pill ' + currentCat.pill;
+      currentBmiRow.style.display = 'block';
+    } else {
+      currentBmiRow.style.display = 'none';
+    }
+  } else {
+    currentBmiRow.style.display = 'none';
+  }
+
+  if(!heightCm || !weightField || heightCm<=0){
+    gainNote.style.display = 'none';
+    bmiInlineEl.innerHTML = 'BMI: <b>–</b>';
+    return;
+  }
+  const hM = heightCm/100;
+  const bmi = weightField / (hM*hM);
+  const cat = bmiCategory(bmi);
+  bmiInlineEl.innerHTML = `BMI: <b>${bmi.toFixed(1)}</b> (${cat.label})${isPreg ? ' — ก่อนตั้งครรภ์' : ''}`;
+
+  if(isPreg){
+    const currentWeight = parseFloat(document.getElementById('f_weight').value);
+    let range = '';
+    if(cat.key==='under') range = '12.5–18 กก.';
+    else if(cat.key==='normal') range = '11.5–16 กก.';
+    else if(cat.key==='over') range = '7–11.5 กก.';
+    else range = '5–9 กก.';
+    let gainTxt = '';
+    if(currentWeight){
+      const gain = (currentWeight - weightField).toFixed(1);
+      gainTxt = ` | น้ำหนักที่เพิ่มขึ้นจนถึงปัจจุบัน: ${gain} กก.`;
+    }
+    gainNote.style.display = 'block';
+    gainNote.textContent = `ช่วงน้ำหนักที่ควรเพิ่มตลอดการตั้งครรภ์ (ครรภ์เดี่ยว) ตามหมวด BMI ก่อนตั้งครรภ์: ${range}${gainTxt}`;
+  } else {
+    gainNote.style.display = 'none';
+  }
+}
+
+['f_height','f_weight','f_prepregWeight'].forEach(id=>{
+  document.getElementById(id).addEventListener('input', computeGauge);
+});
+document.getElementById('f_height').addEventListener('input', computeIBW);
+document.getElementById('f_gender').addEventListener('change', computeIBW);
+
+const LAB_PRESETS = [
+  {name:'FBS', label:'FBS (น้ำตาลในเลือด)', unit:'mg/dL', type:'range', min:70, max:100, refText:'70-100'},
+  {name:'BUN', label:'BUN', unit:'mg/dL', type:'range', min:7, max:20, refText:'7-20'},
+  {name:'eGFR', label:'eGFR', unit:'mL/min/1.73m²', type:'min', min:90, refText:'>90'},
+  {name:'K', label:'Potassium (K)', unit:'mEq/L', type:'range', min:3.5, max:5.0, refText:'3.5-5.0'},
+  {name:'Cholesterol', label:'Cholesterol', unit:'mg/dL', type:'max', max:200, refText:'<200'},
+  {name:'Triglyceride', label:'Triglyceride', unit:'mg/dL', type:'max', max:150, refText:'<150'},
+  {name:'BP', label:'Blood Pressure', unit:'mmHg', type:'bp', sysMax:120, diaMax:80, refText:'<120/80'}
+];
+
+function renderLabTable(){
+  const grid = document.getElementById('labRows');
+  grid.innerHTML = LAB_PRESETS.map(p=>{
+    if(p.type==='bp'){
+      return `<div class="lab-quick-item" data-name="${p.name}">
+        <div class="lab-quick-name">${p.label}<span class="lab-quick-ref">ค่าปกติ ${p.refText}</span></div>
+        <div class="lab-quick-row">
+          <input type="number" step="1" class="lab-sys" placeholder="SYS" oninput="updateLabPill('${p.name}')">
+          <span>/</span>
+          <input type="number" step="1" class="lab-dia" placeholder="DIA" oninput="updateLabPill('${p.name}')">
+          <span class="lab-unit-text">${p.unit}</span>
+          <span class="lab-pill" id="pill_${p.name}">–</span>
+        </div>
+      </div>`;
+    }
+    return `<div class="lab-quick-item" data-name="${p.name}">
+      <div class="lab-quick-name">${p.label}<span class="lab-quick-ref">ค่าปกติ ${p.refText}</span></div>
+      <div class="lab-quick-row">
+        <input type="number" step="0.1" class="lab-val" oninput="updateLabPill('${p.name}')">
+        <span class="lab-unit-text">${p.unit}</span>
+        <span class="lab-pill" id="pill_${p.name}">–</span>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function updateLabPill(name){
+  const preset = LAB_PRESETS.find(p=>p.name===name);
+  const row = document.querySelector(`[data-name="${name}"]`);
+  const pill = document.getElementById('pill_'+name);
+  let status = '', label = '–';
+
+  if(preset.type==='bp'){
+    const sys = parseFloat(row.querySelector('.lab-sys').value);
+    const dia = parseFloat(row.querySelector('.lab-dia').value);
+    if(isNaN(sys) && isNaN(dia)){ pill.className='lab-pill'; pill.textContent='–'; return; }
+    if((!isNaN(sys) && sys>=preset.sysMax) || (!isNaN(dia) && dia>=preset.diaMax)){ status='high'; label='สูงกว่าปกติ'; }
+    else if((!isNaN(sys) && sys<90) || (!isNaN(dia) && dia<60)){ status='low'; label='ต่ำกว่าปกติ'; }
+    else { status='normal'; label='ปกติ'; }
+  } else {
+    const val = parseFloat(row.querySelector('.lab-val').value);
+    if(isNaN(val)){ pill.className='lab-pill'; pill.textContent='–'; return; }
+    if(preset.type==='range'){
+      if(val<preset.min){ status='low'; label='ต่ำกว่าปกติ'; }
+      else if(val>preset.max){ status='high'; label='สูงกว่าปกติ'; }
+      else { status='normal'; label='ปกติ'; }
+    } else if(preset.type==='min'){
+      if(val<preset.min){ status='low'; label='ต่ำกว่าปกติ'; }
+      else { status='normal'; label='ปกติ'; }
+    } else if(preset.type==='max'){
+      if(val>=preset.max){ status='high'; label='สูงกว่าปกติ'; }
+      else { status='normal'; label='ปกติ'; }
+    }
+  }
+  pill.className = 'lab-pill ' + status;
+  pill.textContent = label;
+}
+
+function getLabData(){
+  const out = [];
+  LAB_PRESETS.forEach(p=>{
+    const row = document.querySelector(`[data-name="${p.name}"]`);
+    if(!row) return;
+    if(p.type==='bp'){
+      const sys = row.querySelector('.lab-sys').value.trim();
+      const dia = row.querySelector('.lab-dia').value.trim();
+      if(sys || dia){
+        out.push({key:p.name, name:p.label, value:`${sys||'-'}/${dia||'-'}`, unit:p.unit, interp:document.getElementById('pill_'+p.name).textContent, ref:p.refText});
+      }
+    } else {
+      const val = row.querySelector('.lab-val').value.trim();
+      if(val){
+        out.push({key:p.name, name:p.label, value:val, unit:p.unit, interp:document.getElementById('pill_'+p.name).textContent, ref:p.refText});
+      }
+    }
+  });
+  return out;
+}
+
+function loadLabsIntoTable(labs){
+  renderLabTable();
+  (labs||[]).forEach(l=>{
+    const row = document.querySelector(`[data-name="${l.key}"]`);
+    if(!row) return;
+    const preset = LAB_PRESETS.find(p=>p.name===l.key);
+    if(preset && preset.type==='bp'){
+      const parts = (l.value||'').split('/');
+      row.querySelector('.lab-sys').value = (parts[0] && parts[0]!=='-') ? parts[0] : '';
+      row.querySelector('.lab-dia').value = (parts[1] && parts[1]!=='-') ? parts[1] : '';
+    } else {
+      row.querySelector('.lab-val').value = l.value || '';
+    }
+    updateLabPill(l.key);
+  });
+}
+
+function escapeAttr(s){
+  if(!s) return '';
+  return String(s).replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
+}
+
+let recallSeq = 0;
+const MEAL_KEY = { 'มื้อเช้า':'เช้า', 'มื้อกลางวัน':'กลางวัน', 'มื้อเย็น':'เย็น', 'ของว่าง/อื่นๆ':'ของว่าง' };
+
+// ตัวอย่างอาหารพร้อมปริมาณต่อ 1 ส่วน จากรายการอาหารแลกเปลี่ยนไทย (สมาคมนักกำหนดอาหารแห่งประเทศไทย)
+const FOOD_QUICK_PICKS = {
+  dish: [
+    { name:'กระเพาะปลา', weight:'', unit:'1 ชาม', cho:20.6, pro:5.6, fat:5.0 },
+    { name:'กระเพาะปลาตุ๋นน้ำแดง', weight:'', unit:'1 ชาม', cho:30.9, pro:8.4, fat:7.5 },
+    { name:'กล้วยไข่', weight:'', unit:'1 ลูก', cho:5.5, pro:1.5, fat:1.3 },
+    { name:'กล้วยคลุกมะพร้าว', weight:'', unit:'1 ถ้วย', cho:13.8, pro:3.8, fat:3.3 },
+    { name:'กล้วยฉาบ', weight:'', unit:'1 ชิ้น', cho:4.0, pro:1.1, fat:1.0 },
+    { name:'กล้วยตาก', weight:'', unit:'1 ผล', cho:4.1, pro:1.1, fat:1.0 },
+    { name:'กล้วยทอด (กล้วยแขก)', weight:'', unit:'1 ชิ้น', cho:6.9, pro:1.9, fat:1.7 },
+    { name:'กล้วยน้ำว้า', weight:'', unit:'1 ลูก', cho:5.0, pro:1.3, fat:1.2 },
+    { name:'กล้วยบวชชี', weight:'', unit:'1 ถ้วยเล็ก', cho:20.9, pro:5.7, fat:5.1 },
+    { name:'กล้วยเล็บมือนาง', weight:'', unit:'1 ผล', cho:4.1, pro:1.1, fat:1.0 },
+    { name:'กล้วยหอม', weight:'', unit:'1 ลูก', cho:10.6, pro:2.9, fat:2.6 },
+    { name:'กวยจั๊บ', weight:'', unit:'1 ชาม', cho:33.0, pro:9.0, fat:8.0 },
+    { name:'กวยจั๊บญวณ', weight:'', unit:'1 ชาม', cho:32.3, pro:8.8, fat:7.8 },
+    { name:'ก๋วยเตี๋ยวแขก', weight:'', unit:'1 ชาม', cho:52.3, pro:14.2, fat:12.7 },
+    { name:'ก๋วยเตี๋ยวคั่วไก่', weight:'', unit:'1 จาน', cho:59.8, pro:16.3, fat:14.5 },
+    { name:'ก๋วยเตี๋ยวต้มยำกุ้ง', weight:'', unit:'1 ถ้วย', cho:44.0, pro:12.0, fat:10.7 },
+    { name:'ก๋วยเตี๋ยวเนื้อเลียง', weight:'', unit:'1 ถ้วย', cho:50.9, pro:13.9, fat:12.3 },
+    { name:'ก๋วยเตี๋ยวเนื้อสับ', weight:'', unit:'1 จาน', cho:50.9, pro:13.9, fat:12.3 },
+    { name:'ก๋วยเตี๋ยวผัดกะเพราไก่', weight:'', unit:'1 จาน', cho:60.5, pro:16.5, fat:14.7 },
+    { name:'ก๋วยเตี๋ยวผัดไทยใส่ไข่', weight:'', unit:'1 จาน', cho:79.3, pro:21.6, fat:19.2 },
+    { name:'ก๋วยเตี๋ยวราดหน้าปลากะพง', weight:'', unit:'1 จาน', cho:59.8, pro:16.3, fat:14.5 },
+    { name:'ก๋วยเตี๋ยวเรือน้ำตก', weight:'', unit:'1 ชาม', cho:24.8, pro:6.8, fat:6.0 },
+    { name:'ก๋วยเตี๋ยวเรือน้ำตกแห้ง', weight:'', unit:'1 ชาม', cho:30.9, pro:8.4, fat:7.5 },
+    { name:'ก๋วยเตี๋ยวเส้นปลาน้ำ', weight:'', unit:'1 ชาม', cho:51.6, pro:14.1, fat:12.5 },
+    { name:'ก๋วยเตี๋ยวเส้นปลาแห้ง', weight:'', unit:'1 ชาม', cho:57.8, pro:15.8, fat:14.0 },
+    { name:'ก๋วยเตี๋ยวเส้นเล็กต้มยำหมู', weight:'', unit:'1 ชาม', cho:46.1, pro:12.6, fat:11.2 },
+    { name:'ก๋วยเตี๋ยวเส้นเล็กหมูแห้ง', weight:'', unit:'1 ชาม', cho:45.4, pro:12.4, fat:11.0 },
+    { name:'ก๋วยเตี๋ยวเส้นหมี่น้ำลูกชิ้นเนื้อวัว', weight:'', unit:'1 จาน', cho:31.1, pro:8.5, fat:7.5 },
+    { name:'ก๋วยเตี๋ยวเส้นหมี่ลูกชิ้นเนื้อ', weight:'', unit:'1 ชาม', cho:35.5, pro:9.7, fat:8.6 },
+    { name:'ก๋วยเตี๋ยวเส้นใหญ่ผัดซีอิ๊วใส่ไข่', weight:'', unit:'1 จาน', cho:71.5, pro:19.5, fat:17.3 },
+    { name:'ก๋วยเตี๋ยวเส้นใหญ่ราดหน้าไก่', weight:'', unit:'1 จาน', cho:54.6, pro:14.9, fat:13.2 },
+    { name:'ก๋วยเตี๋ยวเส้นใหญ่ราดหน้าหมู', weight:'', unit:'1 จาน', cho:54.6, pro:14.9, fat:13.2 },
+    { name:'ก๋วยเตี๋ยวหลอด', weight:'', unit:'1 ชิ้น', cho:6.9, pro:1.9, fat:1.7 },
+    { name:'กะละแม', weight:'', unit:'1 ห่อเล็ก', cho:8.9, pro:2.4, fat:2.2 },
+    { name:'กะหรี่ปั๊บ', weight:'', unit:'1 ตัว', cho:21.6, pro:5.9, fat:5.2 },
+    { name:'กุ้งแช่น้ำปลา', weight:'', unit:'1 ตัว', cho:1.9, pro:0.5, fat:0.5 },
+    { name:'กุ้งทอดกระเทียมพริกไทย', weight:'', unit:'1 ตัวขนาดกลาง', cho:11.8, pro:3.2, fat:2.9 },
+    { name:'กุ้งนางนึ่งนมสด', weight:'', unit:'1 ถ้วย', cho:25.4, pro:6.9, fat:6.2 },
+    { name:'กุ้งนึ่งกระเทียม', weight:'', unit:'1 จาน', cho:17.1, pro:4.6, fat:4.1 },
+    { name:'กุ้งผัดพริกอ่อน', weight:'', unit:'1 จาน', cho:32.3, pro:8.8, fat:7.8 },
+    { name:'กุ้งฝอยชุบแป้งทอด', weight:'', unit:'1 แพ', cho:42.4, pro:11.5, fat:10.3 },
+    { name:'กุ้งอบวุ้นเส้น', weight:'', unit:'1 จาน', cho:41.2, pro:11.2, fat:10.0 },
+    { name:'กุนเชียงทอด', weight:'', unit:'1 ชิ้นเล็ก', cho:16.5, pro:4.5, fat:4.0 },
+    { name:'กุยช่ายทอด', weight:'', unit:'1 ชิ้น', cho:15.7, pro:4.3, fat:3.8 },
+    { name:'เกาเหลาราดหน้า', weight:'', unit:'1 ถ้วย', cho:41.2, pro:11.2, fat:10.0 },
+    { name:'เกาเหลาลูกชิ้นน้ำ', weight:'', unit:'1 ชาม', cho:30.9, pro:8.4, fat:7.5 },
+    { name:'เกี๊ยวกรอบราดหน้ากุ้ง', weight:'', unit:'1 จาน', cho:87.3, pro:23.8, fat:21.2 },
+    { name:'เกี๊ยวซ่า', weight:'', unit:'1 ชิ้น', cho:8.7, pro:2.4, fat:2.1 },
+    { name:'เกี๊ยวกุ้งน้ำ', weight:'', unit:'1 ชาม', cho:37.8, pro:10.3, fat:9.2 },
+    { name:'เกี๊ยวปลาน้ำ', weight:'', unit:'1 ถ้วย', cho:22.7, pro:6.2, fat:5.5 },
+    { name:'แกงกะหรี่ไก่', weight:'', unit:'1 ถ้วย', cho:61.9, pro:16.9, fat:15.0 },
+    { name:'แกงกะหรี่หมู', weight:'', unit:'1 ถ้วย', cho:44.7, pro:12.2, fat:10.8 },
+    { name:'แกงขี้เหล็ก', weight:'', unit:'1 ถ้วย', cho:26.8, pro:7.3, fat:6.5 },
+    { name:'แกงขี้เหล็กหมูย่าง', weight:'', unit:'1 ถ้วย', cho:33.7, pro:9.2, fat:8.2 },
+    { name:'แกงเขียวหวานไก่', weight:'', unit:'1 ถ้วย', cho:33.0, pro:9.0, fat:8.0 },
+    { name:'แกงเขียวหวานปลาดุก', weight:'', unit:'1 ถ้วย', cho:32.3, pro:8.8, fat:7.8 },
+    { name:'แกงเขียวหวานลูกชิ้นปลากราย', weight:'', unit:'1 ถ้วย', cho:33.0, pro:9.0, fat:8.0 },
+    { name:'แกงเขียวหวานหมู', weight:'', unit:'1 ถ้วย', cho:32.3, pro:8.8, fat:7.8 },
+    { name:'แกงจืดไข่เจียว', weight:'', unit:'1 ถ้วย', cho:16.5, pro:4.5, fat:4.0 },
+    { name:'แกงจืดตำลึงหมูสับ', weight:'', unit:'1 ถ้วย', cho:12.4, pro:3.4, fat:3.0 },
+    { name:'แกงจืดเต้าหู้ไม่ใส่หมูสับ', weight:'', unit:'1 ถ้วย', cho:11.0, pro:3.0, fat:2.7 },
+    { name:'แกงจืดเต้าหู้ยัดไส้', weight:'', unit:'1 ถ้วย', cho:15.1, pro:4.1, fat:3.7 },
+    { name:'แกงจืดถั่วงอกไม่ใส่หมูสับ', weight:'', unit:'1 ถ้วย', cho:6.9, pro:1.9, fat:1.7 },
+    { name:'แกงจืดถั่วงอกหมูสับ', weight:'', unit:'1 ถ้วย', cho:6.9, pro:1.9, fat:1.7 },
+    { name:'แกงจืดฟักยัดไส้', weight:'', unit:'1 ถ้วย', cho:12.4, pro:3.4, fat:3.0 },
+    { name:'แกงจืดมะระยัดไส้', weight:'', unit:'1 ถ้วย', cho:12.4, pro:3.4, fat:3.0 },
+    { name:'แกงจืดมะระยัดไส้หมูวุ้นเส้น', weight:'', unit:'1 ชิ้น', cho:9.1, pro:2.5, fat:2.2 },
+    { name:'แกงจืดวุ้นเส้น', weight:'', unit:'1 ถ้วย', cho:11.7, pro:3.2, fat:2.8 },
+    { name:'แกงไตปลา', weight:'', unit:'1 ถ้วย', cho:6.9, pro:1.9, fat:1.7 },
+    { name:'แกงป่าไก่', weight:'', unit:'1 ถ้วย', cho:15.1, pro:4.1, fat:3.7 },
+    { name:'แกงเผ็ดไก่ใส่มะเขือ', weight:'', unit:'1 ถ้วย', cho:32.3, pro:8.8, fat:7.8 },
+    { name:'แกงเผ็ดไก่ใส่หน่อไม้', weight:'', unit:'1 ถ้วย', cho:33.7, pro:9.2, fat:8.2 },
+    { name:'แกงเผ็ดเป็ดย่าง', weight:'', unit:'1 ถ้วย', cho:33.0, pro:9.0, fat:8.0 },
+    { name:'แกงเผ็ดฟักทองใส่หมู', weight:'', unit:'1 ถ้วย', cho:34.4, pro:9.4, fat:8.3 },
+    { name:'แกงเผ็ดฟักทองหมู', weight:'', unit:'1 ถ้วย', cho:34.4, pro:9.4, fat:8.3 },
+    { name:'แกงเผ็ดมะเขือไก่', weight:'', unit:'1 ถ้วย', cho:32.3, pro:8.8, fat:7.8 },
+    { name:'แกงเผ็ดลูกชิ้นปลา', weight:'', unit:'1 ถ้วย', cho:33.0, pro:9.0, fat:8.0 },
+    { name:'แกงเผ็ดหน่อไม้ไก่', weight:'', unit:'1 ถ้วย', cho:33.7, pro:9.2, fat:8.2 },
+    { name:'แกงเผ็ดหมูยอดมะพร้าว', weight:'', unit:'1 ถ้วย', cho:33.7, pro:9.2, fat:8.2 },
+    { name:'แกงมัสมั่นไก่', weight:'', unit:'1 ถ้วย', cho:44.7, pro:12.2, fat:10.8 },
+    { name:'แกงเลียง', weight:'', unit:'1 ชาม', cho:15.8, pro:4.3, fat:3.8 },
+    { name:'แกงเลียงผักรวม', weight:'', unit:'1 ถ้วย', cho:6.6, pro:1.8, fat:1.6 },
+    { name:'แกงส้ม', weight:'', unit:'1 ถ้วย', cho:3.9, pro:1.1, fat:0.9 },
+    { name:'แกงส้มชะอมไข่ทอดใส่กุ้ง', weight:'', unit:'1 ถ้วย', cho:37.1, pro:10.1, fat:9.0 },
+    { name:'แกงส้มดอกแคกุ้ง', weight:'', unit:'1 ถ้วย', cho:14.4, pro:3.9, fat:3.5 },
+    { name:'แกงส้มปลาช่อนผักบุ้ง', weight:'', unit:'1 ถ้วย', cho:14.4, pro:3.9, fat:3.5 },
+    { name:'แกงส้มปลาแป๊ะซะ', weight:'', unit:'1 ถ้วย', cho:22.0, pro:6.0, fat:5.3 },
+    { name:'แกงส้มผักกระเฉดปลา', weight:'', unit:'1 ชาม', cho:15.1, pro:4.1, fat:3.7 },
+    { name:'แกงส้มผักบุ้งปลาช่อน', weight:'', unit:'1 ถ้วย', cho:14.4, pro:3.9, fat:3.5 },
+    { name:'แกงส้มผักรวม', weight:'', unit:'1 ถ้วย', cho:16.5, pro:4.5, fat:4.0 },
+    { name:'แกงหมูเทโพ', weight:'', unit:'1 ถ้วย', cho:41.2, pro:11.2, fat:10.0 },
+    { name:'แกงเหลืองมะละกอกุ้ง', weight:'', unit:'1 ถ้วย', cho:11.0, pro:3.0, fat:2.7 },
+    { name:'แกงเหลืองหน่อไม้ดองกับปลา', weight:'', unit:'1 ถ้วย', cho:11.0, pro:3.0, fat:2.7 },
+    { name:'แก้วมังกร', weight:'', unit:'1 ลูก', cho:8.2, pro:2.2, fat:2.0 },
+    { name:'โกยซีหมี่', weight:'', unit:'1 จาน', cho:75.6, pro:20.6, fat:18.3 },
+    { name:'ไก่ KFC สะโพก', weight:'', unit:'1 ชิ้น', cho:48.8, pro:13.3, fat:11.8 },
+    { name:'ไก่ KFC ฮอตวิง', weight:'', unit:'1 ชิ้น', cho:10.7, pro:2.9, fat:2.6 },
+    { name:'ไก่ตุ๋นมะนาวดอง', weight:'', unit:'1 ชาม', cho:15.1, pro:4.1, fat:3.7 },
+    { name:'ไก่ทอด', weight:'', unit:'1 น่อง', cho:47.4, pro:12.9, fat:11.5 },
+    { name:'ไก่ผัดขิง', weight:'', unit:'1 จาน', cho:28.9, pro:7.9, fat:7.0 },
+    { name:'ไก่ยอชุบแป้งทอด', weight:'', unit:'1 ชิ้น', cho:10.0, pro:2.7, fat:2.4 },
+    { name:'ไก่ย่าง', weight:'', unit:'1 น่อง', cho:22.7, pro:6.2, fat:5.5 },
+    { name:'ขนมกรวย', weight:'', unit:'1 กรวย', cho:8.7, pro:2.4, fat:2.1 },
+    { name:'ขนมกล้วย', weight:'', unit:'1 ห่อ', cho:16.5, pro:4.5, fat:4.0 },
+    { name:'ขนมกลีบลำดวน', weight:'', unit:'1 ชิ้น', cho:3.2, pro:0.9, fat:0.8 },
+    { name:'ขนมกุยช่าย', weight:'', unit:'1 ชิ้น', cho:7.3, pro:2.0, fat:1.8 },
+    { name:'ขนมเกลียว', weight:'', unit:'1 ตัว', cho:3.4, pro:0.9, fat:0.8 },
+    { name:'ขนมขี้หนู', weight:'', unit:'1 ถ้วย', cho:22.7, pro:6.2, fat:5.5 },
+    { name:'ขนมเข่ง', weight:'', unit:'1 กระทง', cho:16.5, pro:4.5, fat:4.0 },
+    { name:'ขนมครก', weight:'', unit:'1 คู่', cho:12.7, pro:3.4, fat:3.1 },
+    { name:'ขนมจีน', weight:'', unit:'1 ทัพพี', cho:11.0, pro:3.0, fat:2.7 },
+    { name:'ขนมจีนแกงเขียวหวานไก่', weight:'', unit:'1 ชาม', cho:81.7, pro:22.3, fat:19.8 },
+    { name:'ขนมจีนซาวน้ำ', weight:'', unit:'1 จาน', cho:44.0, pro:12.0, fat:10.7 },
+    { name:'ขนมจีนน้ำเงี้ยว', weight:'', unit:'1 ถ้วย', cho:33.4, pro:9.1, fat:8.1 },
+    { name:'ขนมจีนน้ำพริก', weight:'', unit:'1 จาน', cho:31.4, pro:8.5, fat:7.6 },
+    { name:'ขนมจีนน้ำยา', weight:'', unit:'1 จาน', cho:45.7, pro:12.4, fat:11.1 },
+    { name:'ขนมจีนน้ำยาปักษ์ใต้', weight:'', unit:'1 จาน', cho:20.1, pro:5.5, fat:4.9 },
+    { name:'ขนมจีบหมู', weight:'', unit:'1 ชิ้น', cho:4.4, pro:1.2, fat:1.1 },
+    { name:'ขนมตาล', weight:'', unit:'1 กระทง', cho:8.0, pro:2.2, fat:1.9 },
+    { name:'ขนมถั่วแปบ', weight:'', unit:'1 ชิ้น', cho:1.9, pro:0.5, fat:0.5 },
+    { name:'ขนมเทียน', weight:'', unit:'1 ห่อ', cho:14.2, pro:3.9, fat:3.4 },
+    { name:'ขนมบ้าบิ่น', weight:'', unit:'1 ชิ้น', cho:17.9, pro:4.9, fat:4.3 },
+    { name:'ขนมเบื้องไทยไส้เค็ม', weight:'', unit:'1 แผ่น', cho:6.9, pro:1.9, fat:1.7 },
+    { name:'ขนมเบื้องไทยไส้หวาน', weight:'', unit:'1 แผ่น', cho:8.2, pro:2.2, fat:2.0 },
+    { name:'ขนมเปียกปูน', weight:'', unit:'1 จานเล็ก', cho:26.8, pro:7.3, fat:6.5 },
+    { name:'ขนมผิง', weight:'', unit:'1 ชิ้นเล็ก', cho:0.7, pro:0.2, fat:0.2 },
+    { name:'ขนมฝักบัว', weight:'', unit:'1 ชิ้น', cho:9.6, pro:2.6, fat:2.3 },
+    { name:'ขนมเล็บมือนาง', weight:'', unit:'1 จานเล็ก', cho:37.8, pro:10.3, fat:9.2 },
+    { name:'ขนมหน้านวล', weight:'', unit:'1 ชิ้น', cho:3.0, pro:0.8, fat:0.7 },
+    { name:'ขนมหัวผักกาดผัด', weight:'', unit:'1 จาน', cho:77.0, pro:21.0, fat:18.7 },
+    { name:'ขนมหัวผักกาดผัดใส่ไข่', weight:'', unit:'1 จาน', cho:86.6, pro:23.6, fat:21.0 },
+    { name:'ข้าวกะเพราเนื้อ', weight:'', unit:'1 จาน', cho:85.5, pro:23.3, fat:20.7 },
+    { name:'ข้าวกุ้งทอดกระเทียม', weight:'', unit:'1 จาน', cho:68.1, pro:18.6, fat:16.5 },
+    { name:'ข้าวเกรียบกุ้ง', weight:'', unit:'1 แผ่น', cho:5.1, pro:1.4, fat:1.2 },
+    { name:'ข้าวเกรียบปากหม้อ', weight:'', unit:'1 ชิ้น', cho:3.6, pro:1.0, fat:0.9 },
+    { name:'ข้าวแกงกะหรี่ไก่', weight:'', unit:'1 จาน', cho:53.5, pro:14.6, fat:13.0 },
+    { name:'ข้าวแกงเผ็ดไก่', weight:'', unit:'1 จาน', cho:66.7, pro:18.2, fat:16.2 },
+    { name:'ข้าวไก่อบ', weight:'', unit:'1 จาน', cho:67.4, pro:18.4, fat:16.3 },
+    { name:'ข้าวขาหมู', weight:'', unit:'1 จาน', cho:94.9, pro:25.9, fat:23.0 },
+    { name:'ข้าวไข่เจียว', weight:'', unit:'1 จาน', cho:61.2, pro:16.7, fat:14.8 },
+    { name:'ข้าวคลุกกะปิ', weight:'', unit:'1 จาน', cho:56.4, pro:15.4, fat:13.7 },
+    { name:'ข้าวแช่', weight:'', unit:'1 ชุด', cho:48.1, pro:13.1, fat:11.7 },
+    { name:'ข้าวซอยไก่', weight:'', unit:'1 ชาม', cho:54.3, pro:14.8, fat:13.2 },
+    { name:'ข้าวซอยหมู', weight:'', unit:'1 ชาม', cho:54.3, pro:14.8, fat:13.2 },
+    { name:'ข้าวต้ม (ข้าวกล้อง)', weight:'', unit:'1 ถ้วย', cho:16.5, pro:4.5, fat:4.0 },
+    { name:'ข้าวต้ม (ข้าวขาว)', weight:'', unit:'1 ถ้วย', cho:16.5, pro:4.5, fat:4.0 },
+    { name:'ข้าวต้มทรงเครื่อง', weight:'', unit:'1 ถ้วย', cho:31.6, pro:8.6, fat:7.7 },
+    { name:'ข้าวต้มปลา', weight:'', unit:'1 ถ้วย', cho:44.7, pro:12.2, fat:10.8 },
+    { name:'ข้าวต้มมัด', weight:'', unit:'1 มัด', cho:39.2, pro:10.7, fat:9.5 },
+    { name:'ข้าวตังหน้าตั้ง', weight:'', unit:'1 แผ่น', cho:12.4, pro:3.4, fat:3.0 },
+    { name:'ข้าวตังหมูหยอง', weight:'', unit:'1 แผ่น', cho:11.0, pro:3.0, fat:2.7 },
+    { name:'ข้าวแตนราดน้ำตาล', weight:'', unit:'1 แผ่น', cho:20.6, pro:5.6, fat:5.0 },
+    { name:'ข้าวปุ้น (ส้มตำ-ขนมจีน)', weight:'', unit:'1 จาน', cho:24.8, pro:6.8, fat:6.0 },
+    { name:'ข้าวผัดกะเพราหมูกรอบ', weight:'', unit:'1 จาน', cho:89.4, pro:24.4, fat:21.7 },
+    { name:'ข้าวผัดกะเพรากุ้ง', weight:'', unit:'1 จาน', cho:74.2, pro:20.2, fat:18.0 },
+    { name:'ข้าวผัดกะเพราไก่', weight:'', unit:'1 จาน', cho:76.2, pro:20.8, fat:18.5 },
+    { name:'ข้าวผัดกะเพราไก่ไข่ดาว', weight:'', unit:'1 จาน', cho:86.6, pro:23.6, fat:21.0 },
+    { name:'ข้าวผัดกะเพราหมู', weight:'', unit:'1 จาน', cho:79.8, pro:21.8, fat:19.3 },
+    { name:'ข้าวผัดกุ้งใส่ไข่', weight:'', unit:'1 จาน', cho:81.8, pro:22.3, fat:19.8 },
+    { name:'ข้าวผัดกุนเชียง', weight:'', unit:'1 จาน', cho:81.1, pro:22.1, fat:19.7 },
+    { name:'ข้าวผัดแกงเขียวหวานไก่', weight:'', unit:'1 จาน', cho:86.6, pro:23.6, fat:21.0 },
+    { name:'ข้าวผัดคะน้าหมูกรอบ', weight:'', unit:'1 จาน', cho:92.1, pro:25.1, fat:22.3 },
+    { name:'ข้าวผัดต้มยำทะเลแห้ง', weight:'', unit:'1 จาน', cho:55.0, pro:15.0, fat:13.3 },
+    { name:'ข้าวผัดน้ำพริกกุ้งสด', weight:'', unit:'1 จาน', cho:63.3, pro:17.2, fat:15.3 },
+    { name:'ข้าวผัดน้ำพริกเผาหมู', weight:'', unit:'1 จาน', cho:91.4, pro:24.9, fat:22.2 },
+    { name:'ข้าวผัดน้ำพริกลงเรือ', weight:'', unit:'1 จาน', cho:83.2, pro:22.7, fat:20.2 },
+    { name:'ข้าวผัดปลาเค็ม', weight:'', unit:'1 จาน', cho:55.7, pro:15.2, fat:13.5 },
+    { name:'ข้าวผัดปลาหมึกน้ำพริกเผา', weight:'', unit:'1 จาน', cho:73.6, pro:20.1, fat:17.8 },
+    { name:'ข้าวผัดปูใส่ไข่', weight:'', unit:'1 จาน', cho:83.9, pro:22.9, fat:20.3 },
+    { name:'ข้าวผัดผักกระเฉดหมูกรอบ', weight:'', unit:'1 จาน', cho:82.5, pro:22.5, fat:20.0 },
+    { name:'ข้าวผัดมันกุ้งใส่ไข่', weight:'', unit:'1 จาน', cho:79.1, pro:21.6, fat:19.2 },
+    { name:'ข้าวผัดรวมมิตร (น้ำมันน้อย)', weight:'', unit:'1 จาน', cho:28.9, pro:7.9, fat:7.0 },
+    { name:'ข้าวผัดสับปะรด', weight:'', unit:'1 จาน', cho:46.1, pro:12.6, fat:11.2 },
+    { name:'ข้าวผัดไส้กรอก', weight:'', unit:'1 จาน', cho:71.5, pro:19.5, fat:17.3 },
+    { name:'ข้าวผัดหนำเลี้ยบหมูใส่ไข่', weight:'', unit:'1 จาน', cho:50.9, pro:13.9, fat:12.3 },
+    { name:'ข้าวผัดหมูน้ำพริกเผา', weight:'', unit:'1 จาน', cho:91.4, pro:24.9, fat:22.2 },
+    { name:'ข้าวผัดหมูใส่ไข่', weight:'', unit:'1 จาน', cho:76.6, pro:20.9, fat:18.6 },
+    { name:'ข้าวผัดแหนม', weight:'', unit:'1 จาน', cho:83.9, pro:22.9, fat:20.3 },
+    { name:'ข้าวผัดอเมริกัน', weight:'', unit:'1 จาน', cho:108.6, pro:29.6, fat:26.3 },
+    { name:'ข้าวพะแนงเนื้อ', weight:'', unit:'1 จาน', cho:62.8, pro:17.1, fat:15.2 },
+    { name:'ข้าวโพดต้ม', weight:'', unit:'1 ฝัก', cho:27.5, pro:7.5, fat:6.7 },
+    { name:'ข้าวมันไก่', weight:'', unit:'1 จาน', cho:82.0, pro:22.3, fat:19.9 },
+    { name:'ข้าวมันไก่ทอด', weight:'', unit:'1 จาน', cho:95.6, pro:26.1, fat:23.2 },
+    { name:'ข้าวเม่าทอด', weight:'', unit:'1 ชิ้น', cho:28.7, pro:7.8, fat:7.0 },
+    { name:'ข้าวยำปักษ์ใต้', weight:'', unit:'1 จาน', cho:34.1, pro:9.3, fat:8.3 },
+    { name:'ข้าวราดแกงเขียวหวานไก่', weight:'', unit:'1 จาน', cho:66.4, pro:18.1, fat:16.1 },
+    { name:'ข้าวราดผัดผักบุ้ง ไข่ดาว', weight:'', unit:'1 จาน', cho:56.4, pro:15.4, fat:13.7 },
+    { name:'ข้าวราดผัดผักใส่หมู', weight:'', unit:'1 จาน', cho:50.9, pro:13.9, fat:12.3 },
+    { name:'ข้าวราดหน้าไก่', weight:'', unit:'1 จาน', cho:55.0, pro:15.0, fat:13.3 },
+    { name:'ข้าวสตูไก่', weight:'', unit:'1 จาน', cho:63.9, pro:17.4, fat:15.5 },
+    { name:'ข้าวสวย', weight:'', unit:'1 ทัพพี', cho:9.4, pro:2.5, fat:2.3 },
+    { name:'ข้าวสวย (ข้าวกล้อง)', weight:'', unit:'1 ทัพพี', cho:11.0, pro:3.0, fat:2.7 },
+    { name:'ข้าวสวย (ข้าวขาว)', weight:'', unit:'1 ทัพพี', cho:11.0, pro:3.0, fat:2.7 },
+    { name:'ข้าวหน้ากุ้งผัดพริกสด', weight:'', unit:'1 จาน', cho:74.2, pro:20.2, fat:18.0 },
+    { name:'ข้าวหน้าเป็ด', weight:'', unit:'1 จาน', cho:68.1, pro:18.6, fat:16.5 },
+    { name:'ข้าวหมกไก่', weight:'', unit:'1 จาน', cho:73.4, pro:20.0, fat:17.8 },
+    { name:'ข้าวหมูแดง', weight:'', unit:'1 จาน', cho:74.4, pro:20.3, fat:18.0 },
+    { name:'ข้าวหมูทอด', weight:'', unit:'1 จาน', cho:57.2, pro:15.6, fat:13.9 },
+    { name:'ข้าวหมูทอดกระเทียม', weight:'', unit:'1 จาน', cho:72.2, pro:19.7, fat:17.5 },
+    { name:'ข้าวหมูอบ', weight:'', unit:'1 จาน', cho:53.5, pro:14.6, fat:13.0 },
+    { name:'ข้าวเหนียวกะทิทุเรียน', weight:'', unit:'1 ถ้วย', cho:30.9, pro:8.4, fat:7.5 },
+    { name:'ข้าวเหนียวดำ', weight:'', unit:'1 ถ้วยเล็ก', cho:28.2, pro:7.7, fat:6.8 },
+    { name:'ข้าวเหนียวตัด', weight:'', unit:'1 ชิ้น', cho:28.9, pro:7.9, fat:7.0 },
+    { name:'ข้าวเหนียวนึ่ง', weight:'', unit:'1 ทัพพี', cho:22.0, pro:6.0, fat:5.3 },
+    { name:'ข้าวเหนียวมูนกะทิ', weight:'', unit:'1 จานเล็ก', cho:27.1, pro:7.4, fat:6.6 },
+    { name:'ข้าวเหนียวหน้าสังขยา', weight:'', unit:'1 จานเล็ก', cho:30.7, pro:8.4, fat:7.4 },
+    { name:'ข้าวเหนียวหมูทอด', weight:'', unit:'1 ชุด', cho:60.5, pro:16.5, fat:14.7 },
+    { name:'ข้าวเหนียวหมูสวรรค์', weight:'', unit:'1 ชุด', cho:66.0, pro:18.0, fat:16.0 },
+    { name:'ข้าวอบเผือก', weight:'', unit:'1 จาน', cho:52.9, pro:14.4, fat:12.8 },
+    { name:'ไข่เค็ม', weight:'', unit:'1 ฟอง', cho:10.3, pro:2.8, fat:2.5 },
+    { name:'ไข่เจียว', weight:'', unit:'1 ฟอง', cho:29.6, pro:8.1, fat:7.2 },
+    { name:'ไข่ดาว', weight:'', unit:'1 ฟอง', cho:29.6, pro:8.1, fat:7.2 },
+    { name:'ไข่ดาวทรงเครื่อง', weight:'', unit:'1 ฟอง', cho:34.4, pro:9.4, fat:8.3 },
+    { name:'ไข่ต้ม', weight:'', unit:'1 ฟอง', cho:10.0, pro:2.7, fat:2.4 },
+    { name:'ไข่ตุ๋น', weight:'', unit:'1 ฟอง', cho:10.3, pro:2.8, fat:2.5 },
+    { name:'ไข่ตุ๋นทรงเครื่อง', weight:'', unit:'1 ฟอง', cho:21.9, pro:6.0, fat:5.3 },
+    { name:'ไข่นกกระทา', weight:'', unit:'1 จานเล็ก', cho:26.3, pro:7.2, fat:6.4 },
+    { name:'ไข่พะโล้', weight:'', unit:'1 ถ้วย', cho:24.8, pro:6.8, fat:6.0 },
+    { name:'ไข่ยัดไส้', weight:'', unit:'1 จาน', cho:42.6, pro:11.6, fat:10.3 },
+    { name:'ไข่ลวก', weight:'', unit:'1 ฟอง', cho:10.3, pro:2.8, fat:2.5 },
+    { name:'ไข่ลูกเขย', weight:'', unit:'1 ฟอง', cho:28.2, pro:7.7, fat:6.8 },
+    { name:'ไข่หงส์', weight:'', unit:'1 ใบ', cho:8.0, pro:2.2, fat:1.9 },
+    { name:'ครองแครงกรอบเค็ม', weight:'', unit:'1 ตัว', cho:2.6, pro:0.7, fat:0.6 },
+    { name:'ครัวซอง', weight:'', unit:'1 ชิ้น', cho:32.3, pro:8.8, fat:7.8 },
+    { name:'ครีมซุปไก่', weight:'', unit:'1 ถ้วย', cho:22.0, pro:6.0, fat:5.3 },
+    { name:'คอหมูย่าง', weight:'', unit:'1 จาน', cho:27.5, pro:7.5, fat:6.7 },
+    { name:'คะน้าหมูกรอบ', weight:'', unit:'1 จาน', cho:57.8, pro:15.8, fat:14.0 },
+    { name:'เครื่องในไก่ผัดขิง', weight:'', unit:'1 จาน', cho:27.5, pro:7.5, fat:6.7 },
+    { name:'แคนตาลูป', weight:'', unit:'1 ชิ้น', cho:0.6, pro:0.1, fat:0.1 },
+    { name:'แคบหมู มีมัน', weight:'', unit:'1 ชิ้นเล็ก', cho:1.8, pro:0.5, fat:0.4 },
+    { name:'แคบหมู ไร้มัน', weight:'', unit:'1 ชิ้นเล็ก', cho:1.4, pro:0.4, fat:0.3 },
+    { name:'โครงไก่ทอด', weight:'', unit:'1 ตัว', cho:90.2, pro:24.6, fat:21.9 },
+    { name:'เงาะ', weight:'', unit:'1 ลูก', cho:1.7, pro:0.4, fat:0.4 },
+    { name:'แจ่วบอง', weight:'', unit:'1 ถ้วย', cho:3.4, pro:0.9, fat:0.8 },
+    { name:'โจ๊กใส่ไข่', weight:'', unit:'1 ถ้วย', cho:34.4, pro:9.4, fat:8.3 },
+    { name:'โจ๊กหมู', weight:'', unit:'1 ถ้วย', cho:22.0, pro:6.0, fat:5.3 },
+    { name:'โจ๊กหมูตับ ใส่ไข่ลวก', weight:'', unit:'1 ถ้วย', cho:31.6, pro:8.6, fat:7.7 },
+    { name:'เฉาก๊วย', weight:'', unit:'1 ถ้วย', cho:12.4, pro:3.4, fat:3.0 },
+    { name:'ชมพู่', weight:'', unit:'1 ผล', cho:2.2, pro:0.6, fat:0.5 },
+    { name:'เชอร์รี', weight:'', unit:'1 ผล', cho:2.1, pro:0.6, fat:0.5 },
+    { name:'ซาลาเปาทอด', weight:'', unit:'1 ลูก', cho:21.6, pro:5.9, fat:5.2 },
+    { name:'ซาลาเปาไส้หมู', weight:'', unit:'1 ลูก', cho:27.8, pro:7.6, fat:6.7 },
+    { name:'ซาหริ่ม', weight:'', unit:'1 ชุด', cho:29.8, pro:8.1, fat:7.2 },
+    { name:'ซ่าหริ่ม', weight:'', unit:'1 ถ้วย', cho:37.8, pro:10.3, fat:9.2 },
+    { name:'ซุปข้าวโพด', weight:'', unit:'1 ถ้วย', cho:19.2, pro:5.2, fat:4.7 },
+    { name:'ซุปผัก (ใส)', weight:'', unit:'1 ถ้วย', cho:2.1, pro:0.6, fat:0.5 },
+    { name:'ซุปหน่อไม้', weight:'', unit:'1 จาน', cho:5.5, pro:1.5, fat:1.3 },
+    { name:'ต้มกะทิสายบัวปลาทูนึ่ง', weight:'', unit:'1 ถ้วย', cho:30.9, pro:8.4, fat:7.5 },
+    { name:'ต้มข่าไก่', weight:'', unit:'1 ถ้วย', cho:28.9, pro:7.9, fat:7.0 },
+    { name:'ต้มโคล้งไก่ย่าง', weight:'', unit:'1 ถ้วย', cho:15.8, pro:4.3, fat:3.8 },
+    { name:'ต้มโคล้งปลากรอบ', weight:'', unit:'1 ถ้วย', cho:8.2, pro:2.2, fat:2.0 },
+    { name:'ต้มจับฉ่าย', weight:'', unit:'1 ถ้วย', cho:2.1, pro:0.6, fat:0.5 },
+    { name:'ต้มจืดเลือดหมู', weight:'', unit:'1 ถ้วย', cho:16.5, pro:4.5, fat:4.0 },
+    { name:'ต้มตือฮวน', weight:'', unit:'1 ถ้วย', cho:22.0, pro:6.0, fat:5.3 },
+    { name:'ต้มผักกาดดองซี่โครงหมู', weight:'', unit:'1 ถ้วย', cho:12.4, pro:3.4, fat:3.0 },
+    { name:'ต้มยำกุ้ง', weight:'', unit:'1 ถ้วย', cho:8.9, pro:2.4, fat:2.2 },
+    { name:'ต้มยำไก่', weight:'', unit:'1 ถ้วย', cho:8.2, pro:2.2, fat:2.0 },
+    { name:'ต้มยำไก่ใส่เห็ด', weight:'', unit:'1 ถ้วย', cho:11.0, pro:3.0, fat:2.7 },
+    { name:'ต้มยำปลากระป๋อง', weight:'', unit:'1 ถ้วย', cho:7.6, pro:2.1, fat:1.8 },
+    { name:'ต้มยำปลากะพง', weight:'', unit:'1 ถ้วย', cho:11.0, pro:3.0, fat:2.7 },
+    { name:'ต้มยำปลาทู', weight:'', unit:'1 ถ้วย', cho:1.4, pro:0.4, fat:0.3 },
+    { name:'ต้มยำปลาหมึก', weight:'', unit:'1 ถ้วย', cho:1.2, pro:0.3, fat:0.3 },
+    { name:'ต้มยำเห็ดสด', weight:'', unit:'1 ถ้วย', cho:4.1, pro:1.1, fat:1.0 },
+    { name:'ต้มส้มปลาทู', weight:'', unit:'1 ถ้วย', cho:17.9, pro:4.9, fat:4.3 },
+    { name:'ต้มหัวผักกาดขาวซี่โครงหมู', weight:'', unit:'1 ถ้วย', cho:12.4, pro:3.4, fat:3.0 },
+    { name:'ตะโก้แห้ว', weight:'', unit:'1 กระทง', cho:10.7, pro:2.9, fat:2.6 },
+    { name:'ตับไก่ปิ้ง', weight:'', unit:'1 ไม้', cho:8.2, pro:2.2, fat:2.0 },
+    { name:'เต้าส่วน', weight:'', unit:'1 ถ้วย', cho:29.6, pro:8.1, fat:7.2 },
+    { name:'เต้าหู้แข็ง', weight:'', unit:'1 ก้อน', cho:28.9, pro:7.9, fat:7.0 },
+    { name:'เต้าหู้ไข่', weight:'', unit:'1 หลอด', cho:9.6, pro:2.6, fat:2.3 },
+    { name:'เต้าหู้ทอด', weight:'', unit:'1 ชิ้น', cho:7.8, pro:2.1, fat:1.9 },
+    { name:'เต้าหู้นมสด', weight:'', unit:'1 ถ้วย', cho:20.6, pro:5.6, fat:5.0 },
+    { name:'เต้าฮวยน้ำขิง', weight:'', unit:'1 ถ้วย', cho:17.9, pro:4.9, fat:4.3 },
+    { name:'แตงไทย', weight:'', unit:'1 ชิ้น', cho:0.6, pro:0.1, fat:0.1 },
+    { name:'แตงโม', weight:'', unit:'1 กิโลกรัม', cho:34.4, pro:9.4, fat:8.3 },
+    { name:'ถั่วทอด', weight:'', unit:'1 แพ', cho:11.3, pro:3.1, fat:2.7 },
+    { name:'ถั่วลิสงทอด', weight:'', unit:'1 ช้อนโต๊ะ', cho:8.5, pro:2.3, fat:2.1 },
+    { name:'ทองม้วน', weight:'', unit:'1 อัน', cho:4.8, pro:1.3, fat:1.2 },
+    { name:'ทอดมันกุ้ง', weight:'', unit:'1 จาน', cho:35.1, pro:9.6, fat:8.5 },
+    { name:'ทอดมันปลากราย', weight:'', unit:'1 ชิ้น', cho:5.1, pro:1.4, fat:1.2 },
+    { name:'ทับทิมกรอบ', weight:'', unit:'1 ถ้วย', cho:34.4, pro:9.4, fat:8.3 },
+    { name:'ทุเรียนสด', weight:'', unit:'1 เม็ด', cho:8.1, pro:2.2, fat:2.0 },
+    { name:'ทุเรียนทอดกรอบ', weight:'', unit:'1 ชิ้น', cho:1.2, pro:0.3, fat:0.3 },
+    { name:'เทมปุระ', weight:'', unit:'1 ชิ้น', cho:10.6, pro:2.9, fat:2.6 },
+    { name:'นมถั่วเหลือง (ไม่มีน้ำตาล)', weight:'', unit:'1 แก้ว', cho:7.6, pro:2.1, fat:1.8 },
+    { name:'น่องไก่ทอด', weight:'', unit:'1 น่อง', cho:47.4, pro:12.9, fat:11.5 },
+    { name:'น่องไก่ย่าง', weight:'', unit:'1 น่อง', cho:13.3, pro:3.6, fat:3.2 },
+    { name:'น้อยหน่า', weight:'', unit:'1 ลูก', cho:8.4, pro:2.3, fat:2.0 },
+    { name:'น้ำกระเจี๊ยบ', weight:'', unit:'1 แก้ว', cho:16.5, pro:4.5, fat:4.0 },
+    { name:'น้ำโค้ก, น้ำเป๊ปซี่', weight:'', unit:'1 แก้ว', cho:13.8, pro:3.8, fat:3.3 },
+    { name:'น้ำปลามะนาว', weight:'', unit:'1 ตัวเล็ก', cho:22.7, pro:6.2, fat:5.5 },
+    { name:'น้ำพริกกะปิผักสด', weight:'', unit:'1 ช้อนโต๊ะ', cho:3.9, pro:1.1, fat:0.9 },
+    { name:'น้ำพริกกุ้งเผา', weight:'', unit:'1 ถ้วย', cho:12.4, pro:3.4, fat:3.0 },
+    { name:'น้ำพริกปลาป่น', weight:'', unit:'1 ถ้วย', cho:4.8, pro:1.3, fat:1.2 },
+    { name:'น้ำพริกมะขามเปียก', weight:'', unit:'1 ถ้วย', cho:7.6, pro:2.1, fat:1.8 },
+    { name:'น้ำพริกมะขามสด', weight:'', unit:'1 ถ้วย', cho:28.9, pro:7.9, fat:7.0 },
+    { name:'น้ำพริกมะม่วง', weight:'', unit:'1 ถ้วย', cho:13.8, pro:3.8, fat:3.3 },
+    { name:'น้ำพริกลงเรือ', weight:'', unit:'1 ถ้วย', cho:26.8, pro:7.3, fat:6.5 },
+    { name:'น้ำพริกหนุ่ม', weight:'', unit:'1 ช้อนโต๊ะ', cho:2.5, pro:0.7, fat:0.6 },
+    { name:'น้ำพริกอ่อง', weight:'', unit:'1 ช้อนโต๊ะ', cho:11.0, pro:3.0, fat:2.7 },
+    { name:'น้ำมะเขือเทศ', weight:'', unit:'1 แก้ว', cho:6.6, pro:1.8, fat:1.6 },
+    { name:'น้ำมะตูม', weight:'', unit:'1 แก้ว', cho:16.5, pro:4.5, fat:4.0 },
+    { name:'น้ำมะนาว', weight:'', unit:'1 แก้ว', cho:13.8, pro:3.8, fat:3.3 },
+    { name:'น้ำมะพร้าว', weight:'', unit:'1 แก้ว', cho:16.5, pro:4.5, fat:4.0 },
+    { name:'น้ำลำไย', weight:'', unit:'1 แก้ว', cho:13.8, pro:3.8, fat:3.3 },
+    { name:'น้ำส้มคั้น', weight:'', unit:'1 แก้ว', cho:22.0, pro:6.0, fat:5.3 },
+    { name:'น้ำสับปะรด', weight:'', unit:'1 แก้ว', cho:17.2, pro:4.7, fat:4.2 },
+    { name:'น้ำองุ่น', weight:'', unit:'1 แก้ว', cho:15.4, pro:4.2, fat:3.7 },
+    { name:'น้ำอ้อย', weight:'', unit:'1 แก้ว', cho:33.0, pro:9.0, fat:8.0 },
+    { name:'เนื้อไก่ชุบแป้งทอด', weight:'', unit:'1 ชิ้นเล็ก', cho:9.8, pro:2.7, fat:2.4 },
+    { name:'เนื้อน้ำตก', weight:'', unit:'1 จาน', cho:22.7, pro:6.2, fat:5.5 },
+    { name:'เนื้อผัดหวาน', weight:'', unit:'1 จาน', cho:81.1, pro:22.1, fat:19.7 },
+    { name:'บรั่นดี', weight:'', unit:'1 cc', cho:0.3, pro:0.1, fat:0.1 },
+    { name:'บะจ่าง', weight:'', unit:'1 ลูก', cho:41.2, pro:11.2, fat:10.0 },
+    { name:'บะหมี่กรอบราดหน้า', weight:'', unit:'1 จาน', cho:70.8, pro:19.3, fat:17.2 },
+    { name:'บะหมี่กรอบราดหน้าไก่หน่อไม้', weight:'', unit:'1 จาน', cho:90.8, pro:24.8, fat:22.0 },
+    { name:'บะหมี่กรอบราดหน้ารวมมิตร', weight:'', unit:'1 จาน', cho:94.9, pro:25.9, fat:23.0 },
+    { name:'บะหมี่กึ่งสำเร็จรูป', weight:'', unit:'1 ก้อน', cho:34.8, pro:9.5, fat:8.4 },
+    { name:'บะหมี่กึ่งสำเร็จรูปผัดกะเพราหมู', weight:'', unit:'1 จาน', cho:74.2, pro:20.2, fat:18.0 },
+    { name:'บะหมี่กึ่งสำเร็จรูปผัดขี้เมา', weight:'', unit:'1 จาน', cho:72.9, pro:19.9, fat:17.7 },
+    { name:'บะหมี่เกี๊ยวเป็ดย่าง', weight:'', unit:'1 ชาม', cho:57.1, pro:15.6, fat:13.8 },
+    { name:'บะหมี่น้ำน่องไก่', weight:'', unit:'1 ชาม', cho:51.6, pro:14.1, fat:12.5 },
+    { name:'บะหมี่น้ำเกี๊ยวหมูแดง', weight:'', unit:'1 ชาม', cho:41.9, pro:11.4, fat:10.2 },
+    { name:'บะหมี่น้ำต้มยำหมู', weight:'', unit:'1 ถ้วย', cho:41.2, pro:11.2, fat:10.0 },
+    { name:'บะหมี่น้ำเป็ด', weight:'', unit:'1 ชาม', cho:50.9, pro:13.9, fat:12.3 },
+    { name:'บะหมี่น้ำหมูต้มยำ', weight:'', unit:'1 ชาม', cho:41.2, pro:11.2, fat:10.0 },
+    { name:'บะหมี่หมูแดง', weight:'', unit:'1 ชาม', cho:31.8, pro:8.7, fat:7.7 },
+    { name:'บะหมี่แห้งหมูแดง', weight:'', unit:'1 ชาม', cho:47.4, pro:12.9, fat:11.5 },
+    { name:'บัวลอย', weight:'', unit:'1 ถ้วยเล็ก', cho:30.7, pro:8.4, fat:7.4 },
+    { name:'บัวลอยเผือก', weight:'', unit:'1 ถ้วย', cho:41.2, pro:11.2, fat:10.0 },
+    { name:'บาร์บีคิวซี่โครงหมูข้าวคลุกเนย', weight:'', unit:'1 ชุด', cho:46.8, pro:12.8, fat:11.3 },
+    { name:'เบียร์ไทย', weight:'', unit:'1 แก้ว', cho:20.4, pro:5.5, fat:4.9 },
+    { name:'ปลากะพงนึ่งมะนาว', weight:'', unit:'1 ชิ้นกลาง', cho:21.3, pro:5.8, fat:5.2 },
+    { name:'ปลาช่อนทอด', weight:'', unit:'1 ตัว', cho:253.0, pro:69.0, fat:61.3 },
+    { name:'ปลาช่อนอบเกลือ', weight:'', unit:'1 ตัว', cho:30.3, pro:8.2, fat:7.3 },
+    { name:'ปลาชุบขนมปังทอด + สลัดผัก', weight:'', unit:'1 จาน', cho:81.8, pro:22.3, fat:19.8 },
+    { name:'ปลาซาบะย่าง', weight:'', unit:'1 ตัว', cho:30.3, pro:8.2, fat:7.3 },
+    { name:'ปลาแซลมอนย่าง', weight:'', unit:'1 จาน', cho:35.8, pro:9.8, fat:8.7 },
+    { name:'ปลาทอดสามรส', weight:'', unit:'1 ตัวกลาง', cho:64.6, pro:17.6, fat:15.7 },
+    { name:'ปลาทูทอด', weight:'', unit:'1 ตัวกลาง', cho:38.5, pro:10.5, fat:9.3 },
+    { name:'ปลานึ่ง', weight:'', unit:'1 ตัว', cho:21.5, pro:5.8, fat:5.2 },
+    { name:'ปลาเผา', weight:'', unit:'1 ตัว', cho:21.5, pro:5.8, fat:5.2 },
+    { name:'ปลาราดซอสมะนาวมันฝรั่งทอด', weight:'', unit:'1 จาน', cho:77.0, pro:21.0, fat:18.7 },
+    { name:'ปลาราดพริก', weight:'', unit:'1 จาน', cho:41.2, pro:11.2, fat:10.0 },
+    { name:'ปลาร้าทรงเครื่อง', weight:'', unit:'1 ถ้วย', cho:21.3, pro:5.8, fat:5.2 },
+    { name:'ปลาร้าสับ', weight:'', unit:'1 ถ้วย', cho:4.8, pro:1.3, fat:1.2 },
+    { name:'ปลาเล็กปลาน้อยทอดกรอบ', weight:'', unit:'1 ช้อนโต๊ะ', cho:11.0, pro:3.0, fat:2.7 },
+    { name:'ปลาสลิดทอด', weight:'', unit:'1 ตัว', cho:26.1, pro:7.1, fat:6.3 },
+    { name:'ปลาหมึกชุปแป้งทอด', weight:'', unit:'1 ชิ้น', cho:6.7, pro:1.8, fat:1.6 },
+    { name:'ปลาหมึกนึ่งมะนาว', weight:'', unit:'1 ตัว', cho:10.3, pro:2.8, fat:2.5 },
+    { name:'ปลาหมึกผัดฉ่า', weight:'', unit:'1 ถ้วย', cho:35.8, pro:9.8, fat:8.7 },
+    { name:'ปลาหมึกย่าง', weight:'', unit:'1 ไม้', cho:5.1, pro:1.4, fat:1.2 },
+    { name:'ปลาอินทรีเค็มทอด', weight:'', unit:'1 จาน', cho:15.8, pro:4.3, fat:3.8 },
+    { name:'เปาะเปี๊ยะทอด', weight:'', unit:'1 ชิ้น', cho:21.7, pro:5.9, fat:5.3 },
+    { name:'ปาท่องโก๋', weight:'', unit:'1 ตัว', cho:17.1, pro:4.6, fat:4.1 },
+    { name:'ปีกไก่ทอด', weight:'', unit:'1 ชิ้นกลาง', cho:14.7, pro:4.0, fat:3.6 },
+    { name:'ปีกไก่ยัดไส้ทอด', weight:'', unit:'1 ชิ้น', cho:14.2, pro:3.9, fat:3.4 },
+    { name:'ปีกไก่อบ', weight:'', unit:'1 ชิ้น', cho:23.2, pro:6.3, fat:5.6 },
+    { name:'เป็ดตุ๋นมะนาวดอง', weight:'', unit:'1 ถ้วย', cho:15.1, pro:4.1, fat:3.7 },
+    { name:'เป็ดพะโล้', weight:'', unit:'1 ถ้วย', cho:15.1, pro:4.1, fat:3.7 },
+    { name:'ผัดกะหล่ำปลีหมู', weight:'', unit:'1 จาน', cho:31.6, pro:8.6, fat:7.7 },
+    { name:'ผัดกุ้งสะตอหมู', weight:'', unit:'1 จาน', cho:27.5, pro:7.5, fat:6.7 },
+    { name:'ผัดกุ้งหน่อไม้ฝรั่ง', weight:'', unit:'1 จาน', cho:31.6, pro:8.6, fat:7.7 },
+    { name:'ผัดไข่หน่อไม้', weight:'', unit:'1 จาน', cho:27.5, pro:7.5, fat:6.7 },
+    { name:'ผัดคะน้าปลาเค็ม', weight:'', unit:'1 จาน', cho:27.5, pro:7.5, fat:6.7 },
+    { name:'ผัดไชโป๊ใส่ไข่', weight:'', unit:'1 จาน', cho:17.2, pro:4.7, fat:4.2 },
+    { name:'ผัดซีอิ๊วเส้นใหญ่หมูใส่ไข่', weight:'', unit:'1 จาน', cho:93.4, pro:25.5, fat:22.6 },
+    { name:'ผัดดอกกะหล่ำกุ้ง', weight:'', unit:'1 จาน', cho:28.9, pro:7.9, fat:7.0 },
+    { name:'ผัดดอกกุยช่ายตับ', weight:'', unit:'1 จาน', cho:28.9, pro:7.9, fat:7.0 },
+    { name:'ผัดถั่วงอกเต้าหู้', weight:'', unit:'1 จาน', cho:21.3, pro:5.8, fat:5.2 },
+    { name:'ผัดถั่วลันเตากุ้ง', weight:'', unit:'1 จาน', cho:26.1, pro:7.1, fat:6.3 },
+    { name:'ผัดไทยกุ้งสด', weight:'', unit:'1 จาน', cho:66.8, pro:18.2, fat:16.2 },
+    { name:'ผัดไทยกุ้งสดใส่ไข่', weight:'', unit:'1 จาน', cho:74.9, pro:20.4, fat:18.2 },
+    { name:'ผัดไทยไร้เส้น', weight:'', unit:'1 จาน', cho:25.0, pro:6.8, fat:6.1 },
+    { name:'ผัดไทยวุ้นเส้นกุ้งสด', weight:'', unit:'1 จาน', cho:71.5, pro:19.5, fat:17.3 },
+    { name:'ผัดไทยห่อไข่', weight:'', unit:'1 จาน', cho:77.7, pro:21.2, fat:18.8 },
+    { name:'ผัดบรอกโคลีกุ้ง', weight:'', unit:'1 จาน', cho:28.9, pro:7.9, fat:7.0 },
+    { name:'ผัดบวบใส่ไข่', weight:'', unit:'1 จาน', cho:28.9, pro:7.9, fat:7.0 },
+    { name:'ผัดเปรี้ยวหวานไก่', weight:'', unit:'1 จาน', cho:29.6, pro:8.1, fat:7.2 },
+    { name:'ผัดผักกระเฉดน้ำมันหอย', weight:'', unit:'1 จาน', cho:25.4, pro:6.9, fat:6.2 },
+    { name:'ผัดผักกาดขาวหมูวุ้นเส้น', weight:'', unit:'1 จาน', cho:31.6, pro:8.6, fat:7.7 },
+    { name:'ผัดผักกาดดองใส่ไข่', weight:'', unit:'1 จาน', cho:28.2, pro:7.7, fat:6.8 },
+    { name:'ผัดผักคะน้าน้ำมันหอย', weight:'', unit:'1 จาน', cho:28.9, pro:7.9, fat:7.0 },
+    { name:'ผัดผักบุ้ง (ไม่ใส่น้ำมัน)', weight:'', unit:'1 จาน', cho:5.5, pro:1.5, fat:1.3 },
+    { name:'ผัดผักบุ้งไฟแดง', weight:'', unit:'1 จาน', cho:28.9, pro:7.9, fat:7.0 },
+    { name:'ผัดผักรวมหมู', weight:'', unit:'1 จาน', cho:28.9, pro:7.9, fat:7.0 },
+    { name:'ผัดเผ็ดปลาดุก', weight:'', unit:'1 จาน', cho:27.5, pro:7.5, fat:6.7 },
+    { name:'ผัดเผ็ดปลาทอดกรอบ', weight:'', unit:'1 จาน', cho:39.9, pro:10.9, fat:9.7 },
+    { name:'ผัดเผ็ดมะเขือหมู', weight:'', unit:'1 จาน', cho:34.4, pro:9.4, fat:8.3 },
+    { name:'ผัดพริกแกงหมูหน่อไม้', weight:'', unit:'1 จาน', cho:27.5, pro:7.5, fat:6.7 },
+    { name:'ผัดพริกขิงกุ้งกับถั่วฝักยาว', weight:'', unit:'1 จาน', cho:33.7, pro:9.2, fat:8.2 },
+    { name:'ผัดพริกขิงหมูถั่วฝักยาว', weight:'', unit:'1 จาน', cho:36.4, pro:9.9, fat:8.8 },
+    { name:'ผัดฟักทองใส่ไข่', weight:'', unit:'1 จาน', cho:35.1, pro:9.6, fat:8.5 },
+    { name:'ผัดมะเขือยาวหมูสับ', weight:'', unit:'1 จาน', cho:28.9, pro:7.9, fat:7.0 },
+    { name:'ผัดมักกะโรนีกุ้ง', weight:'', unit:'1 จาน', cho:57.8, pro:15.8, fat:14.0 },
+    { name:'ผัดมักกะโรนีหมู', weight:'', unit:'1 จาน', cho:70.7, pro:19.3, fat:17.1 },
+    { name:'ผัดยอดมะระน้ำมันหอย', weight:'', unit:'1 จาน', cho:25.4, pro:6.9, fat:6.2 },
+    { name:'ผัดวุ้นเส้นใส่ไข่', weight:'', unit:'1 จาน', cho:36.4, pro:9.9, fat:8.8 },
+    { name:'ผัดหมี่ซั่ว', weight:'', unit:'1 จาน', cho:54.3, pro:14.8, fat:13.2 },
+    { name:'เผือกทอด', weight:'', unit:'1 ชิ้น', cho:13.6, pro:3.7, fat:3.3 },
+    { name:'ฝรั่ง', weight:'', unit:'1 ผล', cho:23.9, pro:6.5, fat:5.8 },
+    { name:'ฝอยทอง', weight:'', unit:'1 แพ', cho:20.1, pro:5.5, fat:4.9 },
+    { name:'เฝอ', weight:'', unit:'1 ถ้วย', cho:33.0, pro:9.0, fat:8.0 },
+    { name:'พอร์คชอปทอดผักผัดเนย', weight:'', unit:'1 จาน', cho:74.9, pro:20.4, fat:18.2 },
+    { name:'พะแนงไก่', weight:'', unit:'1 ถ้วย', cho:31.6, pro:8.6, fat:7.7 },
+    { name:'พะโล้', weight:'', unit:'1 ถ้วย', cho:28.9, pro:7.9, fat:7.0 },
+    { name:'พุทรา', weight:'', unit:'1 ลูก', cho:2.8, pro:0.8, fat:0.7 },
+    { name:'ฟักตุ๋นไก่มะนาวดอง', weight:'', unit:'1 ถ้วย', cho:17.2, pro:4.7, fat:4.2 },
+    { name:'ฟักทองแกงบวด', weight:'', unit:'1 ถ้วยเล็ก', cho:22.7, pro:6.2, fat:5.5 },
+    { name:'ฟักทองแกงบวด', weight:'', unit:'1 ถ้วย', cho:25.4, pro:6.9, fat:6.2 },
+    { name:'มะกอกฝรั่ง', weight:'', unit:'1 ผล', cho:2.8, pro:0.8, fat:0.7 },
+    { name:'มะขามหวาน', weight:'', unit:'1 ผล', cho:2.8, pro:0.8, fat:0.7 },
+    { name:'มะปรางสุก', weight:'', unit:'1 ผล', cho:2.8, pro:0.8, fat:0.7 },
+    { name:'มะเฟือง', weight:'', unit:'1 ผล', cho:16.5, pro:4.5, fat:4.0 },
+    { name:'มะไฟ', weight:'', unit:'1 ผล', cho:0.6, pro:0.1, fat:0.1 },
+    { name:'มะม่วงเขียวเสวย', weight:'', unit:'1 ผล', cho:16.5, pro:4.5, fat:4.0 },
+    { name:'มะม่วงดิบ', weight:'', unit:'1 ลูก', cho:15.1, pro:4.1, fat:3.7 },
+    { name:'มะม่วงน้ำดอกไม้', weight:'', unit:'1 ชิ้น', cho:2.1, pro:0.6, fat:0.5 },
+    { name:'มะม่วงสุก', weight:'', unit:'1 ลูก', cho:13.5, pro:3.7, fat:3.3 },
+    { name:'มะม่วงอกร่องสุก', weight:'', unit:'1 ชิ้น', cho:2.1, pro:0.6, fat:0.5 },
+    { name:'มะยม', weight:'', unit:'1 เม็ด', cho:0.6, pro:0.1, fat:0.1 },
+    { name:'มะละกอ', weight:'', unit:'1 ชิ้น', cho:1.1, pro:0.3, fat:0.3 },
+    { name:'มักกะโรนีขี้เมาไก่', weight:'', unit:'1 จาน', cho:71.5, pro:19.5, fat:17.3 },
+    { name:'มักกะโรนีผัดกุ้ง', weight:'', unit:'1 จาน', cho:57.8, pro:15.8, fat:14.0 },
+    { name:'มังคุด', weight:'', unit:'1 ผล', cho:1.8, pro:0.5, fat:0.4 },
+    { name:'มันแกงบวด', weight:'', unit:'1 ถ้วยเล็ก', cho:25.3, pro:6.9, fat:6.1 },
+    { name:'มันทอด', weight:'', unit:'1 ชิ้น', cho:17.1, pro:4.6, fat:4.1 },
+    { name:'มั่นฝรั่งทอด (เฟรนช์ฟรายส์)', weight:'', unit:'1 ชิ้น', cho:2.8, pro:0.8, fat:0.7 },
+    { name:'เม็ดขนุน (ขนมไทย)', weight:'', unit:'1 เม็ด', cho:4.8, pro:1.3, fat:1.2 },
+    { name:'เมล็ดมะม่วงหิมพานต์ทอด', weight:'', unit:'1 ชิ้น', cho:3.9, pro:1.1, fat:0.9 },
+    { name:'เมี่ยงก๋วยเตี๋ยว', weight:'', unit:'1 คำ', cho:2.8, pro:0.8, fat:0.7 },
+    { name:'เมี่ยงคำ', weight:'', unit:'1 คำ', cho:4.1, pro:1.1, fat:1.0 },
+    { name:'แม่โขง', weight:'', unit:'1 cc', cho:0.1, pro:0.0, fat:0.0 },
+    { name:'ยากิโซบะ', weight:'', unit:'1 จาน', cho:55.0, pro:15.0, fat:13.3 },
+    { name:'ยำกุนเชียง', weight:'', unit:'1 จาน', cho:30.3, pro:8.2, fat:7.3 },
+    { name:'ยำขนมจีน', weight:'', unit:'1 จาน', cho:30.3, pro:8.2, fat:7.3 },
+    { name:'ยำไข่ต้ม', weight:'', unit:'1 ฟอง', cho:14.4, pro:3.9, fat:3.5 },
+    { name:'ยำไข่ต้มทรงเครื่อง', weight:'', unit:'1 จาน', cho:25.9, pro:7.0, fat:6.3 },
+    { name:'ยำถั่วพู', weight:'', unit:'1 จาน', cho:25.4, pro:6.9, fat:6.2 },
+    { name:'ยำเนื้อย่าง', weight:'', unit:'1 จาน', cho:22.7, pro:6.2, fat:5.5 },
+    { name:'ยำปลากระป๋อง', weight:'', unit:'1 จาน', cho:7.6, pro:2.1, fat:1.8 },
+    { name:'ยำปลาดุกฟู', weight:'', unit:'1 จาน', cho:37.8, pro:10.3, fat:9.2 },
+    { name:'ยำปลาหมึกย่าง', weight:'', unit:'1 จาน', cho:13.6, pro:3.7, fat:3.3 },
+    { name:'ยำผักกระเฉด', weight:'', unit:'1 จาน', cho:15.8, pro:4.3, fat:3.8 },
+    { name:'ยำผักกาดดอง', weight:'', unit:'1 จาน', cho:4.1, pro:1.1, fat:1.0 },
+    { name:'ยำผักบุ้งทอดกรอบ', weight:'', unit:'1 จาน', cho:42.6, pro:11.6, fat:10.3 },
+    { name:'ยำมะเขือยาว', weight:'', unit:'1 จาน', cho:4.8, pro:1.3, fat:1.2 },
+    { name:'ยำมะม่วงทะเล', weight:'', unit:'1 จาน', cho:18.7, pro:5.1, fat:4.5 },
+    { name:'ยำมาม่า', weight:'', unit:'1 จาน', cho:29.6, pro:8.1, fat:7.2 },
+    { name:'ยำแมงกะพรุน', weight:'', unit:'1 จาน', cho:14.4, pro:3.9, fat:3.5 },
+    { name:'ยำรวมมิตรทะเล', weight:'', unit:'1 จาน', cho:18.2, pro:5.0, fat:4.4 },
+    { name:'ยำวุ้นเส้น', weight:'', unit:'1 จาน', cho:16.5, pro:4.5, fat:4.0 },
+    { name:'ยำไส้กรอก', weight:'', unit:'1 จาน', cho:15.1, pro:4.1, fat:3.7 },
+    { name:'ยำหนังหมู', weight:'', unit:'1 จาน', cho:30.3, pro:8.2, fat:7.3 },
+    { name:'ยำหมูย่าง', weight:'', unit:'1 จาน', cho:22.7, pro:6.2, fat:5.5 },
+    { name:'ยำหอยแมลงภู่', weight:'', unit:'1 จาน', cho:8.2, pro:2.2, fat:2.0 },
+    { name:'เย็นตาโฟ', weight:'', unit:'1 ชาม', cho:39.9, pro:10.9, fat:9.7 },
+    { name:'ระกำ', weight:'', unit:'1 ผล', cho:1.1, pro:0.3, fat:0.3 },
+    { name:'ราดหน้าบะหมี่กรอบ', weight:'', unit:'1 จาน', cho:70.8, pro:19.3, fat:17.2 },
+    { name:'ราดหน้าบะหมี่กรอบไก่', weight:'', unit:'1 จาน', cho:90.8, pro:24.8, fat:22.0 },
+    { name:'ราดหน้าปลากะพง', weight:'', unit:'1 จาน', cho:59.8, pro:16.3, fat:14.5 },
+    { name:'ราดหน้าเส้นใหญ่หมู', weight:'', unit:'1 จาน', cho:55.7, pro:15.2, fat:13.5 },
+    { name:'ราดหน้าหมูหมี่กรอบ', weight:'', unit:'1 จาน', cho:94.9, pro:25.9, fat:23.0 },
+    { name:'รูทเบียร์', weight:'', unit:'1 แก้ว', cho:14.4, pro:3.9, fat:3.5 },
+    { name:'โรตี ใส่นมข้นและน้ำตาล', weight:'', unit:'1 ชิ้น', cho:26.4, pro:7.2, fat:6.4 },
+    { name:'โรตีแกงเนื้อ, หมู', weight:'', unit:'1 ชุด', cho:92.8, pro:25.3, fat:22.5 },
+    { name:'ลองกอง', weight:'', unit:'1 ลูก', cho:0.8, pro:0.2, fat:0.2 },
+    { name:'ลอดช่องน้ำกะทิ', weight:'', unit:'1 ถ้วย', cho:28.9, pro:7.9, fat:7.0 },
+    { name:'ลอดช่องสิงคโปร์', weight:'', unit:'1 ถ้วย', cho:29.6, pro:8.1, fat:7.2 },
+    { name:'ละมุด', weight:'', unit:'1 ผล', cho:16.5, pro:4.5, fat:4.0 },
+    { name:'ลางสาด', weight:'', unit:'1 ผล', cho:0.8, pro:0.2, fat:0.2 },
+    { name:'ลาบไก่', weight:'', unit:'1 จาน', cho:17.2, pro:4.7, fat:4.2 },
+    { name:'ลาบเนื้อ', weight:'', unit:'1 จาน', cho:16.4, pro:4.5, fat:4.0 },
+    { name:'ลาบปลา', weight:'', unit:'1 จาน', cho:12.9, pro:3.5, fat:3.1 },
+    { name:'ลาบหมู', weight:'', unit:'1 จาน', cho:16.4, pro:4.5, fat:4.0 },
+    { name:'ลำไย', weight:'', unit:'1 เม็ด', cho:1.1, pro:0.3, fat:0.3 },
+    { name:'ลำไยแห้ง', weight:'', unit:'1 เม็ด', cho:1.2, pro:0.3, fat:0.3 },
+    { name:'ลิ้นจี่', weight:'', unit:'1 ลูก', cho:2.3, pro:0.6, fat:0.6 },
+    { name:'ลูกเกด', weight:'', unit:'1 เม็ด', cho:0.6, pro:0.1, fat:0.1 },
+    { name:'ลูกชิ้นไก่', weight:'', unit:'1 ลูก', cho:0.8, pro:0.2, fat:0.2 },
+    { name:'ลูกชิ้นทอด', weight:'', unit:'1 ลูก', cho:4.8, pro:1.3, fat:1.2 },
+    { name:'ลูกชิ้นเนื้อวัว', weight:'', unit:'1 ลูก', cho:1.1, pro:0.3, fat:0.3 },
+    { name:'ลูกชิ้นปลา', weight:'', unit:'1 ลูก', cho:0.6, pro:0.1, fat:0.1 },
+    { name:'ลูกชุบ', weight:'', unit:'1 ชิ้น', cho:7.8, pro:2.1, fat:1.9 },
+    { name:'ลูกตาลอ่อน', weight:'', unit:'1 ผล', cho:16.5, pro:4.5, fat:4.0 },
+    { name:'ลูกพลับ', weight:'', unit:'1 ผล', cho:16.5, pro:4.5, fat:4.0 },
+    { name:'วอดก้า', weight:'', unit:'1 cc', cho:0.3, pro:0.1, fat:0.1 },
+    { name:'วิสกี้', weight:'', unit:'1 cc', cho:0.3, pro:0.1, fat:0.1 },
+    { name:'วุ้นเส้นต้มยำ', weight:'', unit:'1 จาน', cho:33.7, pro:9.2, fat:8.2 },
+    { name:'วุ้นเส้นผัดไทยกุ้งสด', weight:'', unit:'1 จาน', cho:71.5, pro:19.5, fat:17.3 },
+    { name:'ไวตามิลค์', weight:'', unit:'1 ขวด', cho:20.6, pro:5.6, fat:5.0 },
+    { name:'ไวน์เชอร์รี', weight:'', unit:'1 cc', cho:0.1, pro:0.0, fat:0.0 },
+    { name:'สตรอว์เบอร์รี', weight:'', unit:'1 ผล', cho:8.2, pro:2.2, fat:2.0 },
+    { name:'สเต๊กไก่ทอด + มันบด', weight:'', unit:'1 จาน', cho:84.6, pro:23.1, fat:20.5 },
+    { name:'สเต๊กปลาย่าง', weight:'', unit:'1 จาน', cho:35.8, pro:9.8, fat:8.7 },
+    { name:'สเต๊กหมู + ผักสลัด', weight:'', unit:'1 จาน', cho:69.4, pro:18.9, fat:16.8 },
+    { name:'สปาเกตตีกะเพรากุ้ง', weight:'', unit:'1 จาน', cho:66.7, pro:18.2, fat:16.2 },
+    { name:'สปาเกตตีไก่อบ', weight:'', unit:'1 จาน', cho:59.1, pro:16.1, fat:14.3 },
+    { name:'ส้มเขียวหวาน', weight:'', unit:'1 ลูก', cho:4.4, pro:1.2, fat:1.1 },
+    { name:'ส้มเช้ง', weight:'', unit:'1 ผล', cho:8.2, pro:2.2, fat:2.0 },
+    { name:'ส้มตำ ไม่ใส่ถั่ว', weight:'', unit:'1 จาน', cho:11.0, pro:3.0, fat:2.7 },
+    { name:'ส้มตำไทย ไม่ใส่ถั่ว', weight:'', unit:'1 จาน', cho:7.6, pro:2.1, fat:1.8 },
+    { name:'ส้มตำปู ไม่ใส่ถั่ว', weight:'', unit:'1 จาน', cho:4.8, pro:1.3, fat:1.2 },
+    { name:'ส้มตำปูไทย ไม่ใส่ถั่ว', weight:'', unit:'1 จาน', cho:16.2, pro:4.4, fat:3.9 },
+    { name:'ส้มแป้น', weight:'', unit:'1 กิโลกรัม', cho:46.8, pro:12.8, fat:11.3 },
+    { name:'ส้มโอ', weight:'', unit:'1 กลีบ', cho:8.2, pro:2.2, fat:2.0 },
+    { name:'สละหวาน', weight:'', unit:'1 ผล', cho:8.2, pro:2.2, fat:2.0 },
+    { name:'สลัดกุ้ง', weight:'', unit:'1 จาน', cho:12.7, pro:3.4, fat:3.1 },
+    { name:'สลัดกุ้งน้ำใส', weight:'', unit:'1 จาน', cho:12.7, pro:3.4, fat:3.1 },
+    { name:'สลัดไก่', weight:'', unit:'1 จาน', cho:13.3, pro:3.6, fat:3.2 },
+    { name:'สลัดแขก', weight:'', unit:'1 จาน', cho:31.6, pro:8.6, fat:7.7 },
+    { name:'สลัดไข่', weight:'', unit:'1 จาน', cho:16.9, pro:4.6, fat:4.1 },
+    { name:'สลัดเนื้อสันในทอด', weight:'', unit:'1 จาน', cho:67.4, pro:18.4, fat:16.3 },
+    { name:'สลัดปลาทูน่า', weight:'', unit:'1 จาน', cho:16.8, pro:4.6, fat:4.1 },
+    { name:'สับปะรด', weight:'', unit:'1 ชิ้นเล็ก', cho:1.1, pro:0.3, fat:0.3 },
+    { name:'สัมปันนี', weight:'', unit:'1 ชิ้น', cho:2.9, pro:0.8, fat:0.7 },
+    { name:'สาคูไส้หมู', weight:'', unit:'1 ลูก', cho:7.0, pro:1.9, fat:1.7 },
+    { name:'สาลี่', weight:'', unit:'1 ผล', cho:16.0, pro:4.3, fat:3.9 },
+    { name:'สาลี่หอม', weight:'', unit:'1 ผล', cho:8.2, pro:2.2, fat:2.0 },
+    { name:'สุกี้กุ้ง ไม่ใส่วุ้นเส้น', weight:'', unit:'1 ถ้วย', cho:27.5, pro:7.5, fat:6.7 },
+    { name:'สุกี้ไก่ ไม่ใส่วุ้นเส้น', weight:'', unit:'1 ถ้วย', cho:27.5, pro:7.5, fat:6.7 },
+    { name:'สุกี้น้ำไก่', weight:'', unit:'1 ชาม', cho:47.4, pro:12.9, fat:11.5 },
+    { name:'สุกี้หมู ไม่ใส่วุ้นเส้น', weight:'', unit:'1 ถ้วย', cho:27.5, pro:7.5, fat:6.7 },
+    { name:'สุกี้แห้งทะเล', weight:'', unit:'1 ชาม', cho:38.5, pro:10.5, fat:9.3 },
+    { name:'เส้นก๋วยเตี๋ยวผัดขี้เมา', weight:'', unit:'1 จาน', cho:83.2, pro:22.7, fat:20.2 },
+    { name:'เส้นจันท์ผัดปู', weight:'', unit:'1 จาน', cho:79.1, pro:21.6, fat:19.2 },
+    { name:'เส้นหมี่ลูกชิ้นน้ำใส', weight:'', unit:'1 ชาม', cho:30.9, pro:8.4, fat:7.5 },
+    { name:'เส้นหมี่ลูกชิ้นหมูแห้ง', weight:'', unit:'1 ชาม', cho:59.1, pro:16.1, fat:14.3 },
+    { name:'เส้นใหญ่ผัดซีอิ๊วใส่ไข่', weight:'', unit:'1 จาน', cho:71.5, pro:19.5, fat:17.3 },
+    { name:'ไส้กรอกเนื้อลูกวัวอบสลัดผัก', weight:'', unit:'1 จาน', cho:63.9, pro:17.4, fat:15.5 },
+    { name:'ไส้กรอกอีสาน', weight:'', unit:'1 ลูก', cho:12.4, pro:3.4, fat:3.0 },
+    { name:'ไส้อั่ว', weight:'', unit:'1 คำ', cho:8.2, pro:2.2, fat:2.0 },
+    { name:'หน่อไม้ผัดไข่', weight:'', unit:'1 จาน', cho:27.5, pro:7.5, fat:6.7 },
+    { name:'หมี่กรอบราดหน้าหมู', weight:'', unit:'1 จาน', cho:94.9, pro:25.9, fat:23.0 },
+    { name:'หมี่กะทิ', weight:'', unit:'1 จาน', cho:55.7, pro:15.2, fat:13.5 },
+    { name:'หมี่ซั่วผัด', weight:'', unit:'1 จาน', cho:54.3, pro:14.8, fat:13.2 },
+    { name:'หมูกรอบ', weight:'', unit:'1 จาน', cho:77.0, pro:21.0, fat:18.7 },
+    { name:'หมูกะทะ', weight:'', unit:'1 ชุด', cho:51.6, pro:14.1, fat:12.5 },
+    { name:'หมูคลุกเกล็ดขนมปังทอดซอส', weight:'', unit:'1 ชุด', cho:88.7, pro:24.2, fat:21.5 },
+    { name:'หมูจุ่ม', weight:'', unit:'1 ชุด', cho:51.6, pro:14.1, fat:12.5 },
+    { name:'หมูทอดเนยสลัดน้ำใส', weight:'', unit:'1 จาน', cho:87.3, pro:23.8, fat:21.2 },
+    { name:'หมูน้ำตก', weight:'', unit:'1 จาน', cho:22.7, pro:6.2, fat:5.5 },
+    { name:'หมูบด', weight:'', unit:'1 ช้อนโต๊ะ', cho:6.9, pro:1.9, fat:1.7 },
+    { name:'หมูปิ้ง', weight:'', unit:'1 ไม้', cho:17.2, pro:4.7, fat:4.2 },
+    { name:'หมูผัดขิง', weight:'', unit:'1 จาน', cho:37.8, pro:10.3, fat:9.2 },
+    { name:'หมูแผ่น', weight:'', unit:'1 แผ่นกลาง', cho:16.5, pro:4.5, fat:4.0 },
+    { name:'หมูฝอย', weight:'', unit:'1 ช้อนโต๊ะ', cho:9.4, pro:2.5, fat:2.3 },
+    { name:'หมูยอชุบแป้งทอด', weight:'', unit:'1 ชิ้น', cho:17.2, pro:4.7, fat:4.2 },
+    { name:'หมูย่างเกาหลี', weight:'', unit:'1 ชุด', cho:51.6, pro:14.1, fat:12.5 },
+    { name:'หมูสะเต๊ะ', weight:'', unit:'1 ไม้', cho:15.8, pro:4.3, fat:3.8 },
+    { name:'หมูหยอง', weight:'', unit:'1 ช้อนโต๊ะ', cho:5.2, pro:1.4, fat:1.3 },
+    { name:'หลนปูเค็ม', weight:'', unit:'1 ถ้วย', cho:28.2, pro:7.7, fat:6.8 },
+    { name:'หอยแมลงภู่ทอด', weight:'', unit:'1 จาน', cho:83.2, pro:22.7, fat:20.2 },
+    { name:'หอยแมลงภู่อบหม้อดิน', weight:'', unit:'1 ตัว', cho:2.3, pro:0.6, fat:0.6 },
+    { name:'เห็ดผัดน้ำมันหอย', weight:'', unit:'1 จาน', cho:25.4, pro:6.9, fat:6.2 },
+    { name:'แหนมสด', weight:'', unit:'1 จาน', cho:24.1, pro:6.6, fat:5.8 },
+    { name:'อกไก่ย่าง', weight:'', unit:'1 ชิ้น', cho:15.1, pro:4.1, fat:3.7 },
+    { name:'อกไก่อบ', weight:'', unit:'1 ชิ้น', cho:23.2, pro:6.3, fat:5.6 },
+    { name:'องุ่น', weight:'', unit:'1 เม็ด', cho:2.2, pro:0.6, fat:0.5 },
+    { name:'องุ่นเปรี้ยว', weight:'', unit:'1 เม็ด', cho:0.4, pro:0.1, fat:0.1 },
+    { name:'องุ่นหวาน', weight:'', unit:'1 เม็ด', cho:0.6, pro:0.1, fat:0.1 },
+    { name:'อ้อยควั่น', weight:'', unit:'1 ชิ้น', cho:1.7, pro:0.4, fat:0.4 },
+    { name:'แอปเปิล', weight:'', unit:'1 ลูก', cho:5.8, pro:1.6, fat:1.4 },
+    { name:'โอวัลติน', weight:'', unit:'1 แก้ว', cho:30.3, pro:8.2, fat:7.3 },
+    { name:'ฮะเก๋า', weight:'', unit:'1 ลูกเล็ก', cho:15.8, pro:4.3, fat:3.8 },
+    { name:'ขนมถ้วย', weight:'', unit:'1 ถ้วย', cho:18.3, pro:5.0, fat:4.4 },
+    { name:'กระทงทองไส้ข้าวโพด', weight:'', unit:'1 ชิ้น', cho:9.9, pro:2.7, fat:2.4 },
+    { name:'กระทงทองไส้ไก่', weight:'', unit:'1 ชิ้น', cho:12.8, pro:3.5, fat:3.1 },
+    { name:'กระยาสารท', weight:'', unit:'1 ชิ้นกลาง', cho:28.9, pro:7.9, fat:7.0 },
+    { name:'ขนมชั้น', weight:'', unit:'1 ชิ้น', cho:12.7, pro:3.4, fat:3.1 },
+    { name:'ขนมต้มขาว', weight:'', unit:'1 ลูก', cho:5.6, pro:1.5, fat:1.4 },
+    { name:'ขนมปลากริมไข่เต่า', weight:'', unit:'1 ถ้วย', cho:34.4, pro:9.4, fat:8.3 },
+    { name:'ขนมปังกระเทียม', weight:'', unit:'1 ชิ้น', cho:11.7, pro:3.2, fat:2.8 },
+    { name:'ขนมปังขาไก่', weight:'', unit:'1 ชิ้น', cho:8.9, pro:2.4, fat:2.2 },
+    { name:'ขนมปังปอนด์', weight:'', unit:'1 แผ่น', cho:11.0, pro:3.0, fat:2.7 },
+    { name:'ขนมปังมะพร้าว', weight:'', unit:'1 ชิ้น', cho:32.3, pro:8.8, fat:7.8 },
+    { name:'ขนมปังสังขยา', weight:'', unit:'1 ชิ้น', cho:31.6, pro:8.6, fat:7.7 },
+    { name:'ขนมปังอบกรอบ', weight:'', unit:'1 แผ่นเล็ก', cho:2.8, pro:0.8, fat:0.7 },
+    { name:'ขนมปังไส้กรอก', weight:'', unit:'1 ชิ้น', cho:17.9, pro:4.9, fat:4.3 },
+    { name:'ขนมปังไส้หมูหยอง', weight:'', unit:'1 ชิ้น', cho:25.4, pro:6.9, fat:6.2 },
+    { name:'ขนมหม้อแกง', weight:'', unit:'1 ชิ้น', cho:24.6, pro:6.7, fat:6.0 },
+    { name:'ขนมไหว้พระจันทร์ไส้ทุเรียนกวน', weight:'', unit:'1 ชิ้น', cho:46.8, pro:12.8, fat:11.3 },
+    { name:'ขนมไหว้พระจันทร์ไส้ลูกบัวไข่เค็ม', weight:'', unit:'1 ชิ้น', cho:51.6, pro:14.1, fat:12.5 },
+    { name:'ข้าวเหนียวหน้ากุ้ง', weight:'', unit:'1 ห่อ', cho:24.6, pro:6.7, fat:6.0 },
+    { name:'ข้าวเหนียวสังขยา', weight:'', unit:'1 ห่อ', cho:50.9, pro:13.9, fat:12.3 },
+    { name:'ครีมเทียม', weight:'', unit:'1 ช้อนชา', cho:6.2, pro:1.7, fat:1.5 },
+    { name:'ครีมโรล', weight:'', unit:'1 ชิ้น', cho:49.5, pro:13.5, fat:12.0 },
+    { name:'คอร์นเฟลก', weight:'', unit:'1 ถ้วยตวง', cho:15.1, pro:4.1, fat:3.7 },
+    { name:'คุ้กกี้ข้าวโอ๊ต', weight:'', unit:'1 ชิ้น', cho:10.3, pro:2.8, fat:2.5 },
+    { name:'คุ้กกี้ชาเขียว', weight:'', unit:'1 ชิ้น', cho:10.3, pro:2.8, fat:2.5 },
+    { name:'คุ้กกี้ช็อกโกแลตชิป', weight:'', unit:'1 ชิ้น', cho:29.6, pro:8.1, fat:7.2 },
+    { name:'คุ้กกี้สิงคโปร์', weight:'', unit:'1 ชิ้น', cho:13.1, pro:3.6, fat:3.2 },
+    { name:'คุ้กกี้เนย', weight:'', unit:'1 ชิ้น', cho:14.4, pro:3.9, fat:3.5 },
+    { name:'คุ้กกี้ไส้สับปะรด', weight:'', unit:'1 ชิ้น', cho:26.1, pro:7.1, fat:6.3 },
+    { name:'ชาดำเย็น', weight:'', unit:'1 แก้ว', cho:15.1, pro:4.1, fat:3.7 },
+    { name:'ชามะนาว', weight:'', unit:'1 แก้ว', cho:13.8, pro:3.8, fat:3.3 },
+    { name:'ชาร้อน', weight:'', unit:'1 แก้ว', cho:7.6, pro:2.1, fat:1.8 },
+    { name:'ชาเย็น', weight:'', unit:'1 แก้ว', cho:13.8, pro:3.8, fat:3.3 },
+    { name:'ช็อกโกแลตร้อน', weight:'', unit:'1 แก้ว', cho:16.5, pro:4.5, fat:4.0 },
+    { name:'ถั่วลิสงแผ่นทอด', weight:'', unit:'1 แผ่น', cho:20.6, pro:5.6, fat:5.0 },
+    { name:'ถั่วลิสงต้ม', weight:'', unit:'1 ช้อนโต๊ะ', cho:6.2, pro:1.7, fat:1.5 },
+    { name:'ถั่วเขียวต้มน้ำตาล', weight:'', unit:'1 ถ้วยเล็ก', cho:22.0, pro:6.0, fat:5.3 },
+    { name:'ทองหยิบ', weight:'', unit:'1 ดอก', cho:14.4, pro:3.9, fat:3.5 },
+    { name:'ทุเรียนกวน', weight:'', unit:'1 ช้อนโต๊ะ', cho:15.8, pro:4.3, fat:3.8 },
+    { name:'น้ำนมข้าวโพด', weight:'', unit:'1 แก้ว', cho:11.0, pro:3.0, fat:2.7 },
+    { name:'น้ำตาลทราย', weight:'', unit:'1 ช้อนชา', cho:2.8, pro:0.8, fat:0.7 },
+    { name:'น้ำฝรั่ง', weight:'', unit:'1 กล่อง', cho:13.8, pro:3.8, fat:3.3 },
+    { name:'บราวนี่', weight:'', unit:'1 ชิ้น', cho:46.8, pro:12.8, fat:11.3 },
+    { name:'น้ำใบเตย', weight:'', unit:'1 แก้ว', cho:16.5, pro:4.5, fat:4.0 },
+    { name:'น้ำใบบัวบก', weight:'', unit:'1 แก้ว', cho:16.5, pro:4.5, fat:4.0 },
+    { name:'พายกรอบ', weight:'', unit:'1 ชิ้น', cho:16.2, pro:4.4, fat:3.9 },
+    { name:'พายชีสบูลเบอร์รี', weight:'', unit:'1 ชิ้น', cho:48.1, pro:13.1, fat:11.7 },
+    { name:'พายทูน่า', weight:'', unit:'1 ชิ้น', cho:38.5, pro:10.5, fat:9.3 },
+    { name:'พิซซ่าขอบไส้กรอกชีส', weight:'', unit:'1 ชิ้น', cho:46.8, pro:12.8, fat:11.3 },
+    { name:'พิซซ่าทะเล', weight:'', unit:'1 ชิ้น', cho:46.1, pro:12.6, fat:11.2 },
+    { name:'พิซซ่าฮาวายเอี้ยน', weight:'', unit:'1 ชิ้น', cho:47.4, pro:12.9, fat:11.5 },
+    { name:'พิซซ่าไส้กรอก', weight:'', unit:'1 ชิ้น', cho:39.9, pro:10.9, fat:9.7 },
+    { name:'ฟักทองเชื่อม', weight:'', unit:'1 จาน', cho:23.0, pro:6.3, fat:5.6 },
+    { name:'มะกอกทรงเครื่อง', weight:'', unit:'1 ผล', cho:4.5, pro:1.2, fat:1.1 },
+    { name:'มะขามหวาน', weight:'', unit:'1 ฝัก', cho:4.1, pro:1.1, fat:1.0 },
+    { name:'มันฝรั่งแผ่น', weight:'', unit:'1 ชิ้น', cho:1.8, pro:0.5, fat:0.4 },
+    { name:'มันเทศเชื่อม', weight:'', unit:'1 ถ้วยเล็ก', cho:31.6, pro:8.6, fat:7.7 },
+    { name:'มาการีน', weight:'', unit:'1 ช้อนชา', cho:6.2, pro:1.7, fat:1.5 },
+    { name:'รวมมิตร', weight:'', unit:'1 ถ้วยเล็ก', cho:31.6, pro:8.6, fat:7.7 },
+    { name:'ลูกชิ้นปิ้ง', weight:'', unit:'1 ไม้', cho:22.7, pro:6.2, fat:5.5 },
+    { name:'ลูกตาลลอยแก้ว', weight:'', unit:'1 ถ้วย', cho:24.8, pro:6.8, fat:6.0 },
+    { name:'วุ้นมะพร้าวอ่อน', weight:'', unit:'1 ชิ้น', cho:11.0, pro:3.0, fat:2.7 },
+    { name:'สังขยา', weight:'', unit:'1 ชิ้นเล็ก', cho:28.1, pro:7.6, fat:6.8 },
+    { name:'สังขยาฟักทอง', weight:'', unit:'1 ชิ้นเล็ก', cho:39.6, pro:10.8, fat:9.6 },
+    { name:'สังขยาเผือก', weight:'', unit:'1 ชิ้นเล็ก', cho:30.5, pro:8.3, fat:7.4 },
+    { name:'เกี๊ยวกรอบ', weight:'', unit:'1 ชิ้น', cho:10.7, pro:2.9, fat:2.6 },
+    { name:'เค้กกล้วยหอม', weight:'', unit:'1 ชิ้น', cho:50.9, pro:13.9, fat:12.3 },
+    { name:'เค้กช็อกโกแลต', weight:'', unit:'1 ชิ้น', cho:37.8, pro:10.3, fat:9.2 },
+    { name:'เค้กเนย', weight:'', unit:'1 ชิ้น', cho:35.1, pro:9.6, fat:8.5 },
+    { name:'เค้กใบเตย', weight:'', unit:'1 ชิ้น', cho:34.4, pro:9.4, fat:8.3 },
+    { name:'เต้าหู้เหลือง', weight:'', unit:'1 ชิ้น', cho:12.4, pro:3.4, fat:3.0 },
+    { name:'แซนด์วิชแฮมชีส', weight:'', unit:'1 คู่', cho:39.9, pro:10.9, fat:9.7 },
+    { name:'แซนด์วิชทูน่า', weight:'', unit:'1 คู่', cho:24.8, pro:6.8, fat:6.0 },
+    { name:'แซนด์วิชไก่', weight:'', unit:'1 คู่', cho:33.0, pro:9.0, fat:8.0 },
+    { name:'แยมโรล', weight:'', unit:'1 ชิ้น', cho:42.6, pro:11.6, fat:10.3 },
+    { name:'แฮมเบอร์เกอร์ไก่ชีส', weight:'', unit:'1 ชิ้น', cho:38.5, pro:10.5, fat:9.3 },
+    { name:'แฮมเบอร์เกอร์หมู', weight:'', unit:'1 ชิ้น', cho:33.7, pro:9.2, fat:8.2 },
+    { name:'โดนัท', weight:'', unit:'1 ชิ้น', cho:37.1, pro:10.1, fat:9.0 },
+    { name:'โรตีสายไหม', weight:'', unit:'1 ชิ้น', cho:19.9, pro:5.4, fat:4.8 },
+    { name:'ไอศกรีมกะทิ', weight:'', unit:'1 ก้อน', cho:14.9, pro:4.0, fat:3.6 },
+    { name:'ไอศกรีมกาแฟ', weight:'', unit:'1 ก้อน', cho:19.5, pro:5.3, fat:4.7 },
+    { name:'ไอศกรีมช็อกโกแลต', weight:'', unit:'1 ก้อน', cho:15.1, pro:4.1, fat:3.7 },
+    { name:'ไอศกรีมวานิลลา', weight:'', unit:'1 ก้อน', cho:19.2, pro:5.2, fat:4.7 },
+    { name:'ไอศกรีมสตรอว์เบอร์รี', weight:'', unit:'1 ก้อน', cho:15.1, pro:4.1, fat:3.7 },
+    { name:'ไอศกรีมเรซิน', weight:'', unit:'1 ก้อน', cho:36.3, pro:9.9, fat:8.8 }
+  ],
+  starch: [
+    { name:'ข้าวสวย', weight:'55 กรัม', unit:'1/3 ถ้วยตวง' },
+    { name:'ข้าวเหนียว', weight:'35 กรัม', unit:'1/4 ถ้วยตวง' },
+    { name:'ข้าวต้ม', weight:'150-170 กรัม', unit:'3/4 ถ้วยตวง' },
+    { name:'ขนมจีน', weight:'90 กรัม', unit:'1 จับใหญ่' },
+    { name:'เส้นก๋วยเตี๋ยว (ลวก)', weight:'90 กรัม', unit:'1/2-2/3 ถ้วยตวง' },
+    { name:'เมล็ดขนุน (ต้ม)', weight:'50 กรัม', unit:'' },
+    { name:'ข้าวโพดต้ม', weight:'65 กรัม', unit:'1/2 ฝัก' },
+    { name:'เกาลัด', weight:'30 กรัม', unit:'6 เม็ด' },
+    { name:'ฟักทอง', weight:'70 กรัม', unit:'1 ถ้วยตวง' },
+    { name:'บะหมี่กึ่งสำเร็จรูป (สุก)', weight:'50 กรัม', unit:'1/2 ถ้วยตวง' },
+    { name:'มันฝรั่ง (สุก)', weight:'90 กรัม', unit:'3/4 ถ้วยตวง' },
+    { name:'เผือก (สุก)', weight:'65 กรัม', unit:'1/2 ถ้วยตวง' },
+    { name:'ขนมปัง', weight:'25 กรัม', unit:'1 แผ่น' },
+    { name:'บะหมี่เหลือง', weight:'50 กรัม', unit:'1/2 ถ้วยตวง' },
+    { name:'มักกะโรนี/เส้นสปาเก็ตตี้ (สุก)', weight:'75 กรัม', unit:'1/3 ถ้วยตวง' }
+  ],
+  fat: [
+    { name:'น้ำมันปาล์ม/น้ำมันหมู/น้ำมันไก่', weight:'5 กรัม', unit:'1 ช้อนชา' },
+    { name:'เบคอน', weight:'', unit:'1 ชิ้น' },
+    { name:'กะทิ', weight:'15 กรัม', unit:'1 ช้อนโต๊ะ' },
+    { name:'เนย', weight:'5 กรัม', unit:'1 ช้อนชา' },
+    { name:'หนังไก่ (สุก)', weight:'30 กรัม', unit:'2 ช้อนโต๊ะ' },
+    { name:'น้ำมันมะกอก/น้ำมันรำข้าว/น้ำมันถั่วลิสง', weight:'5 กรัม', unit:'1 ช้อนชา' },
+    { name:'ถั่วลิสง', weight:'', unit:'10 เม็ด' },
+    { name:'เมล็ดมะม่วงหิมพานต์', weight:'', unit:'6 เม็ด' },
+    { name:'งาดำ/งาขาว', weight:'', unit:'1 ช้อนโต๊ะ' },
+    { name:'เมล็ดทานตะวัน', weight:'15 กรัม', unit:'1 ช้อนโต๊ะ' },
+    { name:'เมล็ดฟักทอง', weight:'15 กรัม', unit:'1 ช้อนโต๊ะ' },
+    { name:'น้ำมันถั่วเหลือง/น้ำมันข้าวโพด', weight:'5 กรัม', unit:'1 ช้อนชา' },
+    { name:'น้ำมันดอกคำฝอย/น้ำมันดอกทานตะวัน', weight:'5 กรัม', unit:'1 ช้อนชา' },
+    { name:'เนยเทียม', weight:'5 กรัม', unit:'1 ช้อนชา' },
+    { name:'น้ำสลัดน้ำข้น', weight:'15 กรัม', unit:'1 ช้อนโต๊ะ' },
+    { name:'น้ำสลัดน้ำใส', weight:'5 กรัม', unit:'1 ช้อนชา' }
+  ],
+  sugar: [
+    { name:'น้ำตาล', weight:'5 กรัม', unit:'1 ส่วน' },
+    { name:'ไอศกรีม (1 แท่ง)', weight:'', unit:'1 แท่ง', cho:34.25, pro:0, fat:7 },
+    { name:'ไอศกรีม (1 สกู๊ป)', weight:'100 กรัม', unit:'1 สกู๊ป', cho:52.5, pro:0, fat:10 }
+  ],
+  milk: [
+    { name:'นมพร่องมันเนย', weight:'240 มล.', unit:'' },
+    { name:'นมขาดมันเนย', weight:'240 มล.', unit:'', cho:12, pro:8, fat:1.1 },
+    { name:'นมไขมันเต็ม', weight:'240 มล.', unit:'', cho:12, pro:8, fat:8 },
+    { name:'นมสดระเหย', weight:'120 มล.', unit:'', cho:12, pro:8, fat:8 },
+    { name:'นมผงขาดมันเนย', weight:'30 กรัม', unit:'', cho:12, pro:8, fat:1.1 },
+    { name:'นมผง', weight:'30 กรัม', unit:'', cho:12, pro:8, fat:8 }
+  ],
+  fruit: [
+    { name:'เงาะ', weight:'85 กรัม', unit:'4 ผล' },
+    { name:'ชมพู่', weight:'120 กรัม', unit:'2 ผล' },
+    { name:'กล้วยหักมุก', weight:'50 กรัม', unit:'1/2 ผลใหญ่' },
+    { name:'กล้วยหอม', weight:'50 กรัม', unit:'1/2 ผลใหญ่' },
+    { name:'กล้วยน้ำว้า/กล้วยไข่', weight:'45 กรัม', unit:'1 ผลกลาง' },
+    { name:'มะละกอสุก (ผล)', weight:'80 กรัม', unit:'1/2 ผลกลาง' },
+    { name:'มะม่วง', weight:'100 กรัม', unit:'1/2 ผลกลาง' },
+    { name:'ฝรั่ง', weight:'120 กรัม', unit:'1/2 ผลกลาง' },
+    { name:'ทุเรียน', weight:'40 กรัม', unit:'1 เม็ดกลาง' },
+    { name:'แตงโม', weight:'285 กรัม', unit:'8-10 ชิ้นคำ' },
+    { name:'มังคุด', weight:'250 กรัม', unit:'2-3 ผลขนาดใหญ่' },
+    { name:'มะละกอสุก (หั่นชิ้น)', weight:'115 กรัม', unit:'8 ชิ้นคำ' },
+    { name:'สับปะรด', weight:'125 กรัม', unit:'8 ชิ้นคำ' },
+    { name:'แอปเปิ้ล', weight:'100 กรัม', unit:'1 ผลกลาง' },
+    { name:'องุ่น', weight:'100 กรัม', unit:'20 เม็ด' },
+    { name:'ส้ม', weight:'150 กรัม', unit:'2 ผลกลาง' },
+    { name:'แก้วมังกร', weight:'90 กรัม', unit:'1/2 ผลกลาง' }
+  ],
+  veg: [
+    { name:'กะหล่ำปลี', weight:'', unit:'' },
+    { name:'หอมหัวใหญ่', weight:'', unit:'' },
+    { name:'ถั่วงอก', weight:'', unit:'' },
+    { name:'ถั่วแขก', weight:'', unit:'' },
+    { name:'ต้นกระเทียม', weight:'', unit:'' },
+    { name:'ยอดมะพร้าวอ่อน', weight:'', unit:'' },
+    { name:'ใบ-ดอกขี้เหล็ก', weight:'', unit:'' },
+    { name:'ถั่วลันเตา', weight:'', unit:'' },
+    { name:'ถั่วพู', weight:'', unit:'' },
+    { name:'ยอดชะอม', weight:'', unit:'' },
+    { name:'ยอดกระถิน', weight:'', unit:'' },
+    { name:'สะตอ', weight:'', unit:'' },
+    { name:'ผักหวาน', weight:'', unit:'' },
+    { name:'ถั่วฝักยาว', weight:'', unit:'' },
+    { name:'หัวปลี', weight:'', unit:'' },
+    { name:'ยอดแค', weight:'', unit:'' },
+    { name:'ยอดสะเดา', weight:'', unit:'' },
+    { name:'ดอกขจร', weight:'', unit:'' },
+    { name:'ดอกโสน', weight:'', unit:'' },
+    { name:'คะน้า', weight:'', unit:'' },
+    { name:'พริกหวาน', weight:'', unit:'' },
+    { name:'ผักติ้ว', weight:'', unit:'' },
+    { name:'ผักกระเฉด', weight:'', unit:'' },
+    { name:'ใบยอ', weight:'', unit:'' },
+    { name:'ขนุนอ่อน', weight:'', unit:'' },
+    { name:'ข้าวโพดอ่อน', weight:'', unit:'' },
+    { name:'บล็อคโคลี่', weight:'', unit:'' },
+    { name:'ตำลึง', weight:'', unit:'' },
+    { name:'มะเขือเปราะ', weight:'', unit:'' },
+    { name:'มะระจีน', weight:'', unit:'' },
+    { name:'มะละกอดิบ', weight:'', unit:'' },
+    { name:'หน่อไม้', weight:'', unit:'' },
+    { name:'เห็ดนางฟ้า', weight:'', unit:'' }
+  ],
+  meat: [
+    { name:'เนื้อปลา', weight:'30 กรัม', unit:'2 ช้อนโต๊ะ', pro:7, fat:0.8 },
+    { name:'ปลาทู', weight:'30 กรัม', unit:'2 ช้อนโต๊ะ', pro:7, fat:0.8 },
+    { name:'เนื้อปู', weight:'30 กรัม', unit:'2 ช้อนโต๊ะ', pro:7, fat:0.8 },
+    { name:'ลูกชิ้นกุ้ง/ลูกชิ้นปลา', weight:'', unit:'4-5 ลูก', pro:7, fat:0.8 },
+    { name:'กุ้ง', weight:'30 กรัม', unit:'4-5 ตัว', pro:7, fat:0.8 },
+    { name:'อกไก่', weight:'30 กรัม', unit:'2 ช้อนโต๊ะ', pro:7, fat:3 },
+    { name:'หมู (ไม่ติดมัน)', weight:'30 กรัม', unit:'2 ช้อนโต๊ะ', pro:7, fat:3 },
+    { name:'ไก่/เป็ด (ไม่ติดหนัง)', weight:'30 กรัม', unit:'2 ช้อนโต๊ะ', pro:7, fat:3 },
+    { name:'ลูกชิ้นไก่', weight:'55 กรัม', unit:'4-5 ลูก', pro:7, fat:3 },
+    { name:'ไข่ไก่/ไข่เป็ด', weight:'50 กรัม', unit:'1 ฟอง' },
+    { name:'ปีกไก่', weight:'30 กรัม', unit:'1 ชิ้น' },
+    { name:'น่องไก่', weight:'30 กรัม', unit:'1 ชิ้น' },
+    { name:'หมูสับ/หมูติดมัน', weight:'30 กรัม', unit:'2 ช้อนโต๊ะ' },
+    { name:'ลูกชิ้นหมู/ลูกชิ้นเนื้อ', weight:'30 กรัม', unit:'4-5 ลูก' },
+    { name:'เต้าหู้แข็ง', weight:'60 กรัม', unit:'1/2 แผ่น' },
+    { name:'เต้าหู้หลอด', weight:'180 กรัม', unit:'2/3 หลอด' },
+    { name:'นมถั่วเหลืองไม่หวาน', weight:'240 มล.', unit:'1 แก้ว' },
+    { name:'นมถั่วเหลืองปรุงแต่งรส', weight:'240 มล.', unit:'1 แก้ว' },
+    { name:'ซี่โครงหมู', weight:'30 กรัม', unit:'', pro:7, fat:8 },
+    { name:'หมูบด', weight:'30 กรัม', unit:'2 ช้อนโต๊ะ', pro:7, fat:8 },
+    { name:'แฮม (มีไขมันปน)', weight:'30 กรัม', unit:'1 แผ่น', pro:7, fat:8 },
+    { name:'หมูยอ', weight:'30 กรัม', unit:'2-3 ชิ้น', pro:7, fat:8 },
+    { name:'ไส้กรอกหมู', weight:'30 กรัม', unit:'2 แท่ง', pro:7, fat:8 },
+    { name:'แหนม', weight:'30 กรัม', unit:'2-3 ชิ้น', pro:7, fat:8 },
+    { name:'กุนเชียง', weight:'30 กรัม', unit:'2 ชิ้น', pro:7, fat:8 },
+    { name:'หอยนางรม', weight:'100 กรัม', unit:'', cho:4.62, pro:7, fat:2.5 },
+    { name:'หอยแครง (สุก)', weight:'100 กรัม', unit:'', cho:10.5, pro:15, fat:2 },
+    { name:'หอยเชลล์', weight:'100 กรัม', unit:'', cho:4.5, pro:17, fat:1 },
+    { name:'หอยแมลงภู่ (นึ่ง/สุก)', weight:'100 กรัม', unit:'', cho:16.5, pro:12, fat:4 },
+    { name:'หอยขม', weight:'100 กรัม', unit:'', cho:16.25, pro:13, fat:2 }
+  ]
+};
+
+function addRecallCard(meal, data, focus){
+  data = data || {};
+  recallSeq++;
+  const id = 'recall_' + recallSeq;
+  const selectedGroup = data.group || '';
+  const chipDefs = [
+    {k:'starch', icon:'🍚', label:'ข้าว-แป้ง'},
+    {k:'meat', icon:'🍗', label:'เนื้อสัตว์'},
+    {k:'veg', icon:'🥬', label:'ผัก'},
+    {k:'fruit', icon:'🍎', label:'ผลไม้'},
+    {k:'milk', icon:'🥛', label:'นม'},
+    {k:'fat', icon:'🧈', label:'ไขมัน'},
+    {k:'sugar', icon:'🍬', label:'น้ำตาล'}
+  ];
+  const chipsHtml = chipDefs.map(c=>
+    `<button type="button" class="recall-chip ${selectedGroup===c.k?'active':''}" data-group="${c.k}" onclick="selectRecallGroup('${id}','${c.k}')">${c.icon} ${c.label}</button>`
+  ).join('');
+  const showStepper = true;
+  const card = document.createElement('div');
+  card.className = 'recall-card';
+  card.id = id;
+  card.dataset.meal = meal;
+  card.dataset.group = selectedGroup;
+  card.innerHTML = `
+    <div class="recall-search-wrap">
+      <input type="text" class="recall-card-food" placeholder="พิมพ์ชื่ออาหารเพื่อค้นหา เช่น ข้าวสวย, ไข่ดาว, น้ำเปล่า" value="${escapeAttr(data.food)}" oninput="searchRecallFood('${id}')" onblur="setTimeout(()=>hideRecallSuggest('${id}'),150)">
+      <div class="recall-suggest" id="suggest_${id}" style="display:none;"></div>
+    </div>
+    <div class="recall-chips">${chipsHtml}</div>
+    <div class="recall-quickpicks" id="qp_${id}" style="display:none;"></div>
+    <div class="recall-card-row">
+      <span class="rc-qty-label">จำนวน</span>
+      <div class="recall-stepper" style="display:flex;">
+        <button type="button" onclick="stepRecallUnits('${id}',-0.5)">−</button>
+        <input type="number" class="recall-card-units" step="0.5" min="0" value="${data.units!==undefined?escapeAttr(data.units):'1'}" oninput="computeRecallCard('${id}')">
+        <button type="button" onclick="stepRecallUnits('${id}',0.5)">+</button>
+      </div>
+      <span class="rc-unit" id="unit_${id}">${escapeAttr(data.unitText||'หน่วย')}</span>
+      <span class="recall-card-kcal" id="kcal_${id}" style="display:${showStepper?'inline':'none'};">– kcal</span>
+    </div>
+  `;
+  document.getElementById('mealCards_' + MEAL_KEY[meal]).appendChild(card);
+  renderQuickPicks(id, selectedGroup);
+  computeRecallCard(id);
+  if(focus){ const inp = card.querySelector('.recall-card-food'); if(inp) inp.focus(); }
+}
+
+function selectRecallGroup(id, group){
+  const card = document.getElementById(id);
+  card.dataset.group = group;
+  delete card.dataset.customCho;
+  delete card.dataset.customPro;
+  delete card.dataset.customFat;
+  card.querySelectorAll('.recall-chip').forEach(chip=>{
+    chip.classList.toggle('active', chip.dataset.group === group);
+  });
+  const showStepper = true;
+  card.querySelector('.recall-stepper').style.display = showStepper ? 'flex' : 'none';
+  document.getElementById('kcal_' + id).style.display = showStepper ? 'inline' : 'none';
+  renderQuickPicks(id, group);
+  computeRecallCard(id);
+}
+
+function formatPortionText(p){
+  if(p.weight && p.unit) return `${p.weight} / ${p.unit}`;
+  if(p.weight) return p.weight;
+  if(p.unit) return p.unit;
+  return '';
+}
+
+function renderQuickPicks(id, group){
+  const container = document.getElementById('qp_' + id);
+  container.style.display = 'none';
+  container.innerHTML = '';
+}
+
+function applyQuickPick(id, index, group){
+  const pick = FOOD_QUICK_PICKS[group][index];
+  const card = document.getElementById(id);
+  const portionText = formatPortionText(pick);
+  card.querySelector('.recall-card-food').value = portionText ? `${pick.name} (${portionText})` : pick.name;
+  card.querySelector('.recall-card-units').value = '1';
+  const ut=document.getElementById('unit_'+id); if(ut) ut.textContent = pick.unit || pick.weight || 'หน่วย';
+  if(pick.pro !== undefined || pick.fat !== undefined || pick.cho !== undefined){
+    const base = EXCHANGE_TABLE[group];
+    card.dataset.customCho = (pick.cho !== undefined ? pick.cho : base.cho);
+    card.dataset.customPro = (pick.pro !== undefined ? pick.pro : base.pro);
+    card.dataset.customFat = (pick.fat !== undefined ? pick.fat : base.fat);
+  } else {
+    delete card.dataset.customCho;
+    delete card.dataset.customPro;
+    delete card.dataset.customFat;
+  }
+  computeRecallCard(id);
+}
+
+const GROUP_ICON = { starch:'🍚', meat:'🍗', veg:'🥬', fruit:'🍎', milk:'🥛', fat:'🧈', sugar:'🍬', dish:'🍽️' };
+const GROUP_LABEL = { starch:'ข้าว-แป้ง', meat:'เนื้อสัตว์', veg:'ผัก', fruit:'ผลไม้', milk:'นม', fat:'ไขมัน', sugar:'น้ำตาล', dish:'อาหารจานเดียว' };
+
+
+function searchRecallFood(id){
+  const card = document.getElementById(id);
+  const query = card.querySelector('.recall-card-food').value.trim().toLowerCase();
+  const suggestBox = document.getElementById('suggest_' + id);
+  if(!query){
+    suggestBox.style.display = 'none';
+    suggestBox.innerHTML = '';
+    return;
+  }
+  const results = [];
+  Object.keys(FOOD_QUICK_PICKS).forEach(group=>{
+    FOOD_QUICK_PICKS[group].forEach((pick, idx)=>{
+      if(pick.name.toLowerCase().includes(query)){
+        results.push({ group, idx, pick });
+      }
+    });
+  });
+  const top = results.slice(0, 10);
+  if(!top.length){
+    suggestBox.style.display = 'none';
+    suggestBox.innerHTML = '';
+    return;
+  }
+  suggestBox.innerHTML = top.map(r=>{
+    const k=pickKcal(r.group,r.pick), pt=formatPortionText(r.pick);
+    return `<div class="recall-suggest-item" onmousedown="selectFoodSuggestion('${id}','${r.group}',${r.idx})">
+      <span class="rs-name">${GROUP_ICON[r.group]||''} ${r.pick.name}${pt?`<small>${pt}</small>`:''}</span>
+      <span class="rs-kcal">${k?k+' kcal':''}</span>
+    </div>`;}).join('');
+  suggestBox.style.display = 'block';
+}
+
+function hideRecallSuggest(id){
+  const suggestBox = document.getElementById('suggest_' + id);
+  if(suggestBox) suggestBox.style.display = 'none';
+}
+
+function selectFoodSuggestion(id, group, index){
+  selectRecallGroup(id, group);
+  applyQuickPick(id, index, group);
+  hideRecallSuggest(id);
+}
+
+
+function updateRecallBar(sumKcal){
+  const t=document.getElementById('rbTotal'); if(!t) return;
+  t.textContent = sumKcal.toLocaleString();
+  const tg=document.getElementById('rbTarget'), fill=document.getElementById('rbFill'), st=document.getElementById('rbStatus');
+  if(lastEnergyTotal){
+    tg.textContent = lastEnergyTotal.toLocaleString()+' kcal';
+    const pct=Math.min(100,sumKcal/lastEnergyTotal*100);
+    fill.style.width=pct+'%';
+    const diff=sumKcal-lastEnergyTotal, ok=Math.abs(diff)<=Math.max(50,lastEnergyTotal*0.1);
+    fill.style.background= ok?'var(--ok)':(diff>0?'var(--warn)':'var(--main)');
+    st.className='rb-status '+(ok?'ok':'warn');
+    st.textContent= ok?'✓ ใกล้เคียงเป้าหมาย':(diff>0?'เกิน +':'ขาด ')+Math.abs(diff).toLocaleString()+' kcal';
+  } else {
+    tg.textContent='ยังไม่ตั้งค่า'; fill.style.width=Math.min(100,sumKcal/20)+'%'; fill.style.background='var(--main)';
+    st.className='rb-status'; st.textContent='';
+  }
+}
+function pickKcal(group,pick){
+  const base=EXCHANGE_TABLE[group]; if(!base) return 0;
+  const c=pick.cho!==undefined?pick.cho:base.cho, p=pick.pro!==undefined?pick.pro:base.pro, f=pick.fat!==undefined?pick.fat:base.fat;
+  return Math.round(c*4+p*4+f*9);
+}
+document.addEventListener('keydown',function(e){
+  if(e.key!=='Enter' || !e.target.classList || !e.target.classList.contains('recall-card-food')) return;
+  e.preventDefault();
+  const card=e.target.closest('.recall-card'); const first=card && card.querySelector('.recall-suggest-item');
+  if(first){ first.dispatchEvent(new MouseEvent('mousedown',{bubbles:true})); }
+});
+
+function stepRecallUnits(id, delta){
+  const card = document.getElementById(id);
+  const input = card.querySelector('.recall-card-units');
+  const val = Math.max(0, (parseFloat(input.value) || 0) + delta);
+  input.value = val % 1 === 0 ? val : val.toFixed(1);
+  computeRecallCard(id);
+}
+
+function getCardMacros(card){
+  const group = card.dataset.group;
+  if(group === 'other' || !EXCHANGE_TABLE[group]) return null;
+  if(card.dataset.customPro){
+    return {
+      cho: parseFloat(card.dataset.customCho) || 0,
+      pro: parseFloat(card.dataset.customPro) || 0,
+      fat: parseFloat(card.dataset.customFat) || 0
+    };
+  }
+  return EXCHANGE_TABLE[group];
+}
+
+function computeRecallCard(id){
+  const card = document.getElementById(id);
+  if(!card) return;
+  const units = parseFloat(card.querySelector('.recall-card-units').value) || 0;
+  const kcalEl = document.getElementById('kcal_' + id);
+  const item = getCardMacros(card);
+  if(!item){
+    kcalEl.textContent = '– kcal';
+  } else {
+    const kcal = Math.round((item.cho*4 + item.pro*4 + item.fat*9) * units);
+    kcalEl.textContent = kcal.toLocaleString() + ' kcal';
+  }
+  computeMealTotals();
+  computeRecallSummary();
+}
+
+function computeMealTotals(){
+  Object.values(MEAL_KEY).forEach(key=>{
+    const container = document.getElementById('mealCards_' + key);
+    let sum = 0;
+    container.querySelectorAll('.recall-card').forEach(card=>{
+      const units = parseFloat(card.querySelector('.recall-card-units').value) || 0;
+      const item = getCardMacros(card);
+      if(item){
+        sum += Math.round((item.cho*4 + item.pro*4 + item.fat*9) * units);
+      }
+    });
+    document.getElementById('mealKcal_' + key).textContent = sum.toLocaleString() + ' kcal';
+  });
+}
+
+function fillCompareRow(prefix, target, actual, unit){
+  const targetEl = document.getElementById('cmp'+prefix+'Target');
+  const actualEl = document.getElementById('cmp'+prefix+'Actual');
+  const diffEl = document.getElementById('cmp'+prefix+'Diff');
+
+  if(target === null || target === undefined){
+    targetEl.textContent = '–';
+    actualEl.textContent = actual.toFixed(0) + ' ' + unit;
+    diffEl.textContent = '–';
+    return;
+  }
+
+  const diff = actual - target;
+
+  targetEl.textContent = target.toFixed(0) + ' ' + unit;
+  actualEl.textContent = actual.toFixed(0) + ' ' + unit;
+  diffEl.innerHTML = `<span style="color:${diff>=0?'var(--warn)':'var(--main)'};">${diff>0?'+':''}${diff.toFixed(0)} ${unit}</span>`;
+}
+
+function computeRecallSummary(){
+  let sumCho = 0, sumPro = 0, sumFat = 0, sumKcal = 0;
+  document.querySelectorAll('.recall-card').forEach(card=>{
+    const units = parseFloat(card.querySelector('.recall-card-units').value) || 0;
+    const item = getCardMacros(card);
+    if(item){
+      sumCho += item.cho * units;
+      sumPro += item.pro * units;
+      sumFat += item.fat * units;
+      sumKcal += Math.round((item.cho*4 + item.pro*4 + item.fat*9) * units);
+    }
+  });
+
+  fillCompareRow('Carb', lastCarbG, sumCho, 'g');
+  fillCompareRow('Pro', lastProteinG, sumPro, 'g');
+  fillCompareRow('Fat', lastFatG, sumFat, 'g');
+  fillCompareRow('Kcal', lastEnergyTotal, sumKcal, 'kcal');
+
+  updateRecallBar(sumKcal);
+  const note = document.getElementById('recallVsTarget');
+  if(lastEnergyTotal){
+    const diff = sumKcal - lastEnergyTotal;
+    const ok = Math.abs(diff) <= Math.max(50, lastEnergyTotal*0.1);
+    note.innerHTML = `พลังงานรวมที่ได้รับจริง ${sumKcal.toLocaleString()} kcal เทียบกับเป้าหมาย ${lastEnergyTotal.toLocaleString()} kcal ` +
+      `<span style="color:${ok?'var(--ok)':'var(--warn)'};font-weight:600;">` +
+      `${ok ? '✓ ใกล้เคียงเป้าหมาย' : '⚠ ต่างกัน ' + (diff>0?'+':'') + diff.toLocaleString() + ' kcal'}</span>`;
+  } else {
+    note.textContent = 'ยังไม่ได้ตั้งค่าพลังงานเป้าหมายในหน้า IBW & พลังงาน';
+    note.style.color = 'var(--ink-soft)';
+  }
+}
+
+function removeRecallCard(id){
+  const el = document.getElementById(id);
+  if(el) el.remove();
+  computeMealTotals();
+  computeRecallSummary();
+}
+
+function getRecallData(){
+  return Array.from(document.querySelectorAll('.recall-card')).map(card=>({
+    meal: card.dataset.meal,
+    food: card.querySelector('.recall-card-food').value.trim(),
+    group: card.dataset.group,
+    units: card.querySelector('.recall-card-units').value,
+    kcal: document.getElementById('kcal_' + card.id).textContent
+  })).filter(r=>r.food);
+}
+
+function seedRecallRows(){
+  Object.values(MEAL_KEY).forEach(key=>{
+    document.getElementById('mealCards_' + key).innerHTML = '';
+  });
+  addRecallCard('มื้อเช้า');
+  addRecallCard('มื้อกลางวัน');
+  addRecallCard('มื้อเย็น');
+  addRecallCard('ของว่าง/อื่นๆ');
+  computeMealTotals();
+}
+
+function todayStr(){ return new Date().toISOString().slice(0,10); }
+document.getElementById('f_date').value = todayStr();
+
+document.getElementById('recordForm').addEventListener('submit', async function(e){
+  e.preventDefault();
+  const name = document.getElementById('f_name').value.trim();
+  const hn = document.getElementById('f_hn').value.trim();
+  if(!name || !hn){ showMsg('กรุณากรอกชื่อและเลข HN', 'error'); goToStep(1); return; }
+
+  const isPreg = document.getElementById('f_isPreg').checked;
+  const compl = isPreg ? Array.from(document.querySelectorAll('input[name=compl]:checked')).map(c=>c.value) : [];
+  const probPhysical = Array.from(document.querySelectorAll('input[name=probPhysical]:checked')).map(c=>c.value);
+  const probBehavior = Array.from(document.querySelectorAll('input[name=probBehavior]:checked')).map(c=>c.value);
+  const probSocial = Array.from(document.querySelectorAll('input[name=probSocial]:checked')).map(c=>c.value);
+  const advice = Array.from(document.querySelectorAll('input[name=advice]:checked')).map(c=>c.value);
+  if(document.getElementById('f_advice_other_chk').checked && document.getElementById('f_advice_other').value.trim()){
+    advice.push(document.getElementById('f_advice_other').value.trim());
+  }
+
+  const ibwCalc = calcIBW();
+  const energyFactor = parseFloat(document.getElementById('f_energyFactor').value);
+  const pregEnergyAddon = isPreg && document.getElementById('f_pregEnergyAddon').checked;
+  const energyTotal = ibwCalc ? Math.round(ibwCalc*energyFactor + (pregEnergyAddon?300:0)) : null;
+
+  const rec = {
+    id: editingId || (Date.now().toString(36) + Math.random().toString(36).slice(2,6)),
+    isPreg,
+    date: document.getElementById('f_date').value,
+    hn, name,
+    dept: document.getElementById('f_dept').value,
+    age: document.getElementById('f_age').value,
+    gender: document.getElementById('f_gender').value,
+    weight: document.getElementById('f_weight').value,
+    height: document.getElementById('f_height').value,
+    prepregWeight: document.getElementById('f_prepregWeight').value,
+    ga: document.getElementById('f_ga').value,
+    gp: document.getElementById('f_gp').value,
+    labs: getLabData(),
+    complications: compl,
+    ibw: ibwCalc ? ibwCalc.toFixed(1) : '',
+    energyFactor,
+    pregEnergyAddon,
+    energyTotal,
+    proteinPerKg: document.getElementById('f_proteinPerKg').value,
+    pregProteinAddon: isPreg && document.getElementById('f_pregProteinAddon').checked,
+    pregProteinG: document.getElementById('f_pregProteinG').value,
+    pctCarb: document.getElementById('f_pctCarb').value,
+    pctProtein: document.getElementById('f_pctProteinAuto').value,
+    pctFat: document.getElementById('f_pctFat').value,
+    probPhysical,
+    probBehavior,
+    probSocial,
+    advice,
+    problemNote: document.getElementById('f_problemNote').value,
+    ncdSweetScore: sumNcdGroup('ncdSweet',5).sum,
+    ncdFatScore: sumNcdGroup('ncdFat',5).sum,
+    ncdSaltScore: sumNcdGroup('ncdSalt',5).sum,
+    recall: getRecallData(),
+    recallFreeText: {
+      เช้า: document.getElementById('f_recallFree_เช้า').value,
+      กลางวัน: document.getElementById('f_recallFree_กลางวัน').value,
+      เย็น: document.getElementById('f_recallFree_เย็น').value,
+      ของว่าง: document.getElementById('f_recallFree_ของว่าง').value
+    },
+    recallNote: document.getElementById('f_recallNote').value,
+    savedAt: new Date().toISOString()
+  };
+
+  if(editingId){
+    const idx = records.findIndex(r=>r.id===editingId);
+    if(idx>-1) records[idx] = rec;
+  } else {
+    records.unshift(rec);
+  }
+  await saveRecords();
+  resetForm();
+  showMsg('บันทึกข้อมูลเรียบร้อยแล้ว', 'success');
+});
+
+function resetForm(){
+  document.getElementById('recordForm').reset();
+  document.getElementById('f_date').value = todayStr();
+  document.getElementById('pregExtraRow').classList.remove('show');
+  document.getElementById('f_advice_other').style.display = 'none';
+  setGenderSwitch('หญิง');
+  renderLabTable();
+  seedRecallRows();
+  editingId = null;
+  document.getElementById('btnSubmit').textContent = 'บันทึกข้อมูล';
+  computeGauge();
+  computeIBW();
+  goToStep(1);
+}
+
+renderLabTable();
+seedRecallRows();
+computeIBW();
+goToStep(1);
+loadRecords();
+</script>
+</body>
+</html>
