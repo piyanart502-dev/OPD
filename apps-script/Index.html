@@ -624,7 +624,7 @@
       <div class="step-indicator">
         <div class="step-dot active" data-step="1" onclick="goToStep(1)" style="cursor:pointer;"><span class="num">1</span><span class="label">ข้อมูลผู้ป่วย / พลังงาน / แลป</span></div>
         <div class="step-dot" data-step="2" onclick="goToStep(2)" style="cursor:pointer;"><span class="num">2</span><span class="label">อาหารแลกเปลี่ยน / 24-hr Recall</span></div>
-        <div class="step-dot" data-step="3" onclick="goToStep(3)" style="cursor:pointer;"><span class="num">3</span><span class="label">ประเมิน MNA</span></div>
+        <div class="step-dot" data-step="3" onclick="goToStep(3)" style="cursor:pointer;"><span class="num">3</span><span class="label">ประเมิน MNA-SF</span></div>
         <div class="step-dot" data-step="4" onclick="goToStep(4)" style="cursor:pointer;"><span class="num">4</span><span class="label">ปัญหา / อุปสรรค</span></div>
         <div class="step-dot" data-step="5" onclick="goToStep(5)" style="cursor:pointer;"><span class="num">5</span><span class="label">สรุปผล</span></div>
         <div class="step-dot" data-step="6" onclick="goToStep(6)" style="cursor:pointer;"><span class="num">6</span><span class="label">ข้อมูลระบุตัวผู้ป่วย</span></div>
@@ -955,22 +955,16 @@
       </div><!-- /step 2 (incl. recall) -->
       <div class="form-step" data-step="3">
 <div class="panel mna-panel" style="background:var(--paper);padding:16px;margin:0;">
-        <div class="gauge-label-row"><span>แบบประเมินภาวะโภชนาการ Mini Nutritional Assessment (MNA)</span></div>
-        <div class="ibw-note">สำหรับผู้สูงอายุ — เลือกคำตอบแต่ละข้อ คะแนนรวมสูงสุด 30 คะแนน (ไม่บังคับกรอก)</div>
-        <div class="mna-sec">ส่วนที่ 1: คัดกรอง (A–F) <span class="mna-sub">รวม <b id="mnaScreenScore">–</b> / 14</span></div>
+        <div class="gauge-label-row"><span>Mini Nutritional Assessment : MNA (Short form)</span></div>
+        <div class="ibw-note">แบบคัดกรองภาวะโภชนาการผู้สูงอายุ 6 ข้อ (A–F) คะแนนรวมสูงสุด 14 คะแนน (ไม่บังคับกรอก)</div>
+        <div class="mna-sec">คัดกรอง (A–F)</div>
         <div class="mna-item"><div class="mna-q"><b>A</b>ปริมาณอาหารที่กินลดลงในช่วง 3 เดือนที่ผ่านมา (เบื่ออาหาร ปัญหาการย่อย เคี้ยว/กลืนลำบาก)</div><div class="mna-opts"><label class="mna-opt"><input type="radio" name="mnaA" value="0" onchange="computeMNA()"><span>กินลดลงมาก</span><i>0</i></label><label class="mna-opt"><input type="radio" name="mnaA" value="1" onchange="computeMNA()"><span>กินลดลงปานกลาง</span><i>1</i></label><label class="mna-opt"><input type="radio" name="mnaA" value="2" onchange="computeMNA()"><span>กินไม่ลดลง</span><i>2</i></label></div></div><div class="mna-item"><div class="mna-q"><b>B</b>น้ำหนักลดลงโดยไม่ได้ตั้งใจในช่วง 3 เดือนที่ผ่านมา</div><div class="mna-opts"><label class="mna-opt"><input type="radio" name="mnaB" value="0" onchange="computeMNA()"><span>ลดมากกว่า 3 กก.</span><i>0</i></label><label class="mna-opt"><input type="radio" name="mnaB" value="1" onchange="computeMNA()"><span>ไม่ทราบ</span><i>1</i></label><label class="mna-opt"><input type="radio" name="mnaB" value="2" onchange="computeMNA()"><span>ลด 1–3 กก.</span><i>2</i></label><label class="mna-opt"><input type="radio" name="mnaB" value="3" onchange="computeMNA()"><span>ไม่ลด</span><i>3</i></label></div></div><div class="mna-item"><div class="mna-q"><b>C</b>การเคลื่อนไหว</div><div class="mna-opts"><label class="mna-opt"><input type="radio" name="mnaC" value="0" onchange="computeMNA()"><span>นอนเตียง/นั่งรถเข็น</span><i>0</i></label><label class="mna-opt"><input type="radio" name="mnaC" value="1" onchange="computeMNA()"><span>ลุกจากเตียงได้ แต่ไม่ออกนอกบ้าน</span><i>1</i></label><label class="mna-opt"><input type="radio" name="mnaC" value="2" onchange="computeMNA()"><span>ออกนอกบ้านได้</span><i>2</i></label></div></div><div class="mna-item"><div class="mna-q"><b>D</b>มีความเครียดทางจิตใจ หรือเจ็บป่วยเฉียบพลันในช่วง 3 เดือนที่ผ่านมา</div><div class="mna-opts"><label class="mna-opt"><input type="radio" name="mnaD" value="0" onchange="computeMNA()"><span>ใช่</span><i>0</i></label><label class="mna-opt"><input type="radio" name="mnaD" value="2" onchange="computeMNA()"><span>ไม่</span><i>2</i></label></div></div><div class="mna-item"><div class="mna-q"><b>E</b>ปัญหาด้านสมอง/อารมณ์</div><div class="mna-opts"><label class="mna-opt"><input type="radio" name="mnaE" value="0" onchange="computeMNA()"><span>สมองเสื่อมหรือซึมเศร้ารุนแรง</span><i>0</i></label><label class="mna-opt"><input type="radio" name="mnaE" value="1" onchange="computeMNA()"><span>สมองเสื่อมเล็กน้อย</span><i>1</i></label><label class="mna-opt"><input type="radio" name="mnaE" value="2" onchange="computeMNA()"><span>ไม่มีปัญหา</span><i>2</i></label></div></div><div class="mna-item"><div class="mna-q"><b>F</b>ดัชนีมวลกาย (BMI)</div><div class="mna-opts"><label class="mna-opt"><input type="radio" name="mnaF" value="0" onchange="computeMNA()"><span>< 19</span><i>0</i></label><label class="mna-opt"><input type="radio" name="mnaF" value="1" onchange="computeMNA()"><span>19 – < 21</span><i>1</i></label><label class="mna-opt"><input type="radio" name="mnaF" value="2" onchange="computeMNA()"><span>21 – < 23</span><i>2</i></label><label class="mna-opt"><input type="radio" name="mnaF" value="3" onchange="computeMNA()"><span>≥ 23</span><i>3</i></label></div></div>
-        <div class="mna-sec">ส่วนที่ 2: ประเมินเพิ่มเติม (G–R)</div>
-        <div class="mna-item"><div class="mna-q"><b>G</b>อยู่อาศัยได้ด้วยตนเอง (ไม่ได้อยู่ในสถานพยาบาล/บ้านพักคนชรา)</div><div class="mna-opts"><label class="mna-opt"><input type="radio" name="mnaG" value="1" onchange="computeMNA()"><span>ใช่</span><i>1</i></label><label class="mna-opt"><input type="radio" name="mnaG" value="0" onchange="computeMNA()"><span>ไม่</span><i>0</i></label></div></div><div class="mna-item"><div class="mna-q"><b>H</b>ใช้ยามากกว่า 3 ชนิดต่อวัน</div><div class="mna-opts"><label class="mna-opt"><input type="radio" name="mnaH" value="0" onchange="computeMNA()"><span>ใช่</span><i>0</i></label><label class="mna-opt"><input type="radio" name="mnaH" value="1" onchange="computeMNA()"><span>ไม่</span><i>1</i></label></div></div><div class="mna-item"><div class="mna-q"><b>I</b>มีแผลกดทับหรือแผลที่ผิวหนัง</div><div class="mna-opts"><label class="mna-opt"><input type="radio" name="mnaI" value="0" onchange="computeMNA()"><span>ใช่</span><i>0</i></label><label class="mna-opt"><input type="radio" name="mnaI" value="1" onchange="computeMNA()"><span>ไม่</span><i>1</i></label></div></div><div class="mna-item"><div class="mna-q"><b>J</b>รับประทานอาหารครบมื้อได้กี่มื้อต่อวัน</div><div class="mna-opts"><label class="mna-opt"><input type="radio" name="mnaJ" value="0" onchange="computeMNA()"><span>1 มื้อ</span><i>0</i></label><label class="mna-opt"><input type="radio" name="mnaJ" value="1" onchange="computeMNA()"><span>2 มื้อ</span><i>1</i></label><label class="mna-opt"><input type="radio" name="mnaJ" value="2" onchange="computeMNA()"><span>3 มื้อ</span><i>2</i></label></div></div><div class="mna-item"><div class="mna-q"><b>K</b>ตัวบ่งชี้การบริโภคโปรตีน (เลือกข้อที่ใช่)</div><div class="mna-opts">
-<label class="mna-opt"><input type="checkbox" id="mnaK1" onchange="computeMNA()"><span>นม/ผลิตภัณฑ์นม ≥ 1 ส่วน/วัน</span></label>
-<label class="mna-opt"><input type="checkbox" id="mnaK2" onchange="computeMNA()"><span>ถั่ว/ไข่ ≥ 2 ส่วน/สัปดาห์</span></label>
-<label class="mna-opt"><input type="checkbox" id="mnaK3" onchange="computeMNA()"><span>เนื้อสัตว์ ปลา ไก่ ทุกวัน</span></label>
-<span class="mna-sub">คะแนน: <b id="mnaKScore">0</b> (ใช่ 0–1 ข้อ = 0 · 2 ข้อ = 0.5 · 3 ข้อ = 1)</span></div></div><div class="mna-item"><div class="mna-q"><b>L</b>รับประทานผักหรือผลไม้ ≥ 2 ส่วนต่อวัน</div><div class="mna-opts"><label class="mna-opt"><input type="radio" name="mnaL" value="0" onchange="computeMNA()"><span>ไม่</span><i>0</i></label><label class="mna-opt"><input type="radio" name="mnaL" value="1" onchange="computeMNA()"><span>ใช่</span><i>1</i></label></div></div><div class="mna-item"><div class="mna-q"><b>M</b>ดื่มน้ำ/เครื่องดื่มต่อวัน (1 ถ้วย = 240 มล.)</div><div class="mna-opts"><label class="mna-opt"><input type="radio" name="mnaM" value="0" onchange="computeMNA()"><span>< 3 ถ้วย</span><i>0</i></label><label class="mna-opt"><input type="radio" name="mnaM" value="0.5" onchange="computeMNA()"><span>3 – 5 ถ้วย</span><i>0.5</i></label><label class="mna-opt"><input type="radio" name="mnaM" value="1" onchange="computeMNA()"><span>> 5 ถ้วย</span><i>1</i></label></div></div><div class="mna-item"><div class="mna-q"><b>N</b>วิธีการรับประทานอาหาร</div><div class="mna-opts"><label class="mna-opt"><input type="radio" name="mnaN" value="0" onchange="computeMNA()"><span>ต้องมีผู้ป้อน</span><i>0</i></label><label class="mna-opt"><input type="radio" name="mnaN" value="1" onchange="computeMNA()"><span>กินเองได้บ้างลำบาก</span><i>1</i></label><label class="mna-opt"><input type="radio" name="mnaN" value="2" onchange="computeMNA()"><span>กินเองได้ดี</span><i>2</i></label></div></div><div class="mna-item"><div class="mna-q"><b>O</b>มุมมองต่อภาวะโภชนาการของตนเอง</div><div class="mna-opts"><label class="mna-opt"><input type="radio" name="mnaO" value="0" onchange="computeMNA()"><span>คิดว่าตนเองขาดสารอาหาร</span><i>0</i></label><label class="mna-opt"><input type="radio" name="mnaO" value="1" onchange="computeMNA()"><span>ไม่แน่ใจ</span><i>1</i></label><label class="mna-opt"><input type="radio" name="mnaO" value="2" onchange="computeMNA()"><span>คิดว่าไม่มีปัญหา</span><i>2</i></label></div></div><div class="mna-item"><div class="mna-q"><b>P</b>เทียบกับคนวัยเดียวกัน ผู้ป่วยคิดว่าสุขภาพตนเอง</div><div class="mna-opts"><label class="mna-opt"><input type="radio" name="mnaP" value="0" onchange="computeMNA()"><span>ไม่ดีเท่า</span><i>0</i></label><label class="mna-opt"><input type="radio" name="mnaP" value="0.5" onchange="computeMNA()"><span>ไม่ทราบ</span><i>0.5</i></label><label class="mna-opt"><input type="radio" name="mnaP" value="1" onchange="computeMNA()"><span>ดีเท่ากัน</span><i>1</i></label><label class="mna-opt"><input type="radio" name="mnaP" value="2" onchange="computeMNA()"><span>ดีกว่า</span><i>2</i></label></div></div><div class="mna-item"><div class="mna-q"><b>Q</b>เส้นรอบวงต้นแขน (MAC) ซม.</div><div class="mna-opts"><input type="number" step="0.1" id="mnaMAC" class="mna-num" placeholder="ซม." oninput="computeMNA()"><span class="mna-sub">คะแนน: <b id="mnaQScore">–</b> (&lt;21 = 0 · 21–22 = 0.5 · ≥22 = 1)</span></div></div>
-<div class="mna-item"><div class="mna-q"><b>R</b>เส้นรอบวงน่อง (CC) ซม.</div><div class="mna-opts"><input type="number" step="0.1" id="mnaCC" class="mna-num" placeholder="ซม." oninput="computeMNA()"><span class="mna-sub">คะแนน: <b id="mnaRScore">–</b> (&lt;31 = 0 · ≥31 = 1)</span></div></div>
+        <div class="mna-item"><div class="mna-q"><b>F2</b>เส้นรอบวงน่อง (CC) ซม. — ใช้แทน BMI เมื่อไม่สามารถชั่งน้ำหนัก/วัดส่วนสูงได้</div><div class="mna-opts"><input type="number" step="0.1" id="mnaCC" class="mna-num" placeholder="ซม." oninput="computeMNA()"><span class="mna-sub">&lt; 31 ซม. = 0 · ≥ 31 ซม. = 3 (ถ้ามี BMI จะใช้ BMI เป็นหลัก)</span></div></div>
         <div class="mna-total">
-          <div>คะแนนรวม MNA <b id="mnaTotal">–</b> / 30 <span class="mna-sub" id="mnaAnswered"></span></div>
+          <div>คะแนนรวม MNA-SF <b id="mnaTotal">–</b> / 14 <span class="mna-sub" id="mnaAnswered"></span></div>
           <span class="status-pill pill-normal" id="mnaStatus">–</span>
         </div>
-        <div class="ibw-note" style="margin-top:8px;">แปลผล: ≥ 24 ภาวะโภชนาการปกติ · 17 – 23.5 เสี่ยงต่อภาวะทุพโภชนาการ · &lt; 17 ภาวะทุพโภชนาการ · คัดกรอง (A–F): 12–14 ปกติ · 8–11 เสี่ยง · 0–7 ทุพโภชนาการ</div>
+        <div class="ibw-note" style="margin-top:8px;">แปลผล: 12–14 ภาวะโภชนาการปกติ · 8–11 เสี่ยงต่อภาวะทุพโภชนาการ · 0–7 ภาวะทุพโภชนาการ</div>
       </div>
       </div><!-- /step 4 -->
       <div class="form-step" data-step="4">
@@ -1119,9 +1113,9 @@
         <h4>ผลตรวจทางห้องปฏิบัติการ (Lab) ที่ผิดปกติ</h4>
         <div id="dashLabTable"><div class="summary-empty">ยังไม่มีข้อมูล</div></div>
 
-        <h4>คะแนนเฉลี่ยแบบประเมิน MNA</h4>
+        <h4>คะแนนเฉลี่ยแบบประเมิน MNA-SF</h4>
         <div class="summary-grid">
-          <div><span>คะแนนเฉลี่ย MNA (เต็ม 30)</span><b id="dashMna">–</b></div>
+          <div><span>คะแนนเฉลี่ย MNA-SF (เต็ม 14)</span><b id="dashMna">–</b></div>
         </div>
 
         <h4>ปัญหา/อุปสรรคในการปฏิบัติตามแผนโภชนบำบัดที่พบบ่อย</h4>
@@ -1363,14 +1357,14 @@ function renderSummary(){
   }
   adviceEl.textContent = adviceItems.length ? adviceItems.join(', ') : 'ยังไม่ได้เลือกคำแนะนำ';
 
-  { const m=computeMNA(); document.getElementById('sumMna').textContent = m ? `${m.score} / 30 คะแนน (${m.status}) · คัดกรอง ${m.screen}/14` : '–'; }
+  { const m=computeMNA(); document.getElementById('sumMna').textContent = m ? `${m.score} / 14 คะแนน (${m.status})` : '–'; }
 }
 
 
 const STEP_META = {
   1:['ข้อมูลผู้ป่วย','กรอกข้อมูลทั่วไป น้ำหนัก ส่วนสูง พลังงาน โปรตีน และผลตรวจทางห้องปฏิบัติการ'],
   2:['อาหารแลกเปลี่ยน และ 24-hr Recall','ดูจำนวนหน่วยอาหารแลกเปลี่ยนที่แนะนำ และบันทึกอาหารที่ผู้ป่วยรับประทานในแต่ละมื้อ'],
-  3:['ประเมินภาวะโภชนาการ (MNA)','แบบประเมิน Mini Nutritional Assessment สำหรับผู้สูงอายุ'],
+  3:['ประเมินภาวะโภชนาการ (MNA-SF)','Mini Nutritional Assessment แบบสั้น สำหรับผู้สูงอายุ'],
   4:['ปัญหา/อุปสรรค และคำแนะนำ','ติ๊กปัญหาที่พบและคำแนะนำที่ให้แก่ผู้ป่วย'],
   5:['สรุปผลการให้โภชนบำบัด','ตรวจทานข้อมูล พิมพ์เอกสาร และบันทึก'],
   6:['ข้อมูลระบุตัวผู้ป่วย','ดูข้อมูลผู้ป่วยโดยย่อ'],
@@ -3007,7 +3001,7 @@ document.getElementById('recordForm').addEventListener('submit', async function(
     probSocial,
     advice,
     problemNote: document.getElementById('f_problemNote').value,
-    mna: (function(){const r=computeMNA();if(!r)return null;const a={};document.querySelectorAll('.mna-panel input[type=radio]:checked').forEach(i=>a[i.name]=i.value);return Object.assign(r,{answers:a,mac:document.getElementById('mnaMAC').value,cc:document.getElementById('mnaCC').value});})(),
+    mna: (function(){const r=computeMNA();if(!r)return null;const a={};document.querySelectorAll('.mna-panel input[type=radio]:checked').forEach(i=>a[i.name]=i.value);return Object.assign(r,{answers:a,cc:document.getElementById('mnaCC').value});})(),
     recall: getRecallData(),
     recallFreeText: {
       เช้า: document.getElementById('f_recallFree_เช้า').value,
@@ -3032,31 +3026,20 @@ document.getElementById('recordForm').addEventListener('submit', async function(
 
 
 function computeMNA(){
-  // F: auto-select จาก BMI หน้า 1
   const w=parseFloat(document.getElementById('f_weight').value), h=parseFloat(document.getElementById('f_height').value);
-  if(w>0&&h>0){
-    const bmi=w/Math.pow(h/100,2), v=bmi<19?0:bmi<21?1:bmi<23?2:3;
-    const r=document.querySelector('input[name="mnaF"][value="'+v+'"]'); if(r&&!r.checked) r.checked=true;
-  }
-  const k=['mnaK1','mnaK2','mnaK3'].filter(i=>document.getElementById(i).checked).length;
-  const kScore=k>=3?1:k===2?0.5:0; document.getElementById('mnaKScore').textContent=kScore;
-  const mac=parseFloat(document.getElementById('mnaMAC').value), cc=parseFloat(document.getElementById('mnaCC').value);
-  const q=isNaN(mac)?null:(mac<21?0:mac<22?0.5:1), rr=isNaN(cc)?null:(cc<31?0:1);
-  document.getElementById('mnaQScore').textContent=q===null?'–':q;
-  document.getElementById('mnaRScore').textContent=rr===null?'–':rr;
-  let scr=0,tot=0,ans=0;
-  'ABCDEF'.split('').forEach(x=>{const c=document.querySelector('input[name="mna'+x+'"]:checked'); if(c){scr+=+c.value;ans++;}});
-  tot=scr;
-  'GHIJLMNOP'.split('').forEach(x=>{const c=document.querySelector('input[name="mna'+x+'"]:checked'); if(c){tot+=+c.value;ans++;}});
-  const kAny=k>0; if(kAny){tot+=kScore;ans++;}
-  if(q!==null){tot+=q;ans++;} if(rr!==null){tot+=rr;ans++;}
-  const el=(id)=>document.getElementById(id);
-  const st=el('mnaStatus');
-  if(ans===0){el('mnaScreenScore').textContent='–';el('mnaTotal').textContent='–';el('mnaAnswered').textContent='';st.textContent='–';st.className='status-pill pill-normal';return null;}
-  el('mnaScreenScore').textContent=scr; el('mnaTotal').textContent=tot; el('mnaAnswered').textContent='(ตอบแล้ว '+ans+'/18 ข้อ)';
-  let txt,cls; if(tot>=24){txt='ภาวะโภชนาการปกติ';cls='pill-normal';}else if(tot>=17){txt='เสี่ยงต่อภาวะทุพโภชนาการ';cls='pill-over';}else{txt='ภาวะทุพโภชนาการ';cls='pill-obese';}
+  const cc=parseFloat(document.getElementById('mnaCC').value);
+  let fv=null;
+  if(w>0&&h>0){ const bmi=w/Math.pow(h/100,2); fv=bmi<19?0:bmi<21?1:bmi<23?2:3; }
+  else if(!isNaN(cc)){ fv=cc>=31?3:0; }
+  if(fv!==null){ const r=document.querySelector('input[name="mnaF"][value="'+fv+'"]'); if(r&&!r.checked) r.checked=true; }
+  let tot=0,ans=0;
+  'ABCDEF'.split('').forEach(x=>{const c=document.querySelector('input[name="mna'+x+'"]:checked'); if(c){tot+=+c.value;ans++;}});
+  const el=(id)=>document.getElementById(id), st=el('mnaStatus');
+  if(ans===0){el('mnaTotal').textContent='–';el('mnaAnswered').textContent='';st.textContent='–';st.className='status-pill pill-normal';return null;}
+  el('mnaTotal').textContent=tot; el('mnaAnswered').textContent='(ตอบแล้ว '+ans+'/6 ข้อ)';
+  let txt,cls; if(tot>=12){txt='ภาวะโภชนาการปกติ';cls='pill-normal';}else if(tot>=8){txt='เสี่ยงต่อภาวะทุพโภชนาการ';cls='pill-over';}else{txt='ภาวะทุพโภชนาการ';cls='pill-obese';}
   st.textContent=txt; st.className='status-pill '+cls;
-  return {score:tot,screen:scr,status:txt,answered:ans};
+  return {score:tot,screen:tot,status:txt,answered:ans};
 }
 document.getElementById('f_weight').addEventListener('input',computeMNA);
 document.getElementById('f_height').addEventListener('input',computeMNA);
