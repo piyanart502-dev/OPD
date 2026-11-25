@@ -385,10 +385,10 @@
   @media print{ body{background:#fff !important;} .panel{box-shadow:none;} }
 
   /* ===== 24-hr Recall redesign ===== */
-  .form-step[data-step="3"].active{display:grid;grid-template-columns:1fr 1fr;gap:12px;align-items:start;}
-  .form-step[data-step="3"] .recall-bar{grid-column:1/-1;}
-  .form-step[data-step="3"] .recall-meal-panel{margin:0 !important;padding:12px;background:#fff;}
-  @media (max-width:760px){ .form-step[data-step="3"].active{grid-template-columns:1fr;} }
+  .form-step[data-step="2"].active{display:grid;grid-template-columns:1fr 1fr;gap:12px;align-items:start;}
+  .form-step[data-step="2"] .recall-bar{grid-column:1/-1;}
+  .form-step[data-step="2"] .recall-meal-panel{margin:0 !important;padding:12px;background:#fff;}
+  @media (max-width:760px){ .form-step[data-step="2"].active{grid-template-columns:1fr;} }
   .recall-bar{position:sticky;top:8px;z-index:25;background:linear-gradient(135deg,#0F766E,#0E9F94);color:#fff;border-radius:14px;padding:12px 16px;box-shadow:0 6px 18px rgba(15,118,110,.28);}
   .rb-main{display:flex;align-items:center;gap:22px;flex-wrap:wrap;}
   .rb-label{font-size:11.5px;opacity:.85;}
@@ -421,7 +421,7 @@
   .recall-suggest-item{gap:10px;}
   .recall-suggest-item .rs-name{display:flex;flex-direction:column;line-height:1.3;}
   .recall-suggest-item .rs-name small{color:var(--ink-soft);font-size:11px;}
-  .form-step[data-step="3"] > .panel:not(.recall-meal-panel){grid-column:1/-1;margin:0 !important;}
+  .form-step[data-step="2"] > .panel:not(.recall-meal-panel){grid-column:1/-1;margin:0 !important;}
   .recall-suggest-item .rs-kcal{font-size:12px;font-weight:600;color:var(--main);white-space:nowrap;}
 
   /* ===== Formal summary (step 6) ===== */
@@ -515,12 +515,11 @@
   .form-step .panel{background:#fff !important;border:1px solid var(--line);border-radius:16px;box-shadow:0 1px 2px rgba(15,23,42,.04);padding:14px 16px !important;margin:0 0 12px !important;}
   .form-step .panel .gauge-label-row{font-family:'Prompt',sans-serif;font-size:14.5px;font-weight:600;color:var(--ink);margin-bottom:10px;padding-left:10px;border-left:4px solid var(--main);line-height:1.3;}
   .form-step .panel > .gauge-label-row + p,.form-step .panel .ibw-note{color:var(--ink-soft);}
-  .form-step[data-step="5"] .panel .gauge-label-row{font-size:13.5px;}
+  .form-step[data-step="4"] .panel .gauge-label-row{font-size:13.5px;}
   .form-step .panel textarea{width:100%;}
   .form-step .grid.c2{gap:12px;}
   .form-step .field select{height:40px;}
   /* selected-state emphasis for pills */
-  .form-step[data-step="2"] > .grid.c2:first-of-type{background:#fff;border:1px solid var(--line);border-radius:16px;padding:14px 16px;margin:0 0 12px !important;box-shadow:0 1px 2px rgba(15,23,42,.04);}
   .form-step[data-step="2"] #energyInline{font-size:14px;}
   .p1-sub{font-family:'Prompt',sans-serif;font-size:13.5px;font-weight:600;margin:14px 0 8px;padding-left:10px;border-left:4px solid var(--main);}
   #energyCard .grid.c2{gap:12px;}
@@ -585,13 +584,12 @@
     <form id="recordForm">
       <div class="step-indicator">
         <div class="step-dot active" data-step="1" onclick="goToStep(1)" style="cursor:pointer;"><span class="num">1</span><span class="label">ข้อมูลผู้ป่วย / พลังงาน / แลป</span></div>
-        <div class="step-dot" data-step="2" onclick="goToStep(2)" style="cursor:pointer;"><span class="num">2</span><span class="label">อาหารแลกเปลี่ยน</span></div>
-        <div class="step-dot" data-step="3" onclick="goToStep(3)" style="cursor:pointer;"><span class="num">3</span><span class="label">24-hr Recall</span></div>
-        <div class="step-dot" data-step="4" onclick="goToStep(4)" style="cursor:pointer;"><span class="num">4</span><span class="label">ประเมิน NCDs</span></div>
-        <div class="step-dot" data-step="5" onclick="goToStep(5)" style="cursor:pointer;"><span class="num">5</span><span class="label">ปัญหา / อุปสรรค</span></div>
-        <div class="step-dot" data-step="6" onclick="goToStep(6)" style="cursor:pointer;"><span class="num">6</span><span class="label">สรุปผล</span></div>
-        <div class="step-dot" data-step="7" onclick="goToStep(7)" style="cursor:pointer;"><span class="num">7</span><span class="label">ข้อมูลระบุตัวผู้ป่วย</span></div>
-        <div class="step-dot" data-step="8" onclick="goToStep(8)" style="cursor:pointer;"><span class="num">8</span><span class="label">แดชบอร์ด</span></div>
+        <div class="step-dot" data-step="2" onclick="goToStep(2)" style="cursor:pointer;"><span class="num">2</span><span class="label">อาหารแลกเปลี่ยน / 24-hr Recall</span></div>
+        <div class="step-dot" data-step="3" onclick="goToStep(3)" style="cursor:pointer;"><span class="num">3</span><span class="label">ประเมิน NCDs</span></div>
+        <div class="step-dot" data-step="4" onclick="goToStep(4)" style="cursor:pointer;"><span class="num">4</span><span class="label">ปัญหา / อุปสรรค</span></div>
+        <div class="step-dot" data-step="5" onclick="goToStep(5)" style="cursor:pointer;"><span class="num">5</span><span class="label">สรุปผล</span></div>
+        <div class="step-dot" data-step="6" onclick="goToStep(6)" style="cursor:pointer;"><span class="num">6</span><span class="label">ข้อมูลระบุตัวผู้ป่วย</span></div>
+        <div class="step-dot" data-step="7" onclick="goToStep(7)" style="cursor:pointer;"><span class="num">7</span><span class="label">แดชบอร์ด</span></div>
       </div>
 
       <div id="formMsg" class="form-msg"></div>
@@ -812,9 +810,7 @@
         </div>
         <div class="ibw-note" id="exchangeSummary" style="margin-top:10px;"></div>
       </div>
-      </div><!-- /step 2 -->
 
-      <div class="form-step" data-step="3">
       <div class="recall-bar">
         <div class="rb-main">
           <div><div class="rb-label">พลังงานรวมที่ได้รับ (24 ชม.)</div><div class="rb-total"><span id="rbTotal">0</span> <small>kcal</small></div></div>
@@ -879,12 +875,12 @@
 
       <div class="panel" style="background:var(--paper);padding:16px;margin-top:14px;">
         <div class="gauge-label-row"><span>เปรียบเทียบสัดส่วนอาหารกับ 24-hour Dietary Recall</span></div>
-        <div class="ibw-note" style="margin-top:4px;">เทียบสิ่งที่ผู้ป่วยได้รับจริงจาก Recall กับเป้าหมายจากหน้า 2 (ความต้องการพลังงานโดยประมาณ และสัดส่วนสารอาหาร C:P:F)</div>
+        <div class="ibw-note" style="margin-top:4px;">เทียบสิ่งที่ผู้ป่วยได้รับจริงจาก Recall กับเป้าหมายจากหน้า 1 (ความต้องการพลังงานโดยประมาณ และสัดส่วนสารอาหาร C:P:F)</div>
 
         <div class="lab-table-wrap" style="margin-top:12px;">
           <table class="lab-table">
             <thead>
-              <tr><th>สารอาหาร</th><th>เป้าหมาย (หน้า 2)</th><th>ได้รับจริง</th><th>ผลต่าง</th></tr>
+              <tr><th>สารอาหาร</th><th>เป้าหมาย</th><th>ได้รับจริง</th><th>ผลต่าง</th></tr>
             </thead>
             <tbody>
               <tr>
@@ -917,8 +913,8 @@
           </div>
         </div>
       </div>
-      </div><!-- /step 3 -->
-      <div class="form-step" data-step="4">
+      </div><!-- /step 2 (incl. recall) -->
+      <div class="form-step" data-step="3">
       <div class="panel" style="background:var(--paper);padding:16px;margin:0;">
         <div class="gauge-label-row"><span>แบบประเมินพฤติกรรมการบริโภคอาหาร หวาน มัน เค็ม (Eat Test)</span></div>
         <div class="ibw-note">ข้อมูลจากสำนักงานกองทุนสนับสนุนการสร้างเสริมสุขภาพ (สสส.) — เลือกคำตอบที่ตรงกับความถี่ในการทำพฤติกรรมแต่ละข้อของผู้ป่วย</div>
@@ -1063,7 +1059,7 @@
       </div>
       <div class="ibw-note" style="margin-top:8px;">เกณฑ์: ≤5 เสี่ยงต่ำ · 6–9 เสี่ยงปานกลาง · 10–13 เสี่ยงสูง · 14–15 เสี่ยงสูงมาก (พิจารณาแยกคะแนนแต่ละหมวด — บางข้อเป็นพฤติกรรมที่ดี ทำบ่อยจะได้คะแนนต่ำ)</div>
       </div><!-- /step 4 -->
-      <div class="form-step" data-step="5">
+      <div class="form-step" data-step="4">
       <div class="panel" style="background:var(--paper);padding:16px;margin:0;">
         <div class="gauge-label-row"><span>ปัญหา/อุปสรรคในการปฏิบัติตามแผนโภชนบำบัด</span></div>
         <div class="ibw-note" style="margin-top:4px;">แยกตามหมวด — ติ๊กได้หลายข้อในแต่ละหมวด</div>
@@ -1130,7 +1126,7 @@
       </div>
       </div><!-- /step 5 -->
 
-      <div class="form-step" data-step="6">
+      <div class="form-step" data-step="5">
       <div class="formal">
         <div class="formal-tools no-print">
           <span class="formal-tip">เอกสารสรุปผลการให้โภชนบำบัด · แตะชื่อผู้ป่วยเพื่อดูข้อมูลระบุตัวตน</span>
@@ -1143,7 +1139,7 @@
 
         <div class="fsec">1. ข้อมูลผู้รับบริการ</div>
         <table class="ft">
-          <tr><th>วันที่</th><td id="sumDate">–</td><th>HN</th><td id="sumHn">–</td><th>ชื่อ-สกุล</th><td id="sumName" class="sum7-editable" onclick="goToStep(7)" title="แตะเพื่อดูรายละเอียด">–</td><th>แผนก</th><td id="sumDept">–</td></tr>
+          <tr><th>วันที่</th><td id="sumDate">–</td><th>HN</th><td id="sumHn">–</td><th>ชื่อ-สกุล</th><td id="sumName" class="sum7-editable" onclick="goToStep(6)" title="แตะเพื่อดูรายละเอียด">–</td><th>แผนก</th><td id="sumDept">–</td></tr>
           <tr><th>เพศ</th><td id="sumGender">–</td><th>อายุ</th><td id="sumAge">–</td><th>BMI</th><td id="sumBmi">–</td><th>Lab สูง</th><td id="sumHighLabs" class="fcell-flush"><div class="summary-empty">–</div></td></tr>
         </table>
 
@@ -1185,7 +1181,7 @@
       </div>
       </div><!-- /step 6 -->
 
-      <div class="form-step" data-step="7">
+      <div class="form-step" data-step="6">
       <div class="summary-doc">
         <div class="summary-doc-head" style="justify-content:flex-end;">
           <button type="button" class="btn-ghost btn-small no-print" onclick="window.print()">🖨️ พิมพ์เอกสาร</button>
@@ -1200,7 +1196,7 @@
       </div>
       </div><!-- /step 7 -->
 
-      <div class="form-step" data-step="8">
+      <div class="form-step" data-step="7">
       <div class="print-only print-header">แดชบอร์ดสรุปข้อมูลผู้รับบริการรายเดือน</div>
       <div class="summary-doc">
         <div class="summary-doc-head no-print" style="justify-content:space-between;">
@@ -1301,7 +1297,7 @@ function hideMsg(){
 }
 
 let currentStep = 1;
-const TOTAL_STEPS = 8;
+const TOTAL_STEPS = 7;
 
 function renderDashboard(){
   const monthInput = document.getElementById('dashMonth');
@@ -1485,13 +1481,12 @@ function renderSummary(){
 
 const STEP_META = {
   1:['ข้อมูลผู้ป่วย','กรอกข้อมูลทั่วไป น้ำหนัก ส่วนสูง พลังงาน โปรตีน และผลตรวจทางห้องปฏิบัติการ'],
-  2:['อาหารแลกเปลี่ยน','จำนวนหน่วยอาหารแลกเปลี่ยนที่แนะนำตามพลังงานและสัดส่วนสารอาหาร'],
-  3:['24-hr Dietary Recall','บันทึกอาหารที่ผู้ป่วยรับประทานในแต่ละมื้อ เทียบกับเป้าหมาย'],
-  4:['ประเมินพฤติกรรม (Eat Test)','คะแนนพฤติกรรมการบริโภคหวาน มัน เค็ม'],
-  5:['ปัญหา/อุปสรรค และคำแนะนำ','ติ๊กปัญหาที่พบและคำแนะนำที่ให้แก่ผู้ป่วย'],
-  6:['สรุปผลการให้โภชนบำบัด','ตรวจทานข้อมูล พิมพ์เอกสาร และบันทึก'],
-  7:['ข้อมูลระบุตัวผู้ป่วย','ดูข้อมูลผู้ป่วยโดยย่อ'],
-  8:['แดชบอร์ดรายเดือน','สถิติผู้รับบริการและผลการประเมินรายเดือน']
+  2:['อาหารแลกเปลี่ยน และ 24-hr Recall','ดูจำนวนหน่วยอาหารแลกเปลี่ยนที่แนะนำ และบันทึกอาหารที่ผู้ป่วยรับประทานในแต่ละมื้อ'],
+  3:['ประเมินพฤติกรรม (Eat Test)','คะแนนพฤติกรรมการบริโภคหวาน มัน เค็ม'],
+  4:['ปัญหา/อุปสรรค และคำแนะนำ','ติ๊กปัญหาที่พบและคำแนะนำที่ให้แก่ผู้ป่วย'],
+  5:['สรุปผลการให้โภชนบำบัด','ตรวจทานข้อมูล พิมพ์เอกสาร และบันทึก'],
+  6:['ข้อมูลระบุตัวผู้ป่วย','ดูข้อมูลผู้ป่วยโดยย่อ'],
+  7:['แดชบอร์ดรายเดือน','สถิติผู้รับบริการและผลการประเมินรายเดือน']
 };
 function updateStepHeader(n){
   const m = STEP_META[n]; if(!m) return;
@@ -1521,14 +1516,14 @@ function goToStep(n){
     el.classList.toggle('done', s<n);
   });
   document.getElementById('btnBack').style.display = n>1 ? 'inline-block' : 'none';
-  document.getElementById('btnNext').style.display = (n<TOTAL_STEPS && n!==6) ? 'inline-block' : 'none';
-  document.getElementById('btnSubmit').style.display = n===6 ? 'inline-block' : 'none';
+  document.getElementById('btnNext').style.display = (n<TOTAL_STEPS && n!==5) ? 'inline-block' : 'none';
+  document.getElementById('btnSubmit').style.display = n===5 ? 'inline-block' : 'none';
   document.getElementById('mainPanelTitle').style.display = n===TOTAL_STEPS ? 'none' : 'block';
   if(n===1) computeGauge();
   if(n===2) computeIBW();
-  if(n===6) renderSummary();
-  if(n===7) renderStep7();
-  if(n===8) renderDashboard();
+  if(n===5) renderSummary();
+  if(n===6) renderStep7();
+  if(n===7) renderDashboard();
   window.scrollTo({top:0, behavior:'smooth'});
 }
 
