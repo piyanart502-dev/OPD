@@ -540,6 +540,15 @@
   #energyCard .cpf-inner .grid.c3 > div[style*="text-align:center"] > span{display:inline !important;font-size:11px !important;}
   #energyCard .cpf-inner .grid.c3 > div[style*="text-align:center"] > b{font-size:13.5px !important;}
   #energyCard .cpf-inner .grid.c3[style*="margin-top:14px"]{margin-top:6px !important;}
+
+  /* energy card: two columns */
+  .ec-split{display:grid;grid-template-columns:1fr 1fr;gap:14px;align-items:start;}
+  .ec-left .grid.c2{grid-template-columns:1fr !important;}
+  .ec-right{background:#F8FAFC;border:1px solid var(--line);border-radius:14px;padding:12px 14px;}
+  .ec-right .cpf-inner .p1-sub{margin-top:0;}
+  .ec-right .cpf-inner .grid.c3 > div[style*="text-align:center"]{justify-content:space-between;padding:6px 10px !important;}
+  .ec-right .cpf-inner .grid.c3[style*="margin-top:14px"]{grid-template-columns:1fr !important;gap:6px !important;}
+  @media (max-width:760px){ .ec-split{grid-template-columns:1fr;} }
 </style>
 </head>
 <body>
@@ -622,7 +631,9 @@
 
       <div class="p1-card" id="energyCard">
         <div class="p1-title"><span class="p1-ic">⚡</span>พลังงานและสัดส่วนสารอาหาร <small>คำนวณอัตโนมัติจากน้ำหนัก ส่วนสูง และเพศ</small></div>
-        <div class="grid c2">
+        <div class="ec-split">
+          <div class="ec-left">
+          <div class="grid c2">
         <div class="field">
           <label>ระดับความต้องการพลังงาน (kcal/kg IBW/วัน)</label>
           <select id="f_energyFactor" onchange="computeEnergy()">
@@ -677,7 +688,9 @@
           </div>
         </div>
       </div>
-        <div class="cpf-inner">
+          </div>
+          <div class="ec-right">
+          <div class="cpf-inner">
         <div class="p1-sub">สัดส่วนสารอาหาร C : P : F</div>
         <div class="grid c3" style="margin-top:10px;">
           <div class="field">
@@ -713,6 +726,9 @@
           </div>
         </div>
       </div>
+          </div>
+        </div>
+        
       </div><!-- /energyCard -->
 
       <div class="p1-card lab-section">
