@@ -584,6 +584,19 @@
   .prob-side input[type=text]:focus{background:#fff;border-color:var(--main);box-shadow:0 0 0 3px rgba(15,118,110,.15);outline:none;}
   .prob-side textarea{width:100%;min-height:110px;resize:vertical;}
   @media (max-width:900px){ .prob-layout{grid-template-columns:1fr;} }
+
+  /* ===== พื้นหลังสวยงาม ===== */
+  body{
+    background-color:#F0FDFA;
+    background-image:
+      url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='72' height='72' viewBox='0 0 72 72'%3E%3Cpath d='M36 14c9 5 12 14 6 22-9-1-14-9-6-22z' fill='%230F766E' fill-opacity='.045'/%3E%3Ccircle cx='8' cy='60' r='2.2' fill='%23F97316' fill-opacity='.08'/%3E%3Ccircle cx='62' cy='8' r='1.8' fill='%2314B8A6' fill-opacity='.10'/%3E%3C/svg%3E"),
+      radial-gradient(900px 520px at 100% 0%,rgba(45,212,191,.28),transparent 65%),
+      radial-gradient(800px 500px at 0% 8%,rgba(147,197,253,.30),transparent 65%),
+      radial-gradient(900px 600px at 50% 110%,rgba(253,186,116,.28),transparent 65%),
+      linear-gradient(180deg,#F0FDFA 0%,#F8FAFC 55%,#FFF7ED 100%);
+    background-attachment:fixed;
+  }
+  .panel,.p1-card,.card{backdrop-filter:blur(6px);}
 </style>
 </head>
 <body>
