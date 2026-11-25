@@ -500,6 +500,33 @@
     .p1-grid .s3{grid-column:span 6;}
     .p1-card .lab-quick-grid{grid-template-columns:1fr;}
   }
+
+  /* ===== App shell polish ===== */
+  .app{max-width:1040px;}
+  header.top{display:flex;justify-content:space-between;align-items:center;gap:12px;}
+  .patient-chip{align-items:center;gap:8px;background:#fff;border:1px solid var(--line);border-radius:999px;padding:5px 14px 5px 6px;box-shadow:var(--shadow);font-size:13px;}
+  .patient-chip .pc-ic{display:grid;place-items:center;width:28px;height:28px;border-radius:50%;background:var(--main-soft);}
+  .patient-chip b{display:block;line-height:1.2;} .patient-chip small{display:block;color:var(--ink-soft);font-size:11.5px;line-height:1.1;}
+  .step-head{display:flex;justify-content:space-between;align-items:flex-end;gap:10px;margin:2px 2px 8px;}
+  .sh-title{font-family:'Prompt',sans-serif;font-size:20px;font-weight:700;letter-spacing:-.2px;color:var(--ink);}
+  .sh-sub{font-size:13px;color:var(--ink-soft);margin-top:1px;}
+  .sh-count{font-size:12px;font-weight:600;color:var(--main);background:var(--main-soft);padding:3px 10px;border-radius:999px;white-space:nowrap;}
+  .step-progress{height:4px;border-radius:4px;background:#E2E8F0;margin:0 2px 14px;overflow:hidden;}
+  .step-progress-fill{height:100%;width:12%;background:linear-gradient(90deg,#0F766E,#2DD4BF);border-radius:4px;transition:width .3s ease;}
+  /* unify inner cards on every page */
+  .form-step .panel{background:#fff !important;border:1px solid var(--line);border-radius:16px;box-shadow:0 1px 2px rgba(15,23,42,.04);padding:14px 16px !important;margin:0 0 12px !important;}
+  .form-step .panel .gauge-label-row{font-family:'Prompt',sans-serif;font-size:14.5px;font-weight:600;color:var(--ink);margin-bottom:10px;padding-left:10px;border-left:4px solid var(--main);line-height:1.3;}
+  .form-step .panel > .gauge-label-row + p,.form-step .panel .ibw-note{color:var(--ink-soft);}
+  .form-step[data-step="5"] .panel .gauge-label-row{font-size:13.5px;}
+  .form-step .panel textarea{width:100%;}
+  .form-step .grid.c2{gap:12px;}
+  .form-step .field select{height:40px;}
+  /* selected-state emphasis for pills */
+  .form-step[data-step="2"] > .grid.c2:first-of-type{background:#fff;border:1px solid var(--line);border-radius:16px;padding:14px 16px;margin:0 0 12px !important;box-shadow:0 1px 2px rgba(15,23,42,.04);}
+  .form-step[data-step="2"] #energyInline{font-size:14px;}
+  .actions{box-shadow:0 -6px 16px rgba(15,23,42,.05);}
+  #btnNext,#btnSubmit{min-width:130px;}
+  @media (max-width:600px){ .sh-title{font-size:17px;} .sh-sub{font-size:12px;} .patient-chip small{display:none;} header.top h1{font-size:16px;} }
 </style>
 </head>
 <body>
@@ -510,6 +537,7 @@
       <h1>ระบบบันทึกโภชนบำบัดผู้ป่วยนอก</h1>
       <p>ฟอร์มเดียว ใช้บันทึกได้ทุกกรณี รวมถึงมารดาตั้งครรภ์ (ติ๊กเลือกเพิ่มเติมได้)</p>
     </div>
+    <div class="patient-chip" id="patientChip" style="display:none;"></div>
   </header>
 
   <div class="panel">
@@ -529,6 +557,11 @@
 
       <div id="formMsg" class="form-msg"></div>
 
+      <div class="step-head" id="stepHead">
+        <div class="step-head-text"><div class="sh-title" id="shTitle"></div><div class="sh-sub" id="shSub"></div></div>
+        <div class="sh-count" id="shCount"></div>
+      </div>
+      <div class="step-progress"><div class="step-progress-fill" id="stepProgress"></div></div>
       <div class="form-step active" data-step="1">
       <div class="p1-card">
         <div class="p1-title"><span class="p1-ic">👤</span>ข้อมูลผู้ป่วย</div>
@@ -1386,8 +1419,36 @@ function renderSummary(){
   document.getElementById('sumNcdSalt').textContent = (saltScore !== '–') ? `${saltScore} คะแนน (${saltRisk})` : '–';
 }
 
+
+const STEP_META = {
+  1:['ข้อมูลผู้ป่วย','กรอกข้อมูลทั่วไป น้ำหนัก ส่วนสูง และผลตรวจทางห้องปฏิบัติการ'],
+  2:['พลังงานและสารอาหาร','เลือกระดับพลังงาน โปรตีน สัดส่วน C:P:F และอาหารแลกเปลี่ยน'],
+  3:['24-hr Dietary Recall','บันทึกอาหารที่ผู้ป่วยรับประทานในแต่ละมื้อ เทียบกับเป้าหมาย'],
+  4:['ประเมินพฤติกรรม (Eat Test)','คะแนนพฤติกรรมการบริโภคหวาน มัน เค็ม'],
+  5:['ปัญหา/อุปสรรค และคำแนะนำ','ติ๊กปัญหาที่พบและคำแนะนำที่ให้แก่ผู้ป่วย'],
+  6:['สรุปผลการให้โภชนบำบัด','ตรวจทานข้อมูล พิมพ์เอกสาร และบันทึก'],
+  7:['ข้อมูลระบุตัวผู้ป่วย','ดูข้อมูลผู้ป่วยโดยย่อ'],
+  8:['แดชบอร์ดรายเดือน','สถิติผู้รับบริการและผลการประเมินรายเดือน']
+};
+function updateStepHeader(n){
+  const m = STEP_META[n]; if(!m) return;
+  const t=document.getElementById('shTitle'); if(!t) return;
+  t.textContent = m[0];
+  document.getElementById('shSub').textContent = m[1];
+  document.getElementById('shCount').textContent = 'ขั้นที่ '+n+' / '+TOTAL_STEPS;
+  document.getElementById('stepProgress').style.width = (n/TOTAL_STEPS*100)+'%';
+}
+function updatePatientChip(){
+  const c=document.getElementById('patientChip'); if(!c) return;
+  const n=(document.getElementById('f_name')||{}).value||'', h=(document.getElementById('f_hn')||{}).value||'';
+  if(n.trim()||h.trim()){ c.style.display='flex'; c.innerHTML='<span class="pc-ic">👤</span><span><b>'+(n.trim()||'ไม่ระบุชื่อ').replace(/</g,'&lt;')+'</b>'+(h.trim()?'<small>HN '+h.trim().replace(/</g,'&lt;')+'</small>':'')+'</span>'; }
+  else c.style.display='none';
+}
+document.addEventListener('input',function(e){ if(e.target && (e.target.id==='f_name'||e.target.id==='f_hn')) updatePatientChip(); });
+
 function goToStep(n){
   currentStep = n;
+  updateStepHeader(n);
   document.querySelectorAll('.form-step').forEach(el=>{
     el.classList.toggle('active', parseInt(el.dataset.step)===n);
   });
