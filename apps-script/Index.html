@@ -166,14 +166,6 @@
   .ibw-note{font-size:12px;color:var(--ink-soft);margin-top:4px;}
   .energy-total{font-family:'Prompt',sans-serif;font-weight:700;font-size:19px;color:var(--main);}
 
-  .ncd-table-wrap{overflow-x:auto;margin-top:10px;}
-  .ncd-table{border-collapse:collapse;font-size:12.5px;min-width:640px;width:100%;}
-  .ncd-table th{background:var(--main-soft);padding:10px 8px;font-size:12px;font-weight:600;text-align:center;vertical-align:top;border:1px solid var(--line);line-height:1.4;}
-  .ncd-table th.cat-header{text-align:left;font-size:14px;font-weight:700;white-space:nowrap;}
-  .ncd-table td{padding:8px;text-align:center;border:1px solid var(--line);vertical-align:middle;}
-  .ncd-table td.freq-label{text-align:left;font-weight:600;white-space:nowrap;background:#FAFAF7;}
-  .ncd-table label{display:flex;align-items:center;justify-content:center;gap:5px;cursor:pointer;font-weight:600;}
-  .ncd-total-row td{text-align:right;font-weight:700;background:var(--paper);padding:10px;}
   .pill-veryhigh{background:#F1C7C7;color:#7A1F1F;}
 
   .recall-meal-panel{padding:16px;}
@@ -350,8 +342,8 @@
   .checkrow label:has(input:checked){background:var(--main-soft);border-color:var(--main);color:var(--main);font-weight:600;}
 
   /* tables & cards */
-  .lab-table-wrap,.summary-doc,.ncd-table-wrap{border-radius:12px;}
-  .lab-table th,.ncd-table th,.ibw-energy-table th,.recall-summary-table th{background:#F1F5F9;color:#475569;}
+  .lab-table-wrap,.summary-doc{border-radius:12px;}
+  .lab-table th,.ibw-energy-table th,.recall-summary-table th{background:#F1F5F9;color:#475569;}
   .lab-quick-item,.recall-card,.record-card{border-radius:12px;border-color:var(--line);background:#fff;transition:.15s;}
   .lab-quick-item:hover,.recall-card:hover{border-color:#99D5CD;box-shadow:0 2px 10px rgba(15,118,110,.08);}
   .recall-card{background:#F8FAFC;}
@@ -632,7 +624,7 @@
       <div class="step-indicator">
         <div class="step-dot active" data-step="1" onclick="goToStep(1)" style="cursor:pointer;"><span class="num">1</span><span class="label">ข้อมูลผู้ป่วย / พลังงาน / แลป</span></div>
         <div class="step-dot" data-step="2" onclick="goToStep(2)" style="cursor:pointer;"><span class="num">2</span><span class="label">อาหารแลกเปลี่ยน / 24-hr Recall</span></div>
-        <div class="step-dot" data-step="3" onclick="goToStep(3)" style="cursor:pointer;"><span class="num">3</span><span class="label">ประเมิน NCDs</span></div>
+        <div class="step-dot" data-step="3" onclick="goToStep(3)" style="cursor:pointer;"><span class="num">3</span><span class="label">ประเมิน MNA</span></div>
         <div class="step-dot" data-step="4" onclick="goToStep(4)" style="cursor:pointer;"><span class="num">4</span><span class="label">ปัญหา / อุปสรรค</span></div>
         <div class="step-dot" data-step="5" onclick="goToStep(5)" style="cursor:pointer;"><span class="num">5</span><span class="label">สรุปผล</span></div>
         <div class="step-dot" data-step="6" onclick="goToStep(6)" style="cursor:pointer;"><span class="num">6</span><span class="label">ข้อมูลระบุตัวผู้ป่วย</span></div>
@@ -962,151 +954,7 @@
       </div>
       </div><!-- /step 2 (incl. recall) -->
       <div class="form-step" data-step="3">
-      <div class="panel" style="background:var(--paper);padding:16px;margin:0;">
-        <div class="gauge-label-row"><span>แบบประเมินพฤติกรรมการบริโภคอาหาร หวาน มัน เค็ม (Eat Test)</span></div>
-        <div class="ibw-note">ข้อมูลจากสำนักงานกองทุนสนับสนุนการสร้างเสริมสุขภาพ (สสส.) — เลือกคำตอบที่ตรงกับความถี่ในการทำพฤติกรรมแต่ละข้อของผู้ป่วย</div>
-      </div>
-
-      <div class="panel" style="background:var(--paper);padding:16px;margin-top:14px;">
-        <div class="ncd-table-wrap">
-          <table class="ncd-table">
-            <thead>
-              <tr>
-                <th class="cat-header">🍯 หวาน</th>
-                <th>ดื่มน้ำเปล่า กาแฟดำ ชาไม่ใส่น้ำตาล</th>
-                <th>ดื่มน้ำอัดลม กาแฟ 3in1 กาแฟเย็น กาแฟปั่น เครื่องดื่มชง น้ำหวาน หรือนมเปรี้ยว</th>
-                <th>ดื่มน้ำผัก ผลไม้สำเร็จรูป</th>
-                <th>กินไอศกรีม เบเกอรี่ หรือขนมหวานไทย</th>
-                <th>เติมน้ำตาล น้ำผึ้ง น้ำเชื่อม เพิ่มลงในอาหาร</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td class="freq-label">ทุกวัน/เกือบทุกวัน</td>
-                <td><label><input type="radio" name="ncdSweet1" value="1" onchange="computeNCD()">1</label></td>
-                <td><label><input type="radio" name="ncdSweet2" value="3" onchange="computeNCD()">3</label></td>
-                <td><label><input type="radio" name="ncdSweet3" value="3" onchange="computeNCD()">3</label></td>
-                <td><label><input type="radio" name="ncdSweet4" value="3" onchange="computeNCD()">3</label></td>
-                <td><label><input type="radio" name="ncdSweet5" value="3" onchange="computeNCD()">3</label></td>
-              </tr>
-              <tr>
-                <td class="freq-label">3-4 ครั้งต่อสัปดาห์</td>
-                <td><label><input type="radio" name="ncdSweet1" value="2" onchange="computeNCD()">2</label></td>
-                <td><label><input type="radio" name="ncdSweet2" value="2" onchange="computeNCD()">2</label></td>
-                <td><label><input type="radio" name="ncdSweet3" value="2" onchange="computeNCD()">2</label></td>
-                <td><label><input type="radio" name="ncdSweet4" value="2" onchange="computeNCD()">2</label></td>
-                <td><label><input type="radio" name="ncdSweet5" value="2" onchange="computeNCD()">2</label></td>
-              </tr>
-              <tr>
-                <td class="freq-label">แทบไม่ทำ/ไม่ทำเลย</td>
-                <td><label><input type="radio" name="ncdSweet1" value="3" onchange="computeNCD()">3</label></td>
-                <td><label><input type="radio" name="ncdSweet2" value="1" onchange="computeNCD()">1</label></td>
-                <td><label><input type="radio" name="ncdSweet3" value="1" onchange="computeNCD()">1</label></td>
-                <td><label><input type="radio" name="ncdSweet4" value="1" onchange="computeNCD()">1</label></td>
-                <td><label><input type="radio" name="ncdSweet5" value="1" onchange="computeNCD()">1</label></td>
-              </tr>
-            </tbody>
-            <tfoot>
-              <tr class="ncd-total-row"><td colspan="6">รวมคะแนนทั้งหมด: <span id="ncdSweetScore">–</span> คะแนน &nbsp; <span class="status-pill pill-normal" id="ncdSweetRisk">–</span></td></tr>
-            </tfoot>
-          </table>
-        </div>
-      </div>
-
-      <div class="panel" style="background:var(--paper);padding:16px;margin-top:14px;">
-        <div class="ncd-table-wrap">
-          <table class="ncd-table">
-            <thead>
-              <tr>
-                <th class="cat-header">🥓 ไขมัน</th>
-                <th>เลือกกินเนื้อสัตว์ติดมัน ติดหนัง มีไขมันแทรก</th>
-                <th>กินอาหารทอด อาหารฟาสต์ฟู้ด อาหารผัดน้ำมัน</th>
-                <th>กินอาหารจานเดียวไขมันสูง หรืออาหารประเภทแกงกะทิ</th>
-                <th>ดื่มเครื่องดื่มที่ชงผสมนมข้นหวาน ครีมเทียม วิปปิ้งครีม</th>
-                <th>ซดน้ำแกง ราดน้ำแกงหรือน้ำผัดลงในข้าว</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td class="freq-label">ทุกวัน/เกือบทุกวัน</td>
-                <td><label><input type="radio" name="ncdFat1" value="3" onchange="computeNCD()">3</label></td>
-                <td><label><input type="radio" name="ncdFat2" value="3" onchange="computeNCD()">3</label></td>
-                <td><label><input type="radio" name="ncdFat3" value="3" onchange="computeNCD()">3</label></td>
-                <td><label><input type="radio" name="ncdFat4" value="3" onchange="computeNCD()">3</label></td>
-                <td><label><input type="radio" name="ncdFat5" value="3" onchange="computeNCD()">3</label></td>
-              </tr>
-              <tr>
-                <td class="freq-label">3-4 ครั้งต่อสัปดาห์</td>
-                <td><label><input type="radio" name="ncdFat1" value="2" onchange="computeNCD()">2</label></td>
-                <td><label><input type="radio" name="ncdFat2" value="2" onchange="computeNCD()">2</label></td>
-                <td><label><input type="radio" name="ncdFat3" value="2" onchange="computeNCD()">2</label></td>
-                <td><label><input type="radio" name="ncdFat4" value="2" onchange="computeNCD()">2</label></td>
-                <td><label><input type="radio" name="ncdFat5" value="2" onchange="computeNCD()">2</label></td>
-              </tr>
-              <tr>
-                <td class="freq-label">แทบไม่ทำ/ไม่ทำเลย</td>
-                <td><label><input type="radio" name="ncdFat1" value="1" onchange="computeNCD()">1</label></td>
-                <td><label><input type="radio" name="ncdFat2" value="1" onchange="computeNCD()">1</label></td>
-                <td><label><input type="radio" name="ncdFat3" value="1" onchange="computeNCD()">1</label></td>
-                <td><label><input type="radio" name="ncdFat4" value="1" onchange="computeNCD()">1</label></td>
-                <td><label><input type="radio" name="ncdFat5" value="1" onchange="computeNCD()">1</label></td>
-              </tr>
-            </tbody>
-            <tfoot>
-              <tr class="ncd-total-row"><td colspan="6">รวมคะแนนทั้งหมด: <span id="ncdFatScore">–</span> คะแนน &nbsp; <span class="status-pill pill-normal" id="ncdFatRisk">–</span></td></tr>
-            </tfoot>
-          </table>
-        </div>
-      </div>
-
-      <div class="panel" style="background:var(--paper);padding:16px;margin-top:14px;">
-        <div class="ncd-table-wrap">
-          <table class="ncd-table">
-            <thead>
-              <tr>
-                <th class="cat-header">🧂 โซเดียม</th>
-                <th>ชิมอาหารก่อนปรุงรสเพิ่มด้วยน้ำปลา ซีอิ๊ว ซอส หรือเครื่องปรุงรส</th>
-                <th>ใช้สมุนไพรหรือเครื่องเทศเป็นส่วนประกอบอาหารแทนเครื่องปรุง</th>
-                <th>กินเนื้อสัตว์แปรรูป ได้แก่ ไส้กรอก หมูยอ แหนม ปลาเค็ม กุ้งแห้ง ปลาร้า</th>
-                <th>กินบะหมี่ โจ๊กกึ่งสำเร็จรูป หรืออาหารกล่องแช่แข็ง</th>
-                <th>กินผักผลไม้ดองหรือผลไม้แช่อิ่ม จิ้มพริกเกลือน้ำปลาหวาน</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td class="freq-label">ทุกวัน/เกือบทุกวัน</td>
-                <td><label><input type="radio" name="ncdSalt1" value="1" onchange="computeNCD()">1</label></td>
-                <td><label><input type="radio" name="ncdSalt2" value="1" onchange="computeNCD()">1</label></td>
-                <td><label><input type="radio" name="ncdSalt3" value="3" onchange="computeNCD()">3</label></td>
-                <td><label><input type="radio" name="ncdSalt4" value="3" onchange="computeNCD()">3</label></td>
-                <td><label><input type="radio" name="ncdSalt5" value="3" onchange="computeNCD()">3</label></td>
-              </tr>
-              <tr>
-                <td class="freq-label">3-4 ครั้งต่อสัปดาห์</td>
-                <td><label><input type="radio" name="ncdSalt1" value="2" onchange="computeNCD()">2</label></td>
-                <td><label><input type="radio" name="ncdSalt2" value="2" onchange="computeNCD()">2</label></td>
-                <td><label><input type="radio" name="ncdSalt3" value="2" onchange="computeNCD()">2</label></td>
-                <td><label><input type="radio" name="ncdSalt4" value="2" onchange="computeNCD()">2</label></td>
-                <td><label><input type="radio" name="ncdSalt5" value="2" onchange="computeNCD()">2</label></td>
-              </tr>
-              <tr>
-                <td class="freq-label">แทบไม่ทำ/ไม่ทำเลย</td>
-                <td><label><input type="radio" name="ncdSalt1" value="3" onchange="computeNCD()">3</label></td>
-                <td><label><input type="radio" name="ncdSalt2" value="3" onchange="computeNCD()">3</label></td>
-                <td><label><input type="radio" name="ncdSalt3" value="1" onchange="computeNCD()">1</label></td>
-                <td><label><input type="radio" name="ncdSalt4" value="1" onchange="computeNCD()">1</label></td>
-                <td><label><input type="radio" name="ncdSalt5" value="1" onchange="computeNCD()">1</label></td>
-              </tr>
-            </tbody>
-            <tfoot>
-              <tr class="ncd-total-row"><td colspan="6">รวมคะแนนทั้งหมด: <span id="ncdSaltScore">–</span> คะแนน &nbsp; <span class="status-pill pill-normal" id="ncdSaltRisk">–</span></td></tr>
-            </tfoot>
-          </table>
-        </div>
-      </div>
-      <div class="ibw-note" style="margin-top:8px;">เกณฑ์: ≤5 เสี่ยงต่ำ · 6–9 เสี่ยงปานกลาง · 10–13 เสี่ยงสูง · 14–15 เสี่ยงสูงมาก (พิจารณาแยกคะแนนแต่ละหมวด — บางข้อเป็นพฤติกรรมที่ดี ทำบ่อยจะได้คะแนนต่ำ)</div>
-
-      <div class="panel mna-panel" style="background:var(--paper);padding:16px;margin-top:18px;">
+<div class="panel mna-panel" style="background:var(--paper);padding:16px;margin:0;">
         <div class="gauge-label-row"><span>แบบประเมินภาวะโภชนาการ Mini Nutritional Assessment (MNA)</span></div>
         <div class="ibw-note">สำหรับผู้สูงอายุ — เลือกคำตอบแต่ละข้อ คะแนนรวมสูงสุด 30 คะแนน (ไม่บังคับกรอก)</div>
         <div class="mna-sec">ส่วนที่ 1: คัดกรอง (A–F) <span class="mna-sub">รวม <b id="mnaScreenScore">–</b> / 14</span></div>
@@ -1222,7 +1070,6 @@
 
         <div class="fsec">4. ประเมินพฤติกรรม ปัญหา และคำแนะนำ</div>
         <table class="ft">
-          <tr><th class="ft-lbl">Eat Test</th><td>หวาน: <b id="sumNcdSweet">–</b> &nbsp;·&nbsp; มัน: <b id="sumNcdFat">–</b> &nbsp;·&nbsp; เค็ม: <b id="sumNcdSalt">–</b></td></tr>
           <tr><th class="ft-lbl">MNA</th><td id="sumMna">–</td></tr>
           <tr><th class="ft-lbl">ปัญหา/อุปสรรค</th><td id="sumProblems">–</td></tr>
           <tr><th class="ft-lbl">คำแนะนำ</th><td id="sumAdvice">–</td></tr>
@@ -1272,11 +1119,9 @@
         <h4>ผลตรวจทางห้องปฏิบัติการ (Lab) ที่ผิดปกติ</h4>
         <div id="dashLabTable"><div class="summary-empty">ยังไม่มีข้อมูล</div></div>
 
-        <h4>คะแนนแบบประเมินพฤติกรรมการบริโภคอาหาร หวาน มัน เค็ม (Eat Test) เฉลี่ย</h4>
+        <h4>คะแนนเฉลี่ยแบบประเมิน MNA</h4>
         <div class="summary-grid">
-          <div><span>หมวดหวาน</span><b id="dashNcdSweet">–</b></div>
-          <div><span>หมวดมัน</span><b id="dashNcdFat">–</b></div>
-          <div><span>หมวดเค็ม</span><b id="dashNcdSalt">–</b></div>
+          <div><span>คะแนนเฉลี่ย MNA (เต็ม 30)</span><b id="dashMna">–</b></div>
         </div>
 
         <h4>ปัญหา/อุปสรรคในการปฏิบัติตามแผนโภชนบำบัดที่พบบ่อย</h4>
@@ -1397,15 +1242,12 @@ function renderDashboard(){
       }).join('') + `</tbody></table>`;
   }
 
-  ['Sweet','Fat','Salt'].forEach(cat=>{
-    const key = 'ncd'+cat+'Score';
-    const vals = filtered.map(r=>r[key]).filter(v=>typeof v === 'number' && !isNaN(v));
-    const el = document.getElementById('dashNcd'+cat);
-    if(!vals.length){ el.textContent = '–'; return; }
-    const avg = vals.reduce((a,b)=>a+b,0)/vals.length;
-    const info = ncdRiskInfo(avg);
-    el.textContent = avg.toFixed(1) + ' คะแนน (' + info.label + ')';
-  });
+  {
+    const vals = filtered.map(r=>r.mna&&r.mna.score).filter(v=>typeof v==='number'&&!isNaN(v));
+    const el = document.getElementById('dashMna');
+    if(!vals.length) el.textContent='–';
+    else { const avg=vals.reduce((x,y)=>x+y,0)/vals.length; el.textContent=avg.toFixed(1)+' คะแนน ('+vals.length+' ราย)'; }
+  }
 
   const probFreq = {};
   filtered.forEach(r=>{
@@ -1521,15 +1363,6 @@ function renderSummary(){
   }
   adviceEl.textContent = adviceItems.length ? adviceItems.join(', ') : 'ยังไม่ได้เลือกคำแนะนำ';
 
-  const sweetScore = document.getElementById('ncdSweetScore').textContent;
-  const sweetRisk = document.getElementById('ncdSweetRisk').textContent;
-  document.getElementById('sumNcdSweet').textContent = (sweetScore !== '–') ? `${sweetScore} คะแนน (${sweetRisk})` : '–';
-  const fatScore = document.getElementById('ncdFatScore').textContent;
-  const fatRisk = document.getElementById('ncdFatRisk').textContent;
-  document.getElementById('sumNcdFat').textContent = (fatScore !== '–') ? `${fatScore} คะแนน (${fatRisk})` : '–';
-  const saltScore = document.getElementById('ncdSaltScore').textContent;
-  const saltRisk = document.getElementById('ncdSaltRisk').textContent;
-  document.getElementById('sumNcdSalt').textContent = (saltScore !== '–') ? `${saltScore} คะแนน (${saltRisk})` : '–';
   { const m=computeMNA(); document.getElementById('sumMna').textContent = m ? `${m.score} / 30 คะแนน (${m.status}) · คัดกรอง ${m.screen}/14` : '–'; }
 }
 
@@ -1537,7 +1370,7 @@ function renderSummary(){
 const STEP_META = {
   1:['ข้อมูลผู้ป่วย','กรอกข้อมูลทั่วไป น้ำหนัก ส่วนสูง พลังงาน โปรตีน และผลตรวจทางห้องปฏิบัติการ'],
   2:['อาหารแลกเปลี่ยน และ 24-hr Recall','ดูจำนวนหน่วยอาหารแลกเปลี่ยนที่แนะนำ และบันทึกอาหารที่ผู้ป่วยรับประทานในแต่ละมื้อ'],
-  3:['ประเมินพฤติกรรม (Eat Test)','คะแนนพฤติกรรมการบริโภคหวาน มัน เค็ม'],
+  3:['ประเมินภาวะโภชนาการ (MNA)','แบบประเมิน Mini Nutritional Assessment สำหรับผู้สูงอายุ'],
   4:['ปัญหา/อุปสรรค และคำแนะนำ','ติ๊กปัญหาที่พบและคำแนะนำที่ให้แก่ผู้ป่วย'],
   5:['สรุปผลการให้โภชนบำบัด','ตรวจทานข้อมูล พิมพ์เอกสาร และบันทึก'],
   6:['ข้อมูลระบุตัวผู้ป่วย','ดูข้อมูลผู้ป่วยโดยย่อ'],
@@ -1833,50 +1666,6 @@ function togglePreg(){
   row.classList.toggle('show', on);
   computeGauge();
   computeEnergy();
-}
-
-function ncdRiskInfo(score){
-  if(score <= 5) return {label:'เสี่ยงต่ำ', pill:'pill-normal'};
-  if(score <= 9) return {label:'เสี่ยงปานกลาง', pill:'pill-over'};
-  if(score <= 13) return {label:'เสี่ยงสูง', pill:'pill-obese'};
-  return {label:'เสี่ยงสูงมาก', pill:'pill-veryhigh'};
-}
-
-function sumNcdGroup(prefix, count){
-  let sum = 0, answered = 0;
-  for(let i=1; i<=count; i++){
-    const checked = document.querySelector(`input[name="${prefix}${i}"]:checked`);
-    if(checked){ sum += parseInt(checked.value); answered++; }
-  }
-  return { sum, answered, complete: answered === count };
-}
-
-function computeNCD(){
-  const groups = [
-    { prefix:'ncdSweet', scoreEl:'ncdSweetScore', riskEl:'ncdSweetRisk' },
-    { prefix:'ncdFat', scoreEl:'ncdFatScore', riskEl:'ncdFatRisk' },
-    { prefix:'ncdSalt', scoreEl:'ncdSaltScore', riskEl:'ncdSaltRisk' }
-  ];
-  groups.forEach(g=>{
-    const res = sumNcdGroup(g.prefix, 5);
-    const scoreEl = document.getElementById(g.scoreEl);
-    const riskEl = document.getElementById(g.riskEl);
-    if(res.answered === 0){
-      scoreEl.textContent = '–';
-      riskEl.textContent = '–';
-      riskEl.className = 'status-pill pill-normal';
-      return;
-    }
-    scoreEl.textContent = res.sum + (res.complete ? '' : ` (ตอบแล้ว ${res.answered}/5)`);
-    if(res.complete){
-      const info = ncdRiskInfo(res.sum);
-      riskEl.textContent = info.label;
-      riskEl.className = 'status-pill ' + info.pill;
-    } else {
-      riskEl.textContent = 'ตอบไม่ครบ';
-      riskEl.className = 'status-pill pill-over';
-    }
-  });
 }
 
 function bmiCategory(bmi){
@@ -3218,9 +3007,6 @@ document.getElementById('recordForm').addEventListener('submit', async function(
     probSocial,
     advice,
     problemNote: document.getElementById('f_problemNote').value,
-    ncdSweetScore: sumNcdGroup('ncdSweet',5).sum,
-    ncdFatScore: sumNcdGroup('ncdFat',5).sum,
-    ncdSaltScore: sumNcdGroup('ncdSalt',5).sum,
     mna: (function(){const r=computeMNA();if(!r)return null;const a={};document.querySelectorAll('.mna-panel input[type=radio]:checked').forEach(i=>a[i.name]=i.value);return Object.assign(r,{answers:a,mac:document.getElementById('mnaMAC').value,cc:document.getElementById('mnaCC').value});})(),
     recall: getRecallData(),
     recallFreeText: {
