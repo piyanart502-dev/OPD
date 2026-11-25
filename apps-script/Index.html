@@ -607,6 +607,20 @@
   .mna-locked .mna-opts label.mna-opt{pointer-events:none;}
   .mna-locked .mna-opts label.mna-opt:not(:has(input:checked)){opacity:.45;}
   .mna-auto{font-style:normal;font-size:12px;font-weight:600;color:var(--main);background:var(--main-soft);border-radius:8px;padding:1px 8px;margin-left:4px;}
+
+  /* ===== ผู้ป่วยรายใหม่ / dialog ===== */
+  .top-actions{display:flex;align-items:center;gap:10px;flex-wrap:wrap;justify-content:flex-end;}
+  .btn-new{border:none;cursor:pointer;font:inherit;font-weight:700;font-size:13.5px;color:#fff;padding:9px 16px;border-radius:12px;background:linear-gradient(135deg,#F97316,#FB923C);box-shadow:0 4px 12px rgba(249,115,22,.3);}
+  .btn-new:hover{filter:brightness(1.05);}
+  .dlg-back{position:fixed;inset:0;background:rgba(15,23,42,.45);display:grid;place-items:center;z-index:9999;padding:16px;}
+  .dlg{background:#fff;border-radius:20px;padding:26px 24px 20px;max-width:380px;width:100%;text-align:center;box-shadow:0 20px 60px rgba(0,0,0,.25);}
+  .dlg-ico{width:56px;height:56px;border-radius:50%;margin:0 auto 10px;display:grid;place-items:center;font-size:28px;background:#DCFCE7;color:#16A34A;}
+  .dlg-ico.warn{background:#FFEDD5;color:#EA580C;}
+  .dlg h3{margin:0 0 6px;font-size:18px;}
+  .dlg p{margin:0 0 18px;color:#64748B;font-size:14px;}
+  .dlg-btns{display:flex;gap:8px;flex-wrap:wrap;justify-content:center;}
+  .dlg-btns button{flex:1 1 140px;border:1.5px solid var(--line);background:#fff;border-radius:12px;padding:10px 14px;font:inherit;font-weight:700;cursor:pointer;}
+  .dlg-btns button.primary{background:linear-gradient(135deg,#0F766E,#14B8A6);color:#fff;border-color:transparent;}
 </style>
 </head>
 <body>
@@ -617,8 +631,12 @@
       <h1>ระบบบันทึกโภชนบำบัดผู้ป่วยนอก</h1>
       <p>ฟอร์มเดียว ใช้บันทึกได้ทุกกรณี รวมถึงมารดาตั้งครรภ์ (ติ๊กเลือกเพิ่มเติมได้)</p>
     </div>
-    <div class="patient-chip" id="patientChip" style="display:none;"></div>
+    <div class="top-actions">
+      <div class="patient-chip" id="patientChip" style="display:none;"></div>
+      <button type="button" class="btn-new" id="btnNewPatient" onclick="newPatient()">＋ ผู้ป่วยรายใหม่</button>
+    </div>
   </header>
+  <div class="dlg-back" id="dlgBack" style="display:none;"><div class="dlg" role="dialog" aria-modal="true"><div class="dlg-ico" id="dlgIco"></div><h3 id="dlgTitle"></h3><p id="dlgText"></p><div class="dlg-btns" id="dlgBtns"></div></div></div>
 
   <div class="panel">
     <h2 id="mainPanelTitle"><span class="accent"></span>บันทึกข้อมูลผู้ป่วย</h2>
@@ -3034,6 +3052,8 @@ document.getElementById('recordForm').addEventListener('submit', async function(
   await saveRecords();
   resetForm();
   showMsg('บันทึกข้อมูลเรียบร้อยแล้ว', 'success');
+  showDialog({icon:'✓',title:'บันทึกข้อมูลเรียบร้อยแล้ว',text:'ต้องการทำอะไรต่อ?',
+    buttons:[{label:'ดูรายชื่อผู้ป่วย',onClick:()=>goToStep(6)},{label:'＋ เพิ่มผู้ป่วยรายใหม่',primary:true,onClick:startNewPatient}]});
 });
 
 
@@ -3064,12 +3084,38 @@ new MutationObserver(()=>computeMNA()).observe(document.getElementById('bmiInlin
 document.getElementById('f_weight').addEventListener('input',computeMNA);
 document.getElementById('f_height').addEventListener('input',computeMNA);
 
+
+function showDialog(o){
+  document.getElementById('dlgIco').textContent=o.icon||'✓';
+  document.getElementById('dlgIco').className='dlg-ico'+(o.warn?' warn':'');
+  document.getElementById('dlgTitle').textContent=o.title;
+  document.getElementById('dlgText').textContent=o.text||'';
+  const box=document.getElementById('dlgBtns'); box.innerHTML='';
+  o.buttons.forEach(b=>{const e=document.createElement('button');e.type='button';e.textContent=b.label;if(b.primary)e.className='primary';
+    e.onclick=()=>{closeDialog();if(b.onClick)b.onClick();};box.appendChild(e);});
+  document.getElementById('dlgBack').style.display='grid';
+}
+function closeDialog(){document.getElementById('dlgBack').style.display='none';}
+function startNewPatient(){
+  resetForm(); hideMsg();
+  setTimeout(()=>{const h=document.getElementById('f_hn'); if(h) h.focus();},350);
+}
+function formHasData(){
+  return ['f_hn','f_name','f_age','f_weight','f_height'].some(id=>document.getElementById(id).value.trim()!=='') || !!editingId;
+}
+function newPatient(){
+  if(!formHasData()){ startNewPatient(); return; }
+  showDialog({icon:'!',warn:true,title:'เริ่มบันทึกผู้ป่วยรายใหม่?',text:'ข้อมูลที่กรอกอยู่และยังไม่ได้บันทึกจะถูกล้าง',
+    buttons:[{label:'ยกเลิก'},{label:'ล้างและเริ่มรายใหม่',primary:true,onClick:startNewPatient}]});
+}
+
 function resetForm(){
   document.getElementById('recordForm').reset();
   document.getElementById('f_date').value = todayStr();
   document.getElementById('pregExtraRow').classList.remove('show');
   document.getElementById('f_advice_other').style.display = 'none';
   syncFestival();
+  if(typeof updatePatientChip==='function') updatePatientChip();
   setGenderSwitch('หญิง');
   renderLabTable();
   seedRecallRows();
