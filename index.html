@@ -1898,9 +1898,9 @@ function updateLabPill(name){
     const val = parseFloat(row.querySelector('.lab-val').value);
     if(isNaN(val)){ pill.className='lab-pill'; pill.textContent='–'; return; }
     if(preset.type==='range'){
-      if(preset.byGender){ const g=preset.byGender[document.getElementById('f_gender').value]||[preset.min,preset.max]; preset={...preset,min:g[0],max:g[1]}; }
-      if(val<preset.min){ status='low'; label='ต่ำกว่าปกติ'; }
-      else if(val>preset.max){ status='high'; label='สูงกว่าปกติ'; }
+      const g=(preset.byGender&&preset.byGender[document.getElementById('f_gender').value])||[preset.min,preset.max];
+      if(val<g[0]){ status='low'; label='ต่ำกว่าปกติ'; }
+      else if(val>g[1]){ status='high'; label='สูงกว่าปกติ'; }
       else { status='normal'; label='ปกติ'; }
     } else if(preset.type==='min'){
       if(val<preset.min){ status='low'; label='ต่ำกว่าปกติ'; }
