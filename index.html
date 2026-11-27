@@ -8,7 +8,6 @@
 <link rel="alternate icon" type="image/png" href="icons/favicon-32.png">
 <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
 <link rel="manifest" href="manifest.webmanifest">
-
 <meta name="theme-color" content="#0F766E">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@400;500;600;700&family=IBM+Plex+Sans+Thai:wght@400;500;600;700&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
@@ -670,11 +669,9 @@
     <div class="top-actions">
       <div class="patient-chip" id="patientChip" style="display:none;"></div>
       <button type="button" class="btn-sync off" id="btnSync" onclick="openSyncDialog()">☁️ เชื่อมข้อมูลหลายเครื่อง</button>
-      <button type="button" class="btn-sync off" id="btnLogout" onclick="logout()" style="display:none;">🔒 ออก</button>
       <button type="button" class="btn-new" id="btnNewPatient" onclick="newPatient()">＋ ผู้ป่วยรายใหม่</button>
     </div>
   </header>
-  <div class="dlg-back" id="loginBack" style="display:none;z-index:10000;background:linear-gradient(135deg,#0F766E,#14B8A6);"><div class="dlg" style="max-width:380px;"><div style="width:72px;height:72px;margin:0 auto 12px;border-radius:20px;background:url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA1MTIgNTEyIiB4bWxuczpjMnBhPSJodHRwOi8vYzJwYS5vcmcvbWFuaWZlc3QiPjxkZWZzPjxsaW5lYXJHcmFkaWVudCBpZD0iZyIgeDE9IjAiIHkxPSIwIiB4Mj0iMSIgeTI9IjEiPjxzdG9wIG9mZnNldD0iMCIgc3RvcC1jb2xvcj0iI0Y5NzMxNiIvPjxzdG9wIG9mZnNldD0iMSIgc3RvcC1jb2xvcj0iI0ZCQkYyNCIvPjwvbGluZWFyR3JhZGllbnQ+PC9kZWZzPgo8cmVjdCB3aWR0aD0iNTEyIiBoZWlnaHQ9IjUxMiIgcng9IjExMiIgZmlsbD0idXJsKCNnKSIvPgo8cmVjdCB4PSIxMjQiIHk9IjEwNCIgd2lkdGg9IjI2NCIgaGVpZ2h0PSIzMjQiIHJ4PSIzNiIgZmlsbD0iI2ZmZiIvPgo8cmVjdCB4PSIyMDAiIHk9IjgyIiB3aWR0aD0iMTEyIiBoZWlnaHQ9IjU2IiByeD0iMjAiIGZpbGw9IiM3QzJEMTIiLz4KPGNpcmNsZSBjeD0iMjU2IiBjeT0iMTEwIiByPSIxMCIgZmlsbD0iI0ZEQkE3NCIvPgo8cGF0aCBkPSJNMTY0IDIxNGwyMiAyMiA0MC00NCIgc3Ryb2tlPSIjMTZBMzRBIiBzdHJva2Utd2lkdGg9IjE4IiBzdHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS1saW5lam9pbj0icm91bmQiIGZpbGw9Im5vbmUiLz4KPHJlY3QgeD0iMjUwIiB5PSIyMDYiIHdpZHRoPSIxMDQiIGhlaWdodD0iMTgiIHJ4PSI5IiBmaWxsPSIjQ0JENUUxIi8+CjxwYXRoIGQ9Ik0xNjQgMjk2bDIyIDIyIDQwLTQ0IiBzdHJva2U9IiMxNkEzNEEiIHN0cm9rZS13aWR0aD0iMTgiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIgc3Ryb2tlLWxpbmVqb2luPSJyb3VuZCIgZmlsbD0ibm9uZSIvPgo8cmVjdCB4PSIyNTAiIHk9IjI4OCIgd2lkdGg9IjEwNCIgaGVpZ2h0PSIxOCIgcng9IjkiIGZpbGw9IiNDQkQ1RTEiLz4KPHBhdGggZD0iTTMwMCA0MDBjLTM0LTQtNTYtMzAtNTAtNjIgMzAgMCA1NCAxOCA1NiA0NnoiIGZpbGw9IiMyMkM1NUUiIHRyYW5zZm9ybT0idHJhbnNsYXRlKC0yMCA2KSIvPgo8cGF0aCBkPSJNMTY0IDM2MGwyMiAyMiA0MC00NCIgc3Ryb2tlPSIjMTZBMzRBIiBzdHJva2Utd2lkdGg9IjE4IiBzdHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS1saW5lam9pbj0icm91bmQiIGZpbGw9Im5vbmUiIG9wYWNpdHk9IjAiLz4KPG1ldGFkYXRhPjxjMnBhOm1hbmlmZXN0PkFBQVdnbXAxYldJQUFBQWVhblZ0WkdNeWNHRUFFUUFRZ0FBQXFnQTRtM0VEWXpKd1lRQUFBQlpjYW5WdFlnQUFBRWRxZFcxa1l6SnRZUUFSQUJDQUFBQ3FBRGliY1FOMWNtNDZZekp3WVRwa01qUmhOek5qWmkxa1pqZzFMVFF4TW1NdFlqUXlZeTB5TmpZeU1XSmtaR05sTlRBQUFBQURsMnAxYldJQUFBQXBhblZ0WkdNeVlYTUFFUUFRZ0FBQXFnQTRtM0VEWXpKd1lTNWhjM05sY25ScGIyNXpBQUFBQUx4cWRXMWlBQUFBUkdwMWJXUmpZbTl5QUJFQUVJQUFBS29BT0p0eEUyTXljR0V1YVc1bmNtVmthV1Z1ZEM1Mk13QUFBQUFZWXpKemFMU0dvZUVmbnNEQkdDUmRCem5uMHZRQUFBQndZMkp2Y3FOcFpHTTZabTl5YldGMGJXbHRZV2RsTDNOMlp5dDRiV3hxYVc1emRHRnVZMlZKUkhnc2VHMXdPbWxwWkRvek5tVTRNVFF3TnkxaU1URXpMVFEwTURJdE9EVTFNaTFtTTJRM1pqWXpZekZqWm1Oc2NtVnNZWFJwYjI1emFHbHdhSEJoY21WdWRFOW1BQUFCNG1wMWJXSUFBQUJCYW5WdFpHTmliM0lBRVFBUWdBQUFxZ0E0bTNFVFl6SndZUzVoWTNScGIyNXpMbll5QUFBQUFCaGpNbk5vcUhubStCRVlVaTM4eHZJTndCOWR6QUFBQVpsalltOXlvbWRoWTNScGIyNXpncUptWVdOMGFXOXVhMk15Y0dFdWIzQmxibVZrYW5CaGNtRnRaWFJsY25PaGEybHVaM0psWkdsbGJuUnpnYUpqZFhKc2VDMXpaV3htSTJwMWJXSm1QV015Y0dFdVlYTnpaWEowYVc5dWN5OWpNbkJoTG1sdVozSmxaR2xsYm5RdWRqTmthR0Z6YUZnZytaQnl0Q1dIOEpOL2lvMWQ0TVVrdTc1K0FIN0s0MXVYMHhlQldINGc2TEtrWm1GamRHbHZibmdkWTI5dExtRnVkR2h5YjNCcFl5NWpiR0YxWkdVdWNISnZkbWxrWldScWNHRnlZVzFsZEdWeWM2RjRIMk52YlM1aGJuUm9jbTl3YVdNdWIzSnBaMmx1TFdOdmJtWnBaR1Z1WTJWbmRXNXJibTkzYm10a1pYTmpjbWx3ZEdsdmJuaG1RMnhoZFdSbElIQnliM1pwWkdWa0lIUm9hWE1nWm1sc1pTQmhkQ0IwYUdVZ2NtVnhkV1Z6ZENCdlppQmhJSFZ6WlhJZ1lXNWtJRzFoZVNCb1lYWmxJR055WldGMFpXUWdiM0lnYlc5a2FXWnBaV1FnZEdobElHWnBiR1VnWTI5dWRHVnVkSE11YlhOdlpuUjNZWEpsUVdkbGJuU2haRzVoYldWbVEyeGhkV1JsY21Gc2JFRmpkR2x2Ym5OSmJtTnNkV1JsWlBVQUFBRElhblZ0WWdBQUFFQnFkVzFrWTJKdmNnQVJBQkNBQUFDcUFEaWJjUk5qTW5CaExtaGhjMmd1WkdGMFlRQUFBQUFZWXpKemFKZXduWmVTanNHUEllVWFFYUt0c1BFQUFBQ0FZMkp2Y3FWallXeG5abk5vWVRJMU5tTndZV1JNQUFBQUFBQUFBQUFBQUFBQVpHaGhjMmhZSU15MlpNZFhLaHdLallVQUNaVW8wL25QNVdjb0FXTXhVOVJxSkpVUnMzM21aRzVoYldWdWFuVnRZbVlnYldGdWFXWmxjM1JxWlhoamJIVnphVzl1YzRHaVpYTjBZWEowR1FTTlpteGxibWQwYUJrZUJBQUFBajVxZFcxaUFBQUFKMnAxYldSak1tTnNBQkVBRUlBQUFLb0FPSnR4QTJNeWNHRXVZMnhoYVcwdWRqSUFBQUFDRDJOaWIzS2xZMkZzWjJaemFHRXlOVFpwYzJsbmJtRjBkWEpsZUUxelpXeG1JMnAxYldKbVBTOWpNbkJoTDNWeWJqcGpNbkJoT21ReU5HRTNNMk5tTFdSbU9EVXROREV5WXkxaU5ESmpMVEkyTmpJeFltUmtZMlUxTUM5ak1uQmhMbk5wWjI1aGRIVnlaV3BwYm5OMFlXNWpaVWxFZUN4NGJYQTZhV2xrT2pOa056QmtZamN6TFdaa1pEY3RORFl6WlMxaU1UTXpMVFExTmpnd1pEZGhabUZqTTNKamNtVmhkR1ZrWDJGemMyVnlkR2x2Ym5PRG9tTjFjbXg0TFhObGJHWWphblZ0WW1ZOVl6SndZUzVoYzNObGNuUnBiMjV6TDJNeWNHRXVhVzVuY21Wa2FXVnVkQzUyTTJSb1lYTm9XQ0Q1a0hLMEpZZndrMytLalYzZ3hTUzd2bjRBZnNyalc1ZlRGNEZZZmlEb3NxSmpkWEpzZUNwelpXeG1JMnAxYldKbVBXTXljR0V1WVhOelpYSjBhVzl1Y3k5ak1uQmhMbUZqZEdsdmJuTXVkakprYUdGemFGZ2cyZXhFU2FabTVOVUZzS1htSUhnTENDRzZQWE5QMStkaTVtN3BBZlduVHgyaVkzVnliSGdwYzJWc1ppTnFkVzFpWmoxak1uQmhMbUZ6YzJWeWRHbHZibk12WXpKd1lTNW9ZWE5vTG1SaGRHRmthR0Z6YUZnZ3kwdE42VUlHcWhoRHV4d2dYVmhVdlE1UkE4cWN3aWFRUFpyQ1BnWWJtdUYwWTJ4aGFXMWZaMlZ1WlhKaGRHOXlYMmx1Wm0ralpHNWhiV1Z2UVc1MGFISnZjR2xqSUVacGJHVnpaM1psY25OcGIyNWxNUzR3TGpCcmMzQmxZMVpsY25OcGIyNWxNaTQwTGpBQUFCQTRhblZ0WWdBQUFDaHFkVzFrWXpKamN3QVJBQkNBQUFDcUFEaWJjUU5qTW5CaExuTnBaMjVoZEhWeVpRQUFBQkFJWTJKdmN0S0VXUUlTb2dFbUdDRlpBZ293Z2dJR01JSUJqYUFEQWdFQ0FoUkE1YUFLN3NJNTBMNjRnL29HUWdVOVoxVVRBREFLQmdncWhrak9QUVFEQXpCSk1SY3dGUVlEVlFRS0V3NUJiblJvY205d2FXTXNJRkJDUXpFdU1Dd0dBMVVFQXhNbFFXNTBhSEp2Y0dsaklFTnZiblJsYm5RZ1EzSmxaR1Z1ZEdsaGJITWdVbTl2ZENCRFFUQWVGdzB5TmpBNE1EY3hPRFF6TlRaYUZ3MHlPREE0TURZeE9UUXpOVFphTUVReEZ6QVZCZ05WQkFvVERrRnVkR2h5YjNCcFl5d2dVRUpETVNrd0p3WURWUVFERXlCQmJuUm9jbTl3YVdNZ1EyeGhkV1JsSUVOdmJuUmxiblFnVTJsbmJtbHVaekJaTUJNR0J5cUdTTTQ5QWdFR0NDcUdTTTQ5QXdFSEEwSUFCSmg2Q212TFVCZ0ZGTlUwdlVLbE9WdEU2ZGpkMTdMNVN1d1gwTGVtRmlzQk0zZGtkLzNjeWp4RkEzUW81UzQ2ZlgwL2loWTBWWjdtZmI5S0Y3MDN0NU9qV0RCV01BNEdBMVVkRHdFQi93UUVBd0lIZ0RBVkJnTlZIU1VFRGpBTUJnb3JCZ0VFQVlQb1hnSUJNQXdHQTFVZEV3RUIvd1FDTUFBd0h3WURWUjBqQkJnd0ZvQVV6bEhpQklGT1pGc2orT1BFejVvK25NSFhYTUl3Q2dZSUtvWkl6ajBFQXdNRFp3QXdaQUl3TVhNZEZKNEJldExMVlk3T1J1RTlub3FiYkFaT1puL2FBclh5VHdGQVpmS3JQenhGMnZQb0pOZjErVUNkZzFYR0FqQndYMXpkOVdHcVlrcW1MNVNGcXcxUXlTanIxekpmcEpNOSsxcmREd1NQTE1PUE9qS3VpWGpvVS9wVVVlRzlSd21oWTNCaFpGa05uZ0FBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQVBaWVFJNzNqQXo0ZEFHSG9lOVpsbEZqRFBlQ3BGeDdyMEVzOTVYekI4UHJYNUZONEhrck1oOHVpQlBVUFB4a3ZmaWtIbHFvbm9JSmFGYnR5TDhyUUllcjJWQT08L2MycGE6bWFuaWZlc3Q+PC9tZXRhZGF0YT48L3N2Zz4K') center/cover,#fff;box-shadow:0 6px 18px rgba(0,0,0,.2);" id="loginLogo"></div><h3>ระบบบันทึกโภชนบำบัดผู้ป่วยนอก</h3><p>กรุณาใส่รหัสผ่านเพื่อเข้าใช้งาน</p><input type="password" id="loginPw" placeholder="รหัสผ่าน" autocomplete="current-password" style="width:100%;text-align:center;" onkeydown="if(event.key==='Enter')doLogin()"><label style="display:flex;gap:6px;justify-content:center;align-items:center;font-size:13px;margin:10px 0;cursor:pointer;"><input type="checkbox" id="loginRemember"> จดจำรหัสผ่านบนเครื่องนี้</label><div id="loginMsg" style="min-height:20px;color:#B91C1C;font-size:13px;margin-bottom:10px;"></div><div class="dlg-btns"><button type="button" class="primary" onclick="doLogin()">เข้าสู่ระบบ</button></div></div></div>
   <div class="dlg-back" id="syncBack" style="display:none;"><div class="dlg" style="max-width:460px;text-align:left;"><h3>เชื่อมข้อมูลหลายเครื่อง (Google Sheets)</h3><p>วางลิงก์ Web app ของ Apps Script (ขึ้นต้นด้วย https://script.google.com/ ลงท้าย /exec) เครื่องที่ใส่ลิงก์เดียวกันจะใช้ข้อมูลชุดเดียวกัน และข้อมูลที่บันทึกไว้ในเครื่องนี้จะถูกรวมขึ้นไปด้วย</p><input type="text" id="syncUrl" placeholder="https://script.google.com/macros/s/.../exec" style="width:100%;"><div id="syncMsg" style="margin:8px 0 14px;font-size:13px;color:#0F766E;min-height:18px;"></div><div class="dlg-btns"><button type="button" onclick="closeSyncDialog()">ปิด</button><button type="button" class="primary" onclick="saveSyncUrl()">บันทึกและเชื่อมต่อ</button></div><div style="margin-top:12px;text-align:center;"><button type="button" class="btn-ghost btn-small" onclick="copyAutoLink()">🔗 คัดลอกลิงก์เชื่อมอัตโนมัติ (ส่งให้เครื่องอื่น)</button></div></div></div>
   <div class="dlg-back" id="dlgBack" style="display:none;"><div class="dlg" role="dialog" aria-modal="true"><div class="dlg-ico" id="dlgIco"></div><h3 id="dlgTitle"></h3><p id="dlgText"></p><div class="dlg-btns" id="dlgBtns"></div></div></div>
 
@@ -1229,41 +1226,7 @@ const API_KEY_NAME = 'nutrition-api-url';
     if(u && /^https:\/\/script\.google\.com\/.+\/exec$/.test(u.trim())) localStorage.setItem(API_KEY_NAME, u.trim());
   }catch(e){}
 })();
-const DEFAULT_API_URL = 'https://script.google.com/macros/s/AKfycbyeB3G2TLxNDcNnUocKgm5SWSR4qM1Md8vGaHjYxW6eYBKlb8MkDiTXWysjRompu15Jpg/exec';   // เวอร์ชัน GitHub Pages: ใส่ลิงก์ /exec ได้ที่นี่ (ปลอดภัยเมื่อตั้งรหัสผ่านใน Code.gs แล้ว)
-function getApiUrl(){ try{ return (!IS_GAS && (localStorage.getItem(API_KEY_NAME) || DEFAULT_API_URL)) || ''; }catch(e){ return (!IS_GAS && DEFAULT_API_URL) || ''; } }
-const PW_KEY = 'nutrition-app-pw';
-let _pw = '';
-function getPw(){
-  if(_pw) return _pw;
-  try{ _pw = sessionStorage.getItem(PW_KEY) || localStorage.getItem(PW_KEY) || ''; }catch(e){}
-  return _pw;
-}
-function setPw(pw, remember){
-  _pw = pw;
-  try{ sessionStorage.setItem(PW_KEY, pw); if(remember) localStorage.setItem(PW_KEY, pw); else localStorage.removeItem(PW_KEY); }catch(e){}
-}
-function clearPw(){ _pw=''; try{ sessionStorage.removeItem(PW_KEY); localStorage.removeItem(PW_KEY); }catch(e){} }
-function needsAuth(){ return !!(IS_GAS || getApiUrl()); }
-function isUnauth(e){ return !!(e && (e.message==='UNAUTH' || /unauthorized/i.test(String(e.message||e)))); }
-function showLogin(msg){
-  const b=document.getElementById('loginBack'); if(!b) return;
-  document.getElementById('loginMsg').textContent = msg||'';
-  b.style.display='grid';
-  setTimeout(()=>{ const i=document.getElementById('loginPw'); if(i) i.focus(); },50);
-}
-function hideLogin(){ const b=document.getElementById('loginBack'); if(b) b.style.display='none'; }
-async function doLogin(){
-  const pw=document.getElementById('loginPw').value;
-  const rem=document.getElementById('loginRemember').checked;
-  const msg=document.getElementById('loginMsg');
-  if(!pw){ msg.textContent='กรุณาใส่รหัสผ่าน'; return; }
-  msg.textContent='กำลังตรวจสอบ...';
-  setPw(pw, rem);
-  const ok = await loadRecords(true);
-  if(ok){ hideLogin(); document.getElementById('loginPw').value=''; }
-  else { clearPw(); msg.textContent = 'รหัสผ่านไม่ถูกต้อง หรือเชื่อมต่อไม่ได้'; }
-}
-function logout(){ clearPw(); records=[]; showLogin(''); }
+function getApiUrl(){ try{ return (!IS_GAS && localStorage.getItem(API_KEY_NAME)) || ''; }catch(e){ return ''; } }
 function mergeById(remote, local){
   const m = new Map();
   (remote||[]).forEach(r=>{ if(r&&r.id) m.set(r.id,r); });
@@ -1282,43 +1245,35 @@ function apiJsonp(url){
     function cleanup(){ clearTimeout(timer); try{ delete window[cb]; }catch(e){ window[cb]=undefined; } if(sc.parentNode) sc.parentNode.removeChild(sc); }
     window[cb] = (data)=>{ cleanup(); resolve(data); };
     sc.onerror = ()=>{ cleanup(); reject(new Error('jsonp')); };
-    sc.src = url + (url.includes('?')?'&':'?') + 'action=records&pw=' + encodeURIComponent(getPw()) + '&callback=' + cb + '&t=' + Date.now();
+    sc.src = url + (url.includes('?')?'&':'?') + 'action=records&callback=' + cb + '&t=' + Date.now();
     document.head.appendChild(sc);
   });
 }
-function checkAuthResult(data){
-  if(data && !Array.isArray(data) && data.error) throw new Error('UNAUTH');
-  return data;
-}
 async function apiGet(url){
-  let e1;
   try{
-    const res = await fetch(url + (url.includes('?')?'&':'?') + 'action=records&pw=' + encodeURIComponent(getPw()) + '&t=' + Date.now(), {redirect:'follow'});
+    const res = await fetch(url + (url.includes('?')?'&':'?') + 'action=records&t=' + Date.now(), {redirect:'follow'});
     if(!res.ok) throw new Error('HTTP '+res.status);
     const txt = (await res.text() || '[]').trim();
     if(txt.charAt(0)==='<') throw new Error('HTML');
-    return checkAuthResult(JSON.parse(txt));
-  }catch(err){
-    if(isUnauth(err)) throw err;
-    e1 = err;
+    return JSON.parse(txt);
+  }catch(e1){
+    try{ return await apiJsonp(url); }
+    catch(e2){ throw new Error(e1 && e1.message==='HTML' ? 'HTML' : 'NETWORK'); }
   }
-  try{ return checkAuthResult(await apiJsonp(url)); }
-  catch(e2){ if(isUnauth(e2)) throw e2; throw new Error(e1 && e1.message==='HTML' ? 'HTML' : 'NETWORK'); }
 }
 async function apiPost(url, list){
-  const body = JSON.stringify({pw:getPw(), records:list});
+  const body = JSON.stringify(list);
   try{
     const res = await fetch(url, {method:'POST', redirect:'follow', headers:{'Content-Type':'text/plain;charset=utf-8'}, body});
     if(!res.ok) throw new Error('HTTP '+res.status);
     const j = JSON.parse(await res.text() || '{}');
-    if(j.error==='unauthorized') throw new Error('UNAUTH');
     if(!j.ok) throw new Error('save failed');
     return;
   }catch(e1){
-    if(isUnauth(e1)) throw e1;
+    // สำรอง: ส่งแบบ no-cors (อ่านผลไม่ได้) แล้วตรวจซ้ำว่าข้อมูลเข้าชีตจริง
     await fetch(url, {method:'POST', mode:'no-cors', headers:{'Content-Type':'text/plain;charset=utf-8'}, body});
     await new Promise(r=>setTimeout(r,2500));
-    const back = checkAuthResult(await apiJsonp(url));
+    const back = await apiJsonp(url);
     const ids = new Set((back||[]).map(r=>r.id));
     if(!list.every(r=>ids.has(r.id))) throw new Error('NOTSAVED');
   }
@@ -1327,22 +1282,15 @@ function readLocal(){
   try{ const v = localStorage.getItem(STORAGE_KEY); return v ? JSON.parse(v) : []; }catch(e){ return []; }
 }
 if(typeof document!=='undefined') document.addEventListener('DOMContentLoaded',()=>{ const b=document.getElementById('btnSync'); if(IS_GAS){ if(b) b.style.display='none'; setFooter(); } else setSyncState('ok'); });
-async function loadRecords(fromLogin){
+async function loadRecords(){
   const api = getApiUrl();
-  let ok = true;
   try{
     if(IS_GAS){
-      try{
-        const json = await gas('getRecords', getPw());
-        records = json ? JSON.parse(json) : [];
-      }catch(e){ if(isUnauth(e)){ ok=false; records=[]; if(!fromLogin) showLogin(''); } else throw e; }
+      const json = await gas('getRecords');
+      records = json ? JSON.parse(json) : [];
     } else if(api){
       try{ records = mergeById(await apiGet(api), readLocal()); setSyncState('ok'); }
-      catch(e){
-        console.error(e); records = readLocal();
-        if(isUnauth(e)){ ok=false; if(!fromLogin) showLogin(getPw()?'รหัสผ่านไม่ถูกต้อง':''); setSyncState('ok'); }
-        else { ok=false; setSyncState('err'); }
-      }
+      catch(e){ console.error(e); records = readLocal(); setSyncState('err'); }
     } else if(window.storage){
       const res = await window.storage.get(STORAGE_KEY, false);
       records = res && res.value ? JSON.parse(res.value) : [];
@@ -1351,21 +1299,15 @@ async function loadRecords(fromLogin){
     }
   }catch(e){ records = []; }
   try{ if(typeof currentStep!=='undefined'){ if(currentStep===7) renderDashboard(); if(currentStep===6) renderPatientList(); } }catch(e){}
-  return ok;
 }
 
 async function saveRecords(){
   const api = getApiUrl();
   try{
     if(IS_GAS){
-      try{
-        const latest = JSON.parse((await gas('getRecords', getPw())) || '[]');
-        records = mergeById(latest, records);
-        await gas('saveRecords', JSON.stringify(records), getPw());
-      }catch(e){
-        if(isUnauth(e)){ showLogin('กรุณาใส่รหัสผ่านก่อนบันทึก'); showMsg('ยังไม่ได้บันทึก — กรุณาใส่รหัสผ่านแล้วกดบันทึกอีกครั้ง','error'); }
-        else throw e;
-      }
+      const latest = JSON.parse((await gas('getRecords')) || '[]');
+      records = mergeById(latest, records);
+      await gas('saveRecords', JSON.stringify(records));
     } else if(api){
       try{ localStorage.setItem(STORAGE_KEY, JSON.stringify(records)); }catch(e){}
       try{
@@ -1375,9 +1317,8 @@ async function saveRecords(){
         try{ localStorage.setItem(STORAGE_KEY, JSON.stringify(records)); }catch(e){}
         setSyncState('ok');
       }catch(e){
-        console.error(e);
-        if(isUnauth(e)){ showLogin('กรุณาใส่รหัสผ่านก่อนบันทึก'); showMsg('บันทึกในเครื่องแล้ว แต่ยังไม่ได้ส่งขึ้น Google Sheets — ใส่รหัสผ่านแล้วกดบันทึกอีกครั้ง','error'); }
-        else { setSyncState('err'); showMsg('บันทึกในเครื่องแล้ว แต่ส่งขึ้น Google Sheets ไม่สำเร็จ — ตรวจอินเทอร์เน็ตหรือลิงก์เชื่อมต่อ แล้วบันทึกอีกครั้ง', 'error'); }
+        console.error(e); setSyncState('err');
+        showMsg('บันทึกในเครื่องแล้ว แต่ส่งขึ้น Google Sheets ไม่สำเร็จ — ตรวจอินเทอร์เน็ตหรือลิงก์เชื่อมต่อ แล้วบันทึกอีกครั้ง', 'error');
       }
     } else if(window.storage){
       await window.storage.set(STORAGE_KEY, JSON.stringify(records), false);
@@ -1392,7 +1333,6 @@ async function saveRecords(){
 
 /* ---- ตั้งค่าเชื่อมต่อ Google Sheets (เฉพาะเวอร์ชัน GitHub Pages) ---- */
 function setFooter(){
-  const lo=document.getElementById('btnLogout'); if(lo) lo.style.display = needsAuth() ? '' : 'none';
   const ft=document.getElementById('appFooter'); if(!ft) return;
   const api=getApiUrl();
   ft.textContent = IS_GAS ? 'ข้อมูลถูกบันทึกใน Google Sheets ใช้ร่วมกันทุกเครื่อง'
@@ -1427,14 +1367,8 @@ async function saveSyncUrl(){
   if(!/^https:\/\/script\.google\.com\/.+\/exec/.test(url)){ msg.textContent='ลิงก์ต้องขึ้นต้นด้วย https://script.google.com/ และลงท้ายด้วย /exec'; return; }
   msg.textContent='กำลังทดสอบการเชื่อมต่อ...';
   try{
+    const remote = await apiGet(url);
     try{ localStorage.setItem(API_KEY_NAME, url); }catch(e){}
-    let remote;
-    try{ remote = await apiGet(url); }
-    catch(e0){
-      if(isUnauth(e0)){ closeSyncDialog(); setSyncState('ok'); showLogin(getPw()?'รหัสผ่านไม่ถูกต้อง':'ใส่รหัสผ่านเพื่อเชื่อมต่อ'); return; }
-      try{ localStorage.removeItem(API_KEY_NAME); }catch(e){}
-      throw e0;
-    }
     const merged = mergeById(remote, readLocal());
     await apiPost(url, merged);
     records = merged;
