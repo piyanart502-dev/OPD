@@ -9,6 +9,7 @@ var HEADERS = ['id', 'วันที่', 'HN', 'ชื่อ-สกุล', '�
 function doGet() {
   return HtmlService.createHtmlOutputFromFile('Index')
     .setTitle('ระบบบันทึกโภชนบำบัดผู้ป่วยนอก')
+    .setFaviconUrl('https://raw.githubusercontent.com/piyanart502-dev/OPD/main/icons/favicon-32.png')
     .addMetaTag('viewport', 'width=device-width, initial-scale=1');
 }
 
