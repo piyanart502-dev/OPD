@@ -6,11 +6,27 @@
 var SHEET_NAME = 'Records';
 var HEADERS = ['id', 'วันที่', 'HN', 'ชื่อ-สกุล', 'แผนก', 'อายุ', 'เพศ', 'BMI', 'พลังงานเป้าหมาย (kcal)', 'บันทึกเมื่อ', 'json'];
 
-function doGet() {
+function doGet(e) {
+  // โหมดเชื่อมข้อมูลจากหน้าเว็บ GitHub Pages: ?action=records
+  if (e && e.parameter && e.parameter.action === 'records') {
+    return ContentService.createTextOutput(getRecords()).setMimeType(ContentService.MimeType.JSON);
+  }
   return HtmlService.createHtmlOutputFromFile('Index')
     .setTitle('ระบบบันทึกโภชนบำบัดผู้ป่วยนอก')
     .setFaviconUrl('https://raw.githubusercontent.com/piyanart502-dev/OPD/main/icons/favicon-32.png')
     .addMetaTag('viewport', 'width=device-width, initial-scale=1');
+}
+
+/** รับข้อมูลจากหน้าเว็บ GitHub Pages (ส่งเป็น JSON ทั้งชุด) */
+function doPost(e) {
+  var out;
+  try {
+    saveRecords(e.postData.contents);
+    out = { ok: true };
+  } catch (err) {
+    out = { ok: false, error: String(err) };
+  }
+  return ContentService.createTextOutput(JSON.stringify(out)).setMimeType(ContentService.MimeType.JSON);
 }
 
 function getSheet_() {
