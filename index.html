@@ -2974,10 +2974,27 @@ function hideRecallSuggest(id){
   if(suggestBox) suggestBox.style.display = 'none';
 }
 
+function mealFreeTextEl(card){
+  const panel = card && card.closest('.recall-meal-panel'); if(!panel) return null;
+  const key = (panel.dataset.meal||'').replace('มื้อ','').replace('/อื่นๆ','');
+  return document.getElementById('f_recallFree_'+key);
+}
+function listedNames(txt){ return txt.split(/[,\n]+/).map(x=>x.trim()).filter(Boolean); }
+function syncMealList(card, newName){
+  const ta = mealFreeTextEl(card); if(!ta) return;
+  let items = listedNames(ta.value);
+  const prev = card.dataset.listed;
+  if(prev){ const k = items.indexOf(prev); if(k>-1) items.splice(k,1); }
+  if(newName && !items.includes(newName)) items.push(newName);
+  card.dataset.listed = newName || '';
+  ta.value = items.join(', ');
+  ta.dispatchEvent(new Event('input',{bubbles:true}));
+}
 function selectFoodSuggestion(id, group, index){
   selectRecallGroup(id, group);
   applyQuickPick(id, index, group);
   hideRecallSuggest(id);
+  syncMealList(document.getElementById(id), FOOD_QUICK_PICKS[group][index].name);
 }
 
 
@@ -3114,6 +3131,7 @@ function computeRecallSummary(){
 }
 
 function removeRecallCard(id){
+  try{ const _c=document.getElementById(id); if(_c) syncMealList(_c,''); }catch(e){}
   const el = document.getElementById(id);
   if(el) el.remove();
   computeMealTotals();
