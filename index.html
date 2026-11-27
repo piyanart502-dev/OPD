@@ -671,7 +671,7 @@
       <button type="button" class="btn-new" id="btnNewPatient" onclick="newPatient()">＋ ผู้ป่วยรายใหม่</button>
     </div>
   </header>
-  <div class="dlg-back" id="syncBack" style="display:none;"><div class="dlg" style="max-width:460px;text-align:left;"><h3>เชื่อมข้อมูลหลายเครื่อง (Google Sheets)</h3><p>วางลิงก์ Web app ของ Apps Script (ขึ้นต้นด้วย https://script.google.com/ ลงท้าย /exec) เครื่องที่ใส่ลิงก์เดียวกันจะใช้ข้อมูลชุดเดียวกัน และข้อมูลที่บันทึกไว้ในเครื่องนี้จะถูกรวมขึ้นไปด้วย</p><input type="text" id="syncUrl" placeholder="https://script.google.com/macros/s/.../exec" style="width:100%;"><div id="syncMsg" style="margin:8px 0 14px;font-size:13px;color:#0F766E;min-height:18px;"></div><div class="dlg-btns"><button type="button" onclick="closeSyncDialog()">ปิด</button><button type="button" class="primary" onclick="saveSyncUrl()">บันทึกและเชื่อมต่อ</button></div></div></div>
+  <div class="dlg-back" id="syncBack" style="display:none;"><div class="dlg" style="max-width:460px;text-align:left;"><h3>เชื่อมข้อมูลหลายเครื่อง (Google Sheets)</h3><p>วางลิงก์ Web app ของ Apps Script (ขึ้นต้นด้วย https://script.google.com/ ลงท้าย /exec) เครื่องที่ใส่ลิงก์เดียวกันจะใช้ข้อมูลชุดเดียวกัน และข้อมูลที่บันทึกไว้ในเครื่องนี้จะถูกรวมขึ้นไปด้วย</p><input type="text" id="syncUrl" placeholder="https://script.google.com/macros/s/.../exec" style="width:100%;"><div id="syncMsg" style="margin:8px 0 14px;font-size:13px;color:#0F766E;min-height:18px;"></div><div class="dlg-btns"><button type="button" onclick="closeSyncDialog()">ปิด</button><button type="button" class="primary" onclick="saveSyncUrl()">บันทึกและเชื่อมต่อ</button></div><div style="margin-top:12px;text-align:center;"><button type="button" class="btn-ghost btn-small" onclick="copyAutoLink()">🔗 คัดลอกลิงก์เชื่อมอัตโนมัติ (ส่งให้เครื่องอื่น)</button></div></div></div>
   <div class="dlg-back" id="dlgBack" style="display:none;"><div class="dlg" role="dialog" aria-modal="true"><div class="dlg-ico" id="dlgIco"></div><h3 id="dlgTitle"></h3><p id="dlgText"></p><div class="dlg-btns" id="dlgBtns"></div></div></div>
 
   <div class="panel">
@@ -1218,6 +1218,13 @@ function gas(fn, ...args){
   });
 }
 const API_KEY_NAME = 'nutrition-api-url';
+(function autoConnectFromLink(){
+  try{
+    if(IS_GAS) return;
+    const u = new URLSearchParams(location.search).get('api');
+    if(u && /^https:\/\/script\.google\.com\/.+\/exec$/.test(u.trim())) localStorage.setItem(API_KEY_NAME, u.trim());
+  }catch(e){}
+})();
 function getApiUrl(){ try{ return (!IS_GAS && localStorage.getItem(API_KEY_NAME)) || ''; }catch(e){ return ''; } }
 function mergeById(remote, local){
   const m = new Map();
@@ -1314,6 +1321,14 @@ function openSyncDialog(){
   document.getElementById('syncUrl').value = getApiUrl();
   document.getElementById('syncMsg').textContent = '';
   document.getElementById('syncBack').style.display = 'grid';
+}
+function copyAutoLink(){
+  const api = getApiUrl(); const msg = document.getElementById('syncMsg');
+  if(!api){ msg.textContent='ต้องเชื่อมต่อให้สำเร็จก่อน จึงจะสร้างลิงก์ได้'; return; }
+  const link = location.origin + location.pathname + '?api=' + encodeURIComponent(api);
+  const done = ()=>{ msg.textContent='คัดลอกลิงก์แล้ว — ส่งให้เครื่องอื่นเปิดครั้งเดียว ระบบจะเชื่อมให้อัตโนมัติ (อย่าแชร์นอกหน่วยงาน)'; };
+  if(navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(link).then(done, ()=>{ prompt('คัดลอกลิงก์นี้', link); });
+  else prompt('คัดลอกลิงก์นี้', link);
 }
 function closeSyncDialog(){ document.getElementById('syncBack').style.display = 'none'; }
 async function saveSyncUrl(){
