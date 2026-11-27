@@ -1230,7 +1230,9 @@ function mergeById(remote, local){
 async function apiGet(url){
   const res = await fetch(url + (url.includes('?')?'&':'?') + 'action=records&t=' + Date.now(), {redirect:'follow'});
   if(!res.ok) throw new Error('HTTP '+res.status);
-  return JSON.parse(await res.text() || '[]');
+  const txt = (await res.text() || '[]').trim();
+  if(txt.charAt(0)==='<') throw new Error('HTML');
+  return JSON.parse(txt);
 }
 async function apiPost(url, list){
   const res = await fetch(url, {method:'POST', redirect:'follow', headers:{'Content-Type':'text/plain;charset=utf-8'}, body: JSON.stringify(list)});
@@ -1331,7 +1333,9 @@ async function saveSyncUrl(){
     setTimeout(closeSyncDialog,1200);
   }catch(e){
     console.error(e);
-    msg.textContent='เชื่อมต่อไม่สำเร็จ — ตรวจว่าคัดลอกลิงก์ถูกต้อง และตั้ง Who has access เป็น Anyone';
+    msg.textContent = (e && e.message==='HTML')
+      ? 'ลิงก์ส่งหน้าเว็บกลับมา ไม่ใช่ข้อมูล — โค้ดใน Apps Script ยังเป็นรุ่นเก่า หรือ Who has access ไม่ใช่ Anyone: วาง Code.gs ใหม่แล้ว Deploy → Manage deployments → New version'
+      : 'เชื่อมต่อไม่สำเร็จ ('+(e&&e.message?e.message:'network')+') — ตรวจลิงก์ ลงท้าย /exec, Who has access = Anyone และอินเทอร์เน็ต';
   }
 }
 
