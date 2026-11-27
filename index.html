@@ -693,8 +693,6 @@
           <div class="field s2"><label>วันที่บันทึก</label><input type="date" id="f_date"></div>
           <div class="field s2"><label>เลข HN</label><input type="text" id="f_hn" placeholder="เช่น 68-01234" autocomplete="off"></div>
           <div class="field s2"><label>แผนก</label><select id="f_dept"><option value="">— เลือกแผนก —</option><option value="OPD">OPD</option><option value="คลินิกเบาหวาน">คลินิกเบาหวาน</option><option value="คลินิกความดัน">คลินิกความดัน</option><option value="คลินิกไตเรื้อรัง">คลินิกไตเรื้อรัง</option><option value="คลินิกแม่-เด็ก">คลินิกแม่-เด็ก</option><option value="รพ.สต.">รพ.สต.</option></select></div>
-          <div class="field s3"><label>ชื่อ-นามสกุล</label><input type="text" id="f_name" placeholder="ชื่อ นามสกุล" autocomplete="off"></div>
-          <div class="field s1"><label>อายุ (ปี)</label><input type="number" id="f_age" min="0" max="120" inputmode="numeric" placeholder="ปี"></div>
           <div class="field s2"><label>เพศ</label>
             <div class="gender-switch">
               <button type="button" class="gender-switch-opt active" data-val="หญิง" onclick="setGenderSwitch('หญิง')">หญิง</button>
@@ -702,6 +700,8 @@
             </div>
             <select id="f_gender" style="display:none;"><option value="หญิง">หญิง</option><option value="ชาย">ชาย</option></select>
           </div>
+          <div class="field s3"><label>ชื่อ-นามสกุล</label><input type="text" id="f_name" placeholder="ชื่อ นามสกุล" autocomplete="off"></div>
+          <div class="field s1"><label>อายุ (ปี)</label><input type="number" id="f_age" min="0" max="120" inputmode="numeric" placeholder="ปี"></div>
           <div class="field s2"><label>น้ำหนัก (kg)</label><input type="number" step="0.1" id="f_weight" inputmode="decimal" placeholder="kg"></div>
           <div class="field s2"><label>ส่วนสูง (cm)</label><input type="number" step="0.1" id="f_height" inputmode="decimal" placeholder="cm"></div>
           <div class="field s2"><label>ดัชนีมวลกาย</label><div class="bmi-inline" id="bmiInline">BMI: <b>–</b></div></div>
