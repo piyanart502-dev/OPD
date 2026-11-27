@@ -1234,18 +1234,46 @@ function mergeById(remote, local){
   });
   return Array.from(m.values());
 }
+function apiJsonp(url){
+  return new Promise((resolve, reject)=>{
+    const cb = '__gasCb' + Date.now() + Math.floor(Math.random()*1000);
+    const sc = document.createElement('script');
+    const timer = setTimeout(()=>{ cleanup(); reject(new Error('timeout')); }, 20000);
+    function cleanup(){ clearTimeout(timer); try{ delete window[cb]; }catch(e){ window[cb]=undefined; } if(sc.parentNode) sc.parentNode.removeChild(sc); }
+    window[cb] = (data)=>{ cleanup(); resolve(data); };
+    sc.onerror = ()=>{ cleanup(); reject(new Error('jsonp')); };
+    sc.src = url + (url.includes('?')?'&':'?') + 'action=records&callback=' + cb + '&t=' + Date.now();
+    document.head.appendChild(sc);
+  });
+}
 async function apiGet(url){
-  const res = await fetch(url + (url.includes('?')?'&':'?') + 'action=records&t=' + Date.now(), {redirect:'follow'});
-  if(!res.ok) throw new Error('HTTP '+res.status);
-  const txt = (await res.text() || '[]').trim();
-  if(txt.charAt(0)==='<') throw new Error('HTML');
-  return JSON.parse(txt);
+  try{
+    const res = await fetch(url + (url.includes('?')?'&':'?') + 'action=records&t=' + Date.now(), {redirect:'follow'});
+    if(!res.ok) throw new Error('HTTP '+res.status);
+    const txt = (await res.text() || '[]').trim();
+    if(txt.charAt(0)==='<') throw new Error('HTML');
+    return JSON.parse(txt);
+  }catch(e1){
+    try{ return await apiJsonp(url); }
+    catch(e2){ throw new Error(e1 && e1.message==='HTML' ? 'HTML' : 'NETWORK'); }
+  }
 }
 async function apiPost(url, list){
-  const res = await fetch(url, {method:'POST', redirect:'follow', headers:{'Content-Type':'text/plain;charset=utf-8'}, body: JSON.stringify(list)});
-  if(!res.ok) throw new Error('HTTP '+res.status);
-  const j = JSON.parse(await res.text() || '{}');
-  if(!j.ok) throw new Error('save failed');
+  const body = JSON.stringify(list);
+  try{
+    const res = await fetch(url, {method:'POST', redirect:'follow', headers:{'Content-Type':'text/plain;charset=utf-8'}, body});
+    if(!res.ok) throw new Error('HTTP '+res.status);
+    const j = JSON.parse(await res.text() || '{}');
+    if(!j.ok) throw new Error('save failed');
+    return;
+  }catch(e1){
+    // สำรอง: ส่งแบบ no-cors (อ่านผลไม่ได้) แล้วตรวจซ้ำว่าข้อมูลเข้าชีตจริง
+    await fetch(url, {method:'POST', mode:'no-cors', headers:{'Content-Type':'text/plain;charset=utf-8'}, body});
+    await new Promise(r=>setTimeout(r,2500));
+    const back = await apiJsonp(url);
+    const ids = new Set((back||[]).map(r=>r.id));
+    if(!list.every(r=>ids.has(r.id))) throw new Error('NOTSAVED');
+  }
 }
 function readLocal(){
   try{ const v = localStorage.getItem(STORAGE_KEY); return v ? JSON.parse(v) : []; }catch(e){ return []; }
@@ -1349,8 +1377,10 @@ async function saveSyncUrl(){
   }catch(e){
     console.error(e);
     msg.textContent = (e && e.message==='HTML')
-      ? 'ลิงก์ส่งหน้าเว็บกลับมา ไม่ใช่ข้อมูล — โค้ดใน Apps Script ยังเป็นรุ่นเก่า หรือ Who has access ไม่ใช่ Anyone: วาง Code.gs ใหม่แล้ว Deploy → Manage deployments → New version'
-      : 'เชื่อมต่อไม่สำเร็จ ('+(e&&e.message?e.message:'network')+') — ตรวจลิงก์ ลงท้าย /exec, Who has access = Anyone และอินเทอร์เน็ต';
+      ? 'ลิงก์ส่งหน้าเว็บกลับมา ไม่ใช่ข้อมูล — โค้ด Code.gs ใน Apps Script ยังเป็นรุ่นเก่า: วาง Code.gs ใหม่ แล้ว Deploy → Manage deployments → ไอคอนดินสอ → New version → Deploy'
+      : (e && e.message==='NOTSAVED')
+      ? 'ส่งข้อมูลแล้วแต่ไม่เข้าชีต — วาง Code.gs รุ่นล่าสุด (มี doPost) แล้ว Deploy เป็น New version'
+      : 'ติดต่อลิงก์ไม่ได้ — ตรวจว่า (1) ลิงก์ลงท้าย /exec (2) Who has access = Anyone (3) ลองเปิด ลิงก์?action=records ในหน้าต่างไม่ระบุตัวตนแล้วต้องเห็นข้อมูล [ ] (4) อินเทอร์เน็ต';
   }
 }
 

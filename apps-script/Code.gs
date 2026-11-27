@@ -9,6 +9,10 @@ var HEADERS = ['id', 'วันที่', 'HN', 'ชื่อ-สกุล', '�
 function doGet(e) {
   // โหมดเชื่อมข้อมูลจากหน้าเว็บ GitHub Pages: ?action=records
   if (e && e.parameter && e.parameter.action === 'records') {
+    var cb = e.parameter.callback;
+    if (cb && /^[A-Za-z0-9_.]+$/.test(cb)) {
+      return ContentService.createTextOutput(cb + '(' + getRecords() + ');').setMimeType(ContentService.MimeType.JAVASCRIPT);
+    }
     return ContentService.createTextOutput(getRecords()).setMimeType(ContentService.MimeType.JSON);
   }
   return HtmlService.createHtmlOutputFromFile('Index')
