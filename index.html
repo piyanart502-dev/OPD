@@ -1198,7 +1198,7 @@
     </form>
   </div>
 
-  <footer>ข้อมูลถูกบันทึกไว้ในเครื่องของผู้ใช้งานนี้เท่านั้น</footer>
+  <footer id="appFooter">ข้อมูลถูกบันทึกไว้ในเครื่องของผู้ใช้งานนี้เท่านั้น</footer>
 </div>
 
 <script>
@@ -1243,7 +1243,7 @@ async function apiPost(url, list){
 function readLocal(){
   try{ const v = localStorage.getItem(STORAGE_KEY); return v ? JSON.parse(v) : []; }catch(e){ return []; }
 }
-if(typeof document!=='undefined') document.addEventListener('DOMContentLoaded',()=>{ const b=document.getElementById('btnSync'); if(IS_GAS){ if(b) b.style.display='none'; } else setSyncState('ok'); });
+if(typeof document!=='undefined') document.addEventListener('DOMContentLoaded',()=>{ const b=document.getElementById('btnSync'); if(IS_GAS){ if(b) b.style.display='none'; setFooter(); } else setSyncState('ok'); });
 async function loadRecords(){
   const api = getApiUrl();
   try{
@@ -1294,7 +1294,15 @@ async function saveRecords(){
 }
 
 /* ---- ตั้งค่าเชื่อมต่อ Google Sheets (เฉพาะเวอร์ชัน GitHub Pages) ---- */
+function setFooter(){
+  const ft=document.getElementById('appFooter'); if(!ft) return;
+  const api=getApiUrl();
+  ft.textContent = IS_GAS ? 'ข้อมูลถูกบันทึกใน Google Sheets ใช้ร่วมกันทุกเครื่อง'
+    : api ? 'ข้อมูลถูกบันทึกใน Google Sheets ใช้ร่วมกันทุกเครื่อง (และสำรองไว้ในเครื่องนี้)'
+    : 'ข้อมูลถูกบันทึกไว้ในเครื่องนี้เท่านั้น — กด "☁️ เชื่อมข้อมูลหลายเครื่อง" เพื่อใช้ข้อมูลร่วมกัน';
+}
 function setSyncState(st){
+  setFooter();
   const b = document.getElementById('btnSync'); if(!b) return;
   const api = getApiUrl();
   b.className = 'btn-sync ' + (!api ? 'off' : st==='err' ? 'err' : 'on');
